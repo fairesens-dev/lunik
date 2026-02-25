@@ -1,35 +1,20 @@
-import { useEffect, useRef } from "react";
 import { useContent } from "@/contexts/ContentContext";
 
 const TrustpilotWidget = () => {
-  const ref = useRef<HTMLDivElement>(null);
   const { content } = useContent();
+  const url = content.global.trustpilotUrl || "https://fr.trustpilot.com/";
 
-  useEffect(() => {
-    // Trigger TrustBox widget if script is loaded
-    if ((window as any).Trustpilot && ref.current) {
-      (window as any).Trustpilot.loadFromElement(ref.current, true);
-    }
-  }, []);
-
+  // Don't render the TrustBox widget without a businessUnitId — it throws.
+  // Show a simple link instead.
   return (
-    <div
-      ref={ref}
-      className="trustpilot-widget"
-      data-locale="fr-FR"
-      data-template-id="53aa8807dec7e10d38f59f32"
-      data-businessunit-id=""
-      data-style-height="150px"
-      data-style-width="100%"
-      data-theme="light"
-    >
+    <div className="text-center">
       <a
-        href={content.global.trustpilotUrl || "https://fr.trustpilot.com/"}
+        href={url}
         target="_blank"
         rel="noopener noreferrer"
         className="text-sm text-muted-foreground hover:underline"
       >
-        Trustpilot
+        Voir nos avis sur Trustpilot
       </a>
     </div>
   );
