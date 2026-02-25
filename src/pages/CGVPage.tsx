@@ -1,4 +1,5 @@
 import AnimatedSection from "@/components/AnimatedSection";
+import SEOMeta from "@/components/SEOMeta";
 
 const sections = [
   {
@@ -71,6 +72,7 @@ const sections = [
 const CGVPage = () => {
   return (
     <section className="py-28 lg:py-36">
+      <SEOMeta title="Conditions Générales de Vente | Mon Store" description="Consultez nos conditions générales de vente : paiement, livraison, garanties et droit de rétractation." />
       <div className="max-w-[900px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <h1 className="font-serif text-4xl md:text-5xl font-light mb-6">

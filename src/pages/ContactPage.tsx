@@ -13,6 +13,7 @@ import {
 import { Phone, Mail, Clock, MapPin, CheckCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import SEOMeta from "@/components/SEOMeta";
 
 const ContactPage = () => {
   const { toast } = useToast();
@@ -44,6 +45,7 @@ const ContactPage = () => {
 
   return (
     <section className="py-28 lg:py-36">
+      <SEOMeta title="Contact | Mon Store" description="Contactez notre équipe pour un conseil personnalisé ou un devis sur-mesure. Réponse garantie sous 24h." />
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="text-center max-w-3xl mx-auto mb-20">

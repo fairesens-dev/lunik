@@ -8,9 +8,14 @@ import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ProcessSection from "@/components/home/ProcessSection";
 import FAQSection from "@/components/home/FAQSection";
 import ContactCTASection from "@/components/home/ContactCTASection";
+import SEOMeta from "@/components/SEOMeta";
 
 const Index = () => (
   <>
+    <SEOMeta
+      title="Store Banne Sur-Mesure | Fabrication Française | Mon Store"
+      description="Découvrez nos stores bannes et coffres 100% sur-mesure, fabriqués en France. Prix transparent, livraison en 4-5 semaines. Configurez le vôtre en ligne."
+    />
     <HeroSection />
     <MarqueeSection />
     <ProductHighlightSection />

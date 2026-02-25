@@ -44,10 +44,12 @@ const Footer = () => {
             <nav className="flex flex-col gap-3">
               {[
                 { label: "Notre Store", href: "/store-coffre" },
+                { label: "Échantillons gratuits", href: "/echantillons" },
                 { label: "Service Après-Vente", href: "/service-apres-vente" },
                 { label: "Contact", href: "/contact" },
                 { label: "CGV", href: "/conditions-generales-de-vente" },
                 { label: "Mentions Légales", href: "/mentions-legales" },
+                { label: "Politique de cookies", href: "/cookies" },
               ].map((link) => (
                 <Link
                   key={link.href}
@@ -90,6 +92,9 @@ const Footer = () => {
             </Link>
             <Link to="/mentions-legales" className="text-background/30 hover:text-background/60 transition-colors text-xs">
               Mentions Légales
+            </Link>
+            <Link to="/cookies" className="text-background/30 hover:text-background/60 transition-colors text-xs">
+              Cookies
             </Link>
           </div>
         </div>

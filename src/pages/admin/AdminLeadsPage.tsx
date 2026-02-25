@@ -43,6 +43,7 @@ const AdminLeadsPage = () => {
   const [search, setSearch] = useState("");
   const [nonTraitesOnly, setNonTraitesOnly] = useState(false);
   const [period, setPeriod] = useState("Ce mois");
+  const [typeFilter, setTypeFilter] = useState("Tous");
   const [page, setPage] = useState(1);
 
   useEffect(() => {
@@ -60,8 +61,11 @@ const AdminLeadsPage = () => {
       result = result.filter(l => `${l.prenom} ${l.nom}`.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.telephone.includes(q));
     }
     if (nonTraitesOnly) result = result.filter(l => !l.traite);
+    if (typeFilter === "Échantillons") result = result.filter(l => l.message.startsWith("ECHANTILLON:"));
+    else if (typeFilter === "Configurateur") result = result.filter(l => !l.message.startsWith("ECHANTILLON:") && l.width > 0);
+    else if (typeFilter === "Autre") result = result.filter(l => !l.message.startsWith("ECHANTILLON:") && l.width === 0);
     return result;
-  }, [leads, search, nonTraitesOnly]);
+  }, [leads, search, nonTraitesOnly, typeFilter]);
 
   const totalThisMonth = leads.length;
   const nonTraites = leads.filter(l => !l.traite).length;
@@ -114,6 +118,12 @@ const AdminLeadsPage = () => {
               <Switch checked={nonTraitesOnly} onCheckedChange={(v) => { setNonTraitesOnly(v); setPage(1); }} />
               <span className="text-sm text-gray-600">Non traités uniquement</span>
             </div>
+            <Select value={typeFilter} onValueChange={(v) => { setTypeFilter(v); setPage(1); }}>
+              <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {["Tous", "Configurateur", "Échantillons", "Autre"].map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
               <SelectContent>
