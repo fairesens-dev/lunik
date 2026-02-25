@@ -57,9 +57,12 @@ const HeroSection = () => {
       </div>
       {/* Right image — 45% */}
       <div className="hidden lg:block w-[45%] relative">
-        <div className="absolute inset-0 bg-stone-200 flex items-center justify-center">
-          <span className="text-stone-400 uppercase tracking-widest text-sm font-sans">Photo lifestyle store</span>
-        </div>
+        <img
+          src="/images/store-vue-ensemble.webp"
+          alt="Store coffre sur-mesure déployé sur une terrasse"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+        />
         <div className="absolute inset-0 bg-gradient-to-l from-transparent to-background/30" />
       </div>
     </section>

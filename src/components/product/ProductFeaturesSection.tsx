@@ -11,7 +11,8 @@ const rows = [
       "Résistance UV classement 5/5",
       "Garantie 5 ans",
     ],
-    imageLabel: "PHOTO TOILE DICKSON",
+    image: "/images/store-toile-detail.webp",
+    imageAlt: "Détail de la toile Dickson du store coffre",
     reverse: false,
   },
   {
@@ -23,7 +24,8 @@ const rows = [
       "Coffre intégral étanche",
       "Sans entretien",
     ],
-    imageLabel: "PHOTO ARMATURE DETAIL",
+    image: "/images/store-bras-fixations.webp",
+    imageAlt: "Détail des fixations aluminium du store coffre",
     reverse: true,
   },
   {
@@ -35,7 +37,8 @@ const rows = [
       "Compatible Google Home & Alexa",
       "Détecteur de vent en option",
     ],
-    imageLabel: "PHOTO MOTORISATION SOMFY",
+    image: "/images/store-led-nuit.webp",
+    imageAlt: "Store coffre avec éclairage LED intégré de nuit",
     reverse: false,
   },
 ];
@@ -59,8 +62,13 @@ const ProductFeaturesSection = () => (
           <AnimatedSection key={row.label} delay={i * 0.1}>
             <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${row.reverse ? "lg:direction-rtl" : ""}`}>
               <div className={`${row.reverse ? "lg:order-2" : ""}`}>
-                <div className="aspect-[4/3] bg-stone-200 flex items-center justify-center">
-                  <span className="text-stone-400 uppercase tracking-widest text-xs font-sans">{row.imageLabel}</span>
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img
+                    src={row.image}
+                    alt={row.imageAlt}
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 </div>
               </div>
               <div className={`${row.reverse ? "lg:order-1" : ""}`}>

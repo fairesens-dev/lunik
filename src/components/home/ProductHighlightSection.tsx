@@ -28,8 +28,13 @@ const ProductHighlightSection = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         <AnimatedSection>
-          <div className="aspect-[4/3] bg-stone-200 flex items-center justify-center">
-            <span className="text-stone-400 uppercase tracking-widest text-sm font-sans">Photo produit hero</span>
+          <div className="aspect-[4/3] overflow-hidden">
+            <img
+              src="/images/store-salon-vide.webp"
+              alt="Store coffre déployé au-dessus d'un salon de jardin"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
         </AnimatedSection>
 

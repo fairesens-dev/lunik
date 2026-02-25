@@ -1,12 +1,12 @@
 import AnimatedSection from "@/components/AnimatedSection";
 
 const items = [
-  { label: "Réalisation 1", h: "h-64" },
-  { label: "Réalisation 2", h: "h-80" },
-  { label: "Réalisation 3", h: "h-72" },
-  { label: "Réalisation 4", h: "h-80" },
-  { label: "Réalisation 5", h: "h-64" },
-  { label: "Réalisation 6", h: "h-72" },
+  { src: "/images/store-vue-ensemble.webp", alt: "Vue d'ensemble store coffre déployé", h: "h-64" },
+  { src: "/images/store-salon-apero.webp", alt: "Apéro entre amis sous le store", h: "h-80" },
+  { src: "/images/store-terrasse-work.webp", alt: "Télétravail sous le store sur la terrasse", h: "h-72" },
+  { src: "/images/store-led-toile.webp", alt: "Éclairage LED intégré au store", h: "h-80" },
+  { src: "/images/store-bras-detail.webp", alt: "Détail du bras articulé du store", h: "h-64" },
+  { src: "/images/store-coffre-ouvert.webp", alt: "Vue du coffre ouvert du store", h: "h-72" },
 ];
 
 const GallerySection = () => (
@@ -23,9 +23,14 @@ const GallerySection = () => (
 
       <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
         {items.map((item, i) => (
-          <AnimatedSection key={item.label} delay={i * 0.1}>
-            <div className={`${item.h} bg-stone-200 flex items-center justify-center break-inside-avoid`}>
-              <span className="text-stone-400 uppercase tracking-widest text-xs font-sans">{item.label}</span>
+          <AnimatedSection key={item.alt} delay={i * 0.1}>
+            <div className={`${item.h} overflow-hidden break-inside-avoid`}>
+              <img
+                src={item.src}
+                alt={item.alt}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
             </div>
           </AnimatedSection>
         ))}
