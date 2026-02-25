@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import AnimatedSection from "@/components/AnimatedSection";
+import { useContent } from "@/contexts/ContentContext";
 
 const features = [
   { emoji: "🎨", label: "Toile Dickson sur-mesure", desc: "Plus de 200 coloris disponibles, résistante aux UV et aux intempéries" },
@@ -8,17 +9,20 @@ const features = [
   { emoji: "📐", label: "Dimensions sur-mesure", desc: "De 150 cm à 600 cm de largeur, fabriqué selon vos côtes exactes" },
 ];
 
-const ProductHighlightSection = () => (
+const ProductHighlightSection = () => {
+  const { content } = useContent();
+
+  return (
   <section className="py-28 lg:py-36">
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <AnimatedSection>
         <div className="text-center mb-16">
           <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-4">
-            Le Store Coffre
-            <br />
-            <span className="italic">repensé de A à Z</span>
+            {content.homepage.productSectionTitle.split("\n").map((line, i) => (
+              <span key={i}>{i > 0 && <br />}{i > 0 ? <span className="italic">{line}</span> : line}</span>
+            ))}
           </h2>
-          <p className="text-muted-foreground text-lg">Un seul produit. Le meilleur de sa catégorie.</p>
+          <p className="text-muted-foreground text-lg">{content.homepage.productSectionSubtitle}</p>
         </div>
       </AnimatedSection>
 
@@ -51,6 +55,7 @@ const ProductHighlightSection = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default ProductHighlightSection;

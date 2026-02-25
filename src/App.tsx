@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ConfiguratorSettingsProvider } from "@/contexts/ConfiguratorSettingsContext";
+import { ContentProvider } from "@/contexts/ContentContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
@@ -32,6 +33,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ContentProvider>
         <ConfiguratorSettingsProvider>
         <AuthProvider>
           <Routes>
@@ -66,6 +68,7 @@ const App = () => (
           </Routes>
         </AuthProvider>
         </ConfiguratorSettingsProvider>
+        </ContentProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
