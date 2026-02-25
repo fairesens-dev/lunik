@@ -1,12 +1,12 @@
 import AnimatedSection from "@/components/AnimatedSection";
 
 const items = [
-  { src: "/images/store-salon-vide.webp", alt: "Store coffre au-dessus d'un salon de jardin", h: "h-64" },
-  { src: "/images/store-terrasse-work.webp", alt: "Télétravail en extérieur sous le store", h: "h-80" },
-  { src: "/images/store-led-nuit.webp", alt: "Store avec LED intégrée la nuit", h: "h-72" },
-  { src: "/images/store-coffre-ouvert.webp", alt: "Détail du coffre ouvert", h: "h-80" },
-  { src: "/images/store-toile-detail.webp", alt: "Texture de la toile Dickson", h: "h-64" },
-  { src: "/images/store-salon-apero.webp", alt: "Moment convivial sous le store", h: "h-72" },
+  { src: "/images/real-sunset-terrasse.webp", alt: "Coucher de soleil sous le store sur terrasse", h: "h-64" },
+  { src: "/images/real-maison-platine.webp", alt: "Store coffre 592×400 cm toile Platine sur maison", h: "h-80" },
+  { src: "/images/real-vin-apero.webp", alt: "Apéro sous le store avec télécommande Somfy", h: "h-72" },
+  { src: "/images/real-3stores-paris.webp", alt: "Triple store blanc posé au 3ème étage à Paris", h: "h-80" },
+  { src: "/images/real-montagne-cepe.webp", alt: "Store coffre avec vue montagne", h: "h-64" },
+  { src: "/images/real-bordeaux.webp", alt: "Store coffre toile Bordeaux sur balcon bois", h: "h-72" },
 ];
 
 const ProductGallerySection = () => (
