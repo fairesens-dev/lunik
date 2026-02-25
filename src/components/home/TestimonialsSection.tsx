@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import AnimatedSection from "@/components/AnimatedSection";
-
-const testimonials = [
-  { quote: "Livraison rapide, produit conforme, équipe réactive. Je recommande sans hésiter.", author: "David M.", city: "Lyon" },
-  { quote: "Très bien conseillé, rdv téléphonique tenu, équipe d'installation au top.", author: "Alain R.", city: "Bordeaux" },
-  { quote: "Deuxième commande, troisième store. Toujours aussi satisfait.", author: "Xavier P.", city: "Strasbourg" },
-  { quote: "Excellent rapport qualité/prix, belle finition, parfait pour notre terrasse.", author: "Marie L.", city: "Nantes" },
-];
+import { useContent } from "@/contexts/ContentContext";
 
 const TestimonialsSection = () => {
+  const { content } = useContent();
+  const testimonials = content.homepage.testimonials.filter(t => t.active);
   const [current, setCurrent] = useState(0);
   const maxIndex = testimonials.length - 1;
+
+  if (testimonials.length === 0) return null;
 
   return (
     <section className="py-28 lg:py-36 bg-background">
@@ -35,13 +33,13 @@ const TestimonialsSection = () => {
               style={{ transform: `translateX(-${current * 100}%)` }}
             >
               {testimonials.map((t) => (
-                <div key={t.author} className="w-full flex-shrink-0 px-4 md:px-8">
+                <div key={t.id} className="w-full flex-shrink-0 px-4 md:px-8">
                   <blockquote className="bg-card p-10 lg:p-14 shadow-sm max-w-2xl mx-auto text-center">
                     <p className="font-serif text-xl md:text-2xl italic leading-relaxed mb-6 text-foreground">
-                      "{t.quote}"
+                      "{t.text}"
                     </p>
                     <footer className="text-sm text-muted-foreground">
-                      <span className="font-medium text-foreground">{t.author}</span> — {t.city}
+                      <span className="font-medium text-foreground">{t.name}</span> — {t.city}
                     </footer>
                   </blockquote>
                 </div>

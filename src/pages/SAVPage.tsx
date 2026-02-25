@@ -16,6 +16,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { Phone, Package, BookOpen, Upload } from "lucide-react";
+import { useContent } from "@/contexts/ContentContext";
 
 const services = [
   {
@@ -35,34 +36,10 @@ const services = [
   },
 ];
 
-const faqs = [
-  {
-    q: "Que couvre exactement la garantie ?",
-    a: "La garantie couvre les défauts de fabrication et de matériaux : 10 ans sur la structure aluminium, 5 ans sur la toile Dickson, et 5 ans sur la motorisation Somfy. Elle ne couvre pas l'usure normale, les dommages causés par une utilisation non conforme ou les intempéries exceptionnelles (grêle, tempête).",
-  },
-  {
-    q: "Comment demander une réparation ?",
-    a: "Remplissez le formulaire ci-dessus en sélectionnant « Demande de réparation » et en joignant des photos du problème. Notre équipe vous recontacte sous 24h avec un diagnostic et un devis si nécessaire. Pour les interventions sous garantie, aucun frais ne vous sera facturé.",
-  },
-  {
-    q: "Comment commander des pièces détachées ?",
-    a: "Contactez-nous avec votre numéro de commande et la référence de la pièce souhaitée. Toutes les pièces de nos stores sont disponibles : toile, bras articulés, moteur, télécommande, coffre, supports muraux. Expédition sous 48h en France métropolitaine.",
-  },
-  {
-    q: "Puis-je remplacer la toile de mon store ?",
-    a: "Oui. Nous proposons un service de retoilage pour tous nos modèles. Envoyez-nous les dimensions de votre toile actuelle et le coloris souhaité. Nous vous adressons un devis sous 48h. La nouvelle toile est livrée prête à poser avec un guide d'installation.",
-  },
-  {
-    q: "Intervenez-vous dans toute la France ?",
-    a: "Oui, notre réseau de techniciens couvre l'ensemble de la France métropolitaine. Les délais d'intervention varient selon votre localisation : 48 à 72h en zone urbaine, 5 à 7 jours en zone rurale. Les DOM-TOM sont couverts pour l'envoi de pièces détachées uniquement.",
-  },
-  {
-    q: "Mon moteur ou ma télécommande ne fonctionne plus, que faire ?",
-    a: "Commencez par vérifier l'alimentation électrique et remplacer les piles de la télécommande. Si le problème persiste, effectuez une réinitialisation en coupant le courant 10 secondes puis en le rétablissant. Si cela ne résout pas le problème, contactez notre SAV avec votre numéro de commande.",
-  },
-];
-
 const SAVPage = () => {
+  const { content } = useContent();
+  const faqs = content.sav.faqItems.filter(f => f.active);
+
   return (
     <>
       {/* Hero */}
@@ -74,11 +51,10 @@ const SAVPage = () => {
                 Service Après-Vente
               </p>
               <h1 className="font-serif text-5xl md:text-6xl font-light mb-6">
-                Un SAV qui vous <span className="italic">ressemble</span>
+                {content.sav.heroTitle.split(" ").slice(0, -1).join(" ")} <span className="italic">{content.sav.heroTitle.split(" ").slice(-1)}</span>
               </h1>
               <p className="text-muted-foreground text-lg leading-relaxed">
-                Une équipe dédiée, basée en France, à votre écoute du lundi au vendredi.
-                Réponse garantie sous 24h ouvrées.
+                {content.sav.heroSubtitle}
               </p>
             </div>
           </AnimatedSection>
@@ -148,21 +124,21 @@ const SAVPage = () => {
                   <h3 className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4 font-sans font-medium">
                     Téléphone
                   </h3>
-                  <p className="text-sm">+33 (0)4 XX XX XX XX</p>
-                  <p className="text-xs text-muted-foreground mt-1">Lundi – Vendredi : 9h – 18h</p>
+                   <p className="text-sm">{content.global.phone}</p>
+                   <p className="text-xs text-muted-foreground mt-1">{content.sav.hours}</p>
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4 font-sans font-medium">
                     Email
                   </h3>
-                  <p className="text-sm">sav@brand-store.fr</p>
+                  <p className="text-sm">{content.global.email}</p>
                 </div>
                 <div>
                   <h3 className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-4 font-sans font-medium">
                     Engagement
                   </h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Nous nous engageons à vous répondre sous 24h ouvrées.
+                    Nous nous engageons à vous répondre {content.sav.responseDelay}.
                     Nos techniciens interviennent sur toute la France métropolitaine.
                   </p>
                 </div>
@@ -175,13 +151,13 @@ const SAVPage = () => {
             <div className="max-w-3xl mx-auto">
               <h2 className="font-serif text-3xl mb-8 text-center">Questions fréquentes</h2>
               <Accordion type="single" collapsible>
-                {faqs.map((faq, i) => (
-                  <AccordionItem key={i} value={`faq-${i}`} className="border-border">
+                {faqs.map((faq) => (
+                  <AccordionItem key={faq.id} value={faq.id} className="border-border">
                     <AccordionTrigger className="text-sm font-medium hover:no-underline py-5 text-left">
-                      {faq.q}
+                      {faq.question}
                     </AccordionTrigger>
                     <AccordionContent className="text-muted-foreground text-sm leading-relaxed pb-5">
-                      {faq.a}
+                      {faq.answer}
                     </AccordionContent>
                   </AccordionItem>
                 ))}

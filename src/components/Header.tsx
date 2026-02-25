@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useContent } from "@/contexts/ContentContext";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
@@ -12,6 +13,7 @@ const navLinks = [
 ];
 
 const Header = () => {
+  const { content } = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
@@ -39,7 +41,7 @@ const Header = () => {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/" className="font-serif text-2xl tracking-[0.2em] uppercase font-semibold text-foreground">
-            [BRAND]
+            {content.global.brandName}
           </Link>
 
           {/* Desktop Nav */}

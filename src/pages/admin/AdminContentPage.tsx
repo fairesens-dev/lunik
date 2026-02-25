@@ -1,15 +1,488 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { FileEdit } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { useContent, type Testimonial, type FAQItem } from "@/contexts/ContentContext";
+import { ExternalLink, Trash2, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { Link } from "react-router-dom";
+
+// ── Helpers ────────────────────────────────────────────
+
+const genId = () => Math.random().toString(36).slice(2, 10);
+
+// ── Tab 1: Infos Globales ──────────────────────────────
+
+const TabGlobal = () => {
+  const { content, updateGlobal } = useContent();
+  const { toast } = useToast();
+  const [form, setForm] = useState(content.global);
+  useEffect(() => setForm(content.global), [content.global]);
+
+  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const save = () => { updateGlobal(form); toast({ title: "✅ Infos globales mises à jour" }); };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle>Identité de la marque</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Field label="Nom de la marque" value={form.brandName} onChange={v => set("brandName", v)} />
+          <Field label="Accroche principale (tagline)" value={form.tagline} onChange={v => set("tagline", v)} />
+          <Field label="Téléphone" value={form.phone} onChange={v => set("phone", v)} />
+          <Field label="Email de contact" value={form.email} onChange={v => set("email", v)} />
+          <Field label="Adresse" value={form.address} onChange={v => set("address", v)} />
+          <Field label="SIRET" value={form.siret} onChange={v => set("siret", v)} />
+          <Field label="URL Trustpilot" value={form.trustpilotUrl} onChange={v => set("trustpilotUrl", v)} />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Réseaux sociaux</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Field label="Instagram URL" value={form.socialInstagram} onChange={v => set("socialInstagram", v)} />
+          <Field label="Facebook URL" value={form.socialFacebook} onChange={v => set("socialFacebook", v)} />
+          <Field label="Pinterest URL" value={form.socialPinterest} onChange={v => set("socialPinterest", v)} />
+        </CardContent>
+      </Card>
+      <Button onClick={save}>Sauvegarder</Button>
+    </div>
+  );
+};
+
+// ── Tab 2: Page d'accueil ──────────────────────────────
+
+const TabHomepage = () => {
+  const { content, updateHomepage } = useContent();
+  const { toast } = useToast();
+  const [form, setForm] = useState({
+    heroTitle: content.homepage.heroTitle,
+    heroSubtitle: content.homepage.heroSubtitle,
+    heroOverline: content.homepage.heroOverline,
+    heroCTA1: content.homepage.heroCTA1,
+    heroCTA2: content.homepage.heroCTA2,
+    marqueeText: content.homepage.marqueeText,
+    productSectionTitle: content.homepage.productSectionTitle,
+    productSectionSubtitle: content.homepage.productSectionSubtitle,
+  });
+
+  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const save = () => { updateHomepage(form); toast({ title: "✅ Page d'accueil mise à jour" }); };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle>Section Hero</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Field label="Overline" value={form.heroOverline} onChange={v => set("heroOverline", v)} />
+          <div>
+            <Label className="text-sm font-medium mb-1.5 block">Titre principal H1</Label>
+            <Textarea value={form.heroTitle} onChange={e => set("heroTitle", e.target.value)} rows={3} />
+            <p className="text-xs text-muted-foreground mt-1">{form.heroTitle.length} caractères · Utilisez Entrée pour les retours à la ligne</p>
+          </div>
+          <Field label="Sous-titre / description" value={form.heroSubtitle} onChange={v => set("heroSubtitle", v)} textarea />
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Texte CTA bouton 1" value={form.heroCTA1} onChange={v => set("heroCTA1", v)} />
+            <Field label="Texte CTA bouton 2" value={form.heroCTA2} onChange={v => set("heroCTA2", v)} />
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Texte du bandeau défilant</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Textarea value={form.marqueeText} onChange={e => set("marqueeText", e.target.value)} rows={2} />
+          <div className="bg-primary text-primary-foreground py-3 overflow-hidden rounded">
+            <div className="flex animate-marquee whitespace-nowrap">
+              {[0, 1].map(i => (
+                <span key={i} className="text-xs tracking-[0.3em] uppercase font-sans font-medium mx-0">{form.marqueeText}</span>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Section produit highlight</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium mb-1.5 block">Titre de section</Label>
+            <Textarea value={form.productSectionTitle} onChange={e => set("productSectionTitle", e.target.value)} rows={2} />
+          </div>
+          <Field label="Sous-titre" value={form.productSectionSubtitle} onChange={v => set("productSectionSubtitle", v)} />
+        </CardContent>
+      </Card>
+      <Button onClick={save}>Sauvegarder</Button>
+    </div>
+  );
+};
+
+// ── Tab 3: Page produit ────────────────────────────────
+
+const TabProduct = () => {
+  const { content, updateProductPage } = useContent();
+  const { toast } = useToast();
+  const [form, setForm] = useState({
+    heroTitle: content.productPage.heroTitle,
+    heroOverline: content.productPage.heroOverline,
+    heroSubtitle: content.productPage.heroSubtitle,
+    configuratorTitle: content.productPage.configuratorTitle,
+    configuratorSubtitle: content.productPage.configuratorSubtitle,
+    stepLabels: [...content.productPage.stepLabels],
+    orderConfirmationMessage: content.productPage.orderConfirmationMessage,
+  });
+
+  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const setStep = (i: number, v: string) => {
+    const labels = [...form.stepLabels];
+    labels[i] = v;
+    setForm(p => ({ ...p, stepLabels: labels }));
+  };
+  const save = () => { updateProductPage(form); toast({ title: "✅ Page produit mise à jour" }); };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle>Hero produit</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Field label="Overline" value={form.heroOverline} onChange={v => set("heroOverline", v)} />
+          <div>
+            <Label className="text-sm font-medium mb-1.5 block">Titre H1</Label>
+            <Textarea value={form.heroTitle} onChange={e => set("heroTitle", e.target.value)} rows={2} />
+          </div>
+          <Field label="Sous-titre" value={form.heroSubtitle} onChange={v => set("heroSubtitle", v)} textarea />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Section configurateur</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <Label className="text-sm font-medium mb-1.5 block">Titre</Label>
+            <Textarea value={form.configuratorTitle} onChange={e => set("configuratorTitle", e.target.value)} rows={2} />
+          </div>
+          <Field label="Sous-titre descriptif" value={form.configuratorSubtitle} onChange={v => set("configuratorSubtitle", v)} textarea />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Textes des étapes configurateur</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            {form.stepLabels.map((label, i) => (
+              <Field key={i} label={`Étape ${i + 1}`} value={label} onChange={v => setStep(i, v)} />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Message de confirmation commande</CardTitle></CardHeader>
+        <CardContent>
+          <Textarea value={form.orderConfirmationMessage} onChange={e => set("orderConfirmationMessage", e.target.value)} rows={3} />
+        </CardContent>
+      </Card>
+      <Button onClick={save}>Sauvegarder</Button>
+    </div>
+  );
+};
+
+// ── Tab 4: SAV & Contact ───────────────────────────────
+
+const TabSAV = () => {
+  const { content, updateSAV } = useContent();
+  const { toast } = useToast();
+  const [form, setForm] = useState({
+    heroTitle: content.sav.heroTitle,
+    heroSubtitle: content.sav.heroSubtitle,
+    hours: content.sav.hours,
+    responseDelay: content.sav.responseDelay,
+  });
+
+  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
+  const save = () => { updateSAV(form); toast({ title: "✅ SAV & Contact mis à jour" }); };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader><CardTitle>Page SAV</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Field label="Titre hero SAV" value={form.heroTitle} onChange={v => set("heroTitle", v)} />
+          <Field label="Sous-titre hero SAV" value={form.heroSubtitle} onChange={v => set("heroSubtitle", v)} textarea />
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Horaires & infos contact</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <Field label="Horaires d'ouverture" value={form.hours} onChange={v => set("hours", v)} textarea />
+          <Field label="Délai de réponse affiché" value={form.responseDelay} onChange={v => set("responseDelay", v)} helper='Ex: "sous 24h"' />
+        </CardContent>
+      </Card>
+      <Button onClick={save}>Sauvegarder</Button>
+    </div>
+  );
+};
+
+// ── Tab 5: Témoignages ─────────────────────────────────
+
+const TabTestimonials = () => {
+  const { content, updateTestimonials } = useContent();
+  const { toast } = useToast();
+  const [items, setItems] = useState<Testimonial[]>([...content.homepage.testimonials]);
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const update = (id: string, data: Partial<Testimonial>) =>
+    setItems(prev => prev.map(t => t.id === id ? { ...t, ...data } : t));
+
+  const add = () => setItems(prev => [...prev, { id: genId(), name: "", city: "", text: "", rating: 5, active: true }]);
+
+  const remove = (id: string) => { setItems(prev => prev.filter(t => t.id !== id)); setDeleting(null); };
+
+  const save = () => { updateTestimonials(items); toast({ title: "✅ Témoignages mis à jour" }); };
+
+  return (
+    <div className="space-y-4">
+      {items.map(t => (
+        <Card key={t.id}>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-3 flex-wrap">
+              <Input className="flex-1 min-w-[120px]" placeholder="Prénom + Nom" value={t.name} onChange={e => update(t.id, { name: e.target.value })} />
+              <Input className="w-32" placeholder="Ville" value={t.city} onChange={e => update(t.id, { city: e.target.value })} />
+              <Select value={String(t.rating)} onValueChange={v => update(t.id, { rating: Number(v) })}>
+                <SelectTrigger className="w-20"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  {[1,2,3,4,5].map(n => <SelectItem key={n} value={String(n)}>{"★".repeat(n)}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <div className="flex items-center gap-2">
+                <Switch checked={t.active} onCheckedChange={v => update(t.id, { active: v })} />
+                <span className="text-xs text-muted-foreground">{t.active ? "Actif" : "Masqué"}</span>
+              </div>
+            </div>
+            <Textarea placeholder="Texte du témoignage" value={t.text} onChange={e => update(t.id, { text: e.target.value })} rows={2} />
+            {deleting === t.id ? (
+              <div className="flex items-center gap-2 text-sm">
+                <span>Supprimer ?</span>
+                <Button size="sm" variant="ghost" onClick={() => setDeleting(null)}>Annuler</Button>
+                <Button size="sm" variant="destructive" onClick={() => remove(t.id)}>Confirmer</Button>
+              </div>
+            ) : (
+              <Button size="sm" variant="ghost" className="text-destructive" onClick={() => setDeleting(t.id)}>
+                <Trash2 className="w-4 h-4 mr-1" /> Supprimer
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+      <Button variant="outline" onClick={add}><Plus className="w-4 h-4 mr-1" /> Ajouter un témoignage</Button>
+      <div><Button onClick={save}>Sauvegarder</Button></div>
+    </div>
+  );
+};
+
+// ── Tab 6: FAQ ─────────────────────────────────────────
+
+const FAQEditor = ({ items, onChange }: { items: FAQItem[]; onChange: (items: FAQItem[]) => void }) => {
+  const [deleting, setDeleting] = useState<string | null>(null);
+
+  const update = (id: string, data: Partial<FAQItem>) =>
+    onChange(items.map(f => f.id === id ? { ...f, ...data } : f));
+
+  const move = (i: number, dir: -1 | 1) => {
+    const arr = [...items];
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    onChange(arr);
+  };
+
+  const add = () => onChange([...items, { id: genId(), question: "", answer: "", active: true }]);
+  const remove = (id: string) => { onChange(items.filter(f => f.id !== id)); setDeleting(null); };
+
+  return (
+    <div className="space-y-3">
+      {items.map((f, i) => (
+        <Card key={f.id}>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-0.5">
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => move(i, -1)} disabled={i === 0}>
+                  <ArrowUp className="w-3 h-3" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-6 w-6" onClick={() => move(i, 1)} disabled={i === items.length - 1}>
+                  <ArrowDown className="w-3 h-3" />
+                </Button>
+              </div>
+              <div className="flex-1 space-y-2">
+                <Input placeholder="Question" value={f.question} onChange={e => update(f.id, { question: e.target.value })} />
+                <Textarea placeholder="Réponse" value={f.answer} onChange={e => update(f.id, { answer: e.target.value })} rows={2} />
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <Switch checked={f.active} onCheckedChange={v => update(f.id, { active: v })} />
+                {deleting === f.id ? (
+                  <div className="flex gap-1">
+                    <Button size="sm" variant="ghost" className="h-6 text-xs px-1" onClick={() => setDeleting(null)}>✕</Button>
+                    <Button size="sm" variant="destructive" className="h-6 text-xs px-1" onClick={() => remove(f.id)}>✓</Button>
+                  </div>
+                ) : (
+                  <Button size="icon" variant="ghost" className="h-6 w-6 text-destructive" onClick={() => setDeleting(f.id)}>
+                    <Trash2 className="w-3 h-3" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ))}
+      <Button variant="outline" onClick={add}><Plus className="w-4 h-4 mr-1" /> Ajouter une question</Button>
+    </div>
+  );
+};
+
+const TabFAQ = () => {
+  const { content, updateHomepageFAQ, updateProductFAQ } = useContent();
+  const { toast } = useToast();
+  const [homeFaq, setHomeFaq] = useState<FAQItem[]>([...content.homepage.faqItems]);
+  const [productFaq, setProductFaq] = useState<FAQItem[]>([...content.productPage.faqItems]);
+
+  const save = () => {
+    updateHomepageFAQ(homeFaq);
+    updateProductFAQ(productFaq);
+    toast({ title: "✅ FAQ mises à jour" });
+  };
+
+  return (
+    <div className="space-y-6">
+      <Tabs defaultValue="home">
+        <TabsList>
+          <TabsTrigger value="home">FAQ Page d'accueil</TabsTrigger>
+          <TabsTrigger value="product">FAQ Page produit</TabsTrigger>
+        </TabsList>
+        <TabsContent value="home">
+          <FAQEditor items={homeFaq} onChange={setHomeFaq} />
+        </TabsContent>
+        <TabsContent value="product">
+          <FAQEditor items={productFaq} onChange={setProductFaq} />
+        </TabsContent>
+      </Tabs>
+      <Button onClick={save}>Sauvegarder</Button>
+    </div>
+  );
+};
+
+// ── Tab 7: Bannière promo ──────────────────────────────
+
+const TabPromoBanner = () => {
+  const { content, updatePromoBanner } = useContent();
+  const { toast } = useToast();
+  const [form, setForm] = useState(content.promoBanner);
+  useEffect(() => setForm(content.promoBanner), [content.promoBanner]);
+
+  const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
+  const save = () => { updatePromoBanner(form); toast({ title: "✅ Bannière promo mise à jour" }); };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Bannière promotionnelle (header)</CardTitle>
+          <CardDescription>Si activée, une bannière s'affiche en haut de toutes les pages</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Switch checked={form.active} onCheckedChange={v => set("active", v)} />
+            <Label>{form.active ? "Activée" : "Désactivée"}</Label>
+          </div>
+          <Field label="Texte de la bannière" value={form.text} onChange={v => set("text", v)} />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Couleur de fond</Label>
+              <div className="flex gap-2">
+                <input type="color" value={form.bgColor} onChange={e => set("bgColor", e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                <Input value={form.bgColor} onChange={e => set("bgColor", e.target.value)} className="flex-1" />
+              </div>
+            </div>
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Couleur du texte</Label>
+              <div className="flex gap-2">
+                <input type="color" value={form.textColor} onChange={e => set("textColor", e.target.value)} className="w-10 h-10 rounded border cursor-pointer" />
+                <Input value={form.textColor} onChange={e => set("textColor", e.target.value)} className="flex-1" />
+              </div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Texte du bouton CTA" value={form.ctaText} onChange={v => set("ctaText", v)} />
+            <Field label="URL du CTA" value={form.ctaUrl} onChange={v => set("ctaUrl", v)} />
+          </div>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader><CardTitle>Aperçu</CardTitle></CardHeader>
+        <CardContent>
+          <div
+            className="w-full py-2.5 px-4 text-center text-sm font-medium flex items-center justify-center gap-3 rounded"
+            style={{ backgroundColor: form.bgColor, color: form.textColor }}
+          >
+            <span>{form.text}</span>
+            {form.ctaText && <span className="underline underline-offset-2 font-semibold">{form.ctaText} →</span>}
+          </div>
+        </CardContent>
+      </Card>
+      <Button onClick={save}>Sauvegarder</Button>
+    </div>
+  );
+};
+
+// ── Shared Field component ─────────────────────────────
+
+const Field = ({ label, value, onChange, textarea, helper }: {
+  label: string; value: string; onChange: (v: string) => void; textarea?: boolean; helper?: string;
+}) => (
+  <div>
+    <Label className="text-sm font-medium mb-1.5 block">{label}</Label>
+    {textarea
+      ? <Textarea value={value} onChange={e => onChange(e.target.value)} rows={3} />
+      : <Input value={value} onChange={e => onChange(e.target.value)} />
+    }
+    {helper && <p className="text-xs text-muted-foreground mt-1">{helper}</p>}
+  </div>
+);
+
+// ── Main Page ──────────────────────────────────────────
 
 const AdminContentPage = () => (
   <div className="space-y-6 font-sans">
-    <h1 className="text-2xl font-bold text-gray-900">Contenu</h1>
-    <Card className="border-gray-200">
-      <CardContent className="p-12 text-center">
-        <FileEdit className="w-10 h-10 text-gray-300 mx-auto mb-3" />
-        <p className="text-gray-500">Gestion du contenu — Coming soon</p>
-      </CardContent>
-    </Card>
+    <div className="flex items-center justify-between">
+      <div>
+        <h1 className="text-2xl font-bold text-foreground">Gestion du contenu</h1>
+        <p className="text-muted-foreground text-sm mt-1">Toute modification est appliquée immédiatement sur le site.</p>
+      </div>
+    </div>
+
+    <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center justify-between">
+      <span className="text-sm text-green-800">👁️ Aperçu en direct — Les modifications s'appliquent en temps réel sur le site.</span>
+      <Link to="/" target="_blank" className="text-sm text-green-700 font-medium flex items-center gap-1 hover:underline">
+        Voir le site <ExternalLink className="w-3 h-3" />
+      </Link>
+    </div>
+
+    <Tabs defaultValue="global">
+      <TabsList className="flex-wrap h-auto gap-1">
+        <TabsTrigger value="global">Infos globales</TabsTrigger>
+        <TabsTrigger value="homepage">Page d'accueil</TabsTrigger>
+        <TabsTrigger value="product">Page produit</TabsTrigger>
+        <TabsTrigger value="sav">SAV & Contact</TabsTrigger>
+        <TabsTrigger value="testimonials">Témoignages</TabsTrigger>
+        <TabsTrigger value="faq">FAQ</TabsTrigger>
+        <TabsTrigger value="promo">Bannière promo</TabsTrigger>
+      </TabsList>
+      <TabsContent value="global"><TabGlobal /></TabsContent>
+      <TabsContent value="homepage"><TabHomepage /></TabsContent>
+      <TabsContent value="product"><TabProduct /></TabsContent>
+      <TabsContent value="sav"><TabSAV /></TabsContent>
+      <TabsContent value="testimonials"><TabTestimonials /></TabsContent>
+      <TabsContent value="faq"><TabFAQ /></TabsContent>
+      <TabsContent value="promo"><TabPromoBanner /></TabsContent>
+    </Tabs>
   </div>
 );
 

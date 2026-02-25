@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import AnimatedSection from "@/components/AnimatedSection";
+import { useContent } from "@/contexts/ContentContext";
 import type { useConfigurator } from "@/hooks/useConfigurator";
 
 type ConfiguratorProps = ReturnType<typeof useConfigurator> & {
@@ -21,6 +22,8 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
     onOrder,
   } = props;
 
+  const { content } = useContent();
+  const { productPage } = content;
   const { dimensions, pricing } = settings;
   const activeOptions = settings.options.filter(o => o.active);
 
@@ -40,12 +43,12 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
               Configurateur en ligne
             </span>
             <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-4">
-              Créez votre store
-              <br />
-              <span className="italic">sur-mesure</span>
+              {productPage.configuratorTitle.split("\n").map((line, i) => (
+                <span key={i}>{i > 0 && <br />}{i > 0 ? <span className="italic">{line}</span> : line}</span>
+              ))}
             </h2>
             <p className="text-muted-foreground text-sm max-w-lg mx-auto">
-              Renseignez vos dimensions, choisissez vos coloris et vos options. Votre prix s'affiche immédiatement, sans engagement.
+              {productPage.configuratorSubtitle}
             </p>
           </div>
         </AnimatedSection>
@@ -85,7 +88,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
               <div className="p-8 lg:p-10 space-y-10">
                 {/* 01 Dimensions */}
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">01 — Vos dimensions</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">01 — {productPage.stepLabels[0] || "VOS DIMENSIONS"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Le prix s'adapte en temps réel selon votre surface</p>
                   <div className="grid grid-cols-2 gap-4 mb-3">
                     <div>
@@ -113,7 +116,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
 
                 {/* 02 Toile */}
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — Couleur de toile</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Toile Dickson · Plus de 200 coloris</p>
                   <div className="grid grid-cols-6 gap-3 mb-3">
                     {TOILE_COLORS.map((c) => (
@@ -136,7 +139,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
 
                 {/* 03 Armature */}
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">03 — Couleur de l'armature</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">03 — {productPage.stepLabels[2] || "COULEUR DE L'ARMATURE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
                   <div className="flex flex-wrap gap-4">
                     {ARMATURE_COLORS.map((c) => (
@@ -167,7 +170,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
 
                 {/* 04 Options — dynamic from context */}
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">04 — Options</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">04 — {productPage.stepLabels[3] || "OPTIONS"}</p>
                   <div className="space-y-3">
                     {activeOptions.map((opt) => {
                       const isPack = (opt.includesIds && opt.includesIds.length > 0);
