@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS emails_sent jsonb NOT NULL DEFAULT '[]'::jsonb;

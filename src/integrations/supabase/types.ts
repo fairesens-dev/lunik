@@ -149,6 +149,7 @@ export type Database = {
           client_postal_code: string | null
           created_at: string
           delivery_option: string | null
+          emails_sent: Json
           id: string
           message: string | null
           newsletter_optin: boolean | null
@@ -178,6 +179,7 @@ export type Database = {
           client_postal_code?: string | null
           created_at?: string
           delivery_option?: string | null
+          emails_sent?: Json
           id?: string
           message?: string | null
           newsletter_optin?: boolean | null
@@ -207,6 +209,7 @@ export type Database = {
           client_postal_code?: string | null
           created_at?: string
           delivery_option?: string | null
+          emails_sent?: Json
           id?: string
           message?: string | null
           newsletter_optin?: boolean | null
