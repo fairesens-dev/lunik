@@ -78,7 +78,7 @@ export async function fetchBusinessSummary(): Promise<TrustpilotSummary | null> 
       body: { action: "summary" },
     });
 
-    if (error || data?.error) return null;
+    if (error || !data || data?.error) return null;
 
     setCache("tp_summary", data);
     return data as TrustpilotSummary;
@@ -105,7 +105,7 @@ export async function fetchReviews(params?: {
       body: { action: "reviews", params: { ...params, stars } },
     });
 
-    if (error || data?.error) return null;
+    if (error || !data || data?.error) return null;
 
     setCache(cacheKey, data);
     return data as TrustpilotReviewsResponse;
