@@ -12,6 +12,7 @@ interface AuthContextType {
   admin: Admin | null;
   login: (email: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
+  updateAdmin: (data: Partial<Admin>) => void;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -54,8 +55,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     sessionStorage.removeItem(STORAGE_KEY);
   }, []);
 
+  const updateAdmin = useCallback((data: Partial<Admin>) => {
+    setAdmin(prev => {
+      if (!prev) return prev;
+      const updated = { ...prev, ...data };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify({ isAuthenticated: true, admin: updated }));
+      return updated;
+    });
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, admin, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, admin, login, logout, updateAdmin }}>
       {children}
     </AuthContext.Provider>
   );
