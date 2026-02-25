@@ -1,121 +1,98 @@
 
 
-# Build Content Management Page (/admin/contenu)
+# Build Admin Settings Page (/admin/parametres)
 
-Create a ContentContext for site-wide content management and a full admin page with 7 tabs to edit all front-end text content in real-time.
-
----
-
-## New Files
-
-### 1. `src/contexts/ContentContext.tsx`
-
-React Context with localStorage persistence (key: `site_content`).
-
-**State structure** matches the spec exactly:
-- `global`: brandName, tagline, phone, email, address, siret, socialInstagram, socialFacebook, socialPinterest, trustpilotUrl
-- `homepage`: heroTitle, heroSubtitle, heroOverline, heroCTA1, heroCTA2, marqueeText, productSectionTitle, productSectionSubtitle, testimonials array, faqItems array
-- `productPage`: heroTitle, heroOverline, heroSubtitle, configuratorTitle, configuratorSubtitle, stepLabels array, orderConfirmationMessage, faqItems array
-- `sav`: heroTitle, heroSubtitle, hours, responseDelay, faqItems array
-- `promoBanner`: active, text, bgColor, textColor, ctaText, ctaUrl
-
-Default values populated from the current hardcoded strings in existing components.
-
-**Methods**: `updateGlobal()`, `updateHomepage()`, `updateProductPage()`, `updateSAV()`, `updatePromoBanner()`, `updateTestimonials()`, `updateHomepageFAQ()`, `updateProductFAQ()`, `updateSAVFAQ()`
-
-Provider loads from localStorage on mount, persists on every state change.
-
-### 2. `src/components/PromoBanner.tsx`
-
-Simple full-width banner component consuming ContentContext:
-- Only renders if `promoBanner.active === true`
-- Shows text, CTA button, styled with configured bgColor/textColor
-- Rendered at top of Layout.tsx (above Header)
+Rewrite the placeholder `AdminSettingsPage` into a full 4-tab settings interface integrating with AuthContext, ContentContext, and ConfiguratorSettingsContext.
 
 ---
 
-## Rewritten Files
+## File to Rewrite
 
-### 3. `src/pages/admin/AdminContentPage.tsx` -- FULL REWRITE
+### `src/pages/admin/AdminSettingsPage.tsx` -- FULL REWRITE
 
-Page title: "Gestion du contenu", subtitle about real-time updates.
+**Page header**: Title "Parametres", no subtitle needed.
 
-**7 Tabs** (shadcn Tabs):
+**4 Tabs** (using shadcn Tabs component):
 
-**Tab 1 -- Infos globales**: Two cards ("Identite de la marque" with brandName/tagline/phone/email/address/siret/trustpilotUrl, "Reseaux sociaux" with Instagram/Facebook/Pinterest URLs). Save button + toast.
+### Tab 1 -- Mon compte
 
-**Tab 2 -- Page d'accueil**: Cards for Hero (overline, title textarea with char count, subtitle, CTA1 text, CTA2 text), Marquee (textarea + live scrolling preview below), Product highlight section (title, subtitle). Save + toast.
+**Card 1: "Informations administrateur"**
+- Two side-by-side inputs: Prenom + Nom (initialized from `useAuth().admin.name`, split on space)
+- Email de connexion (initialized from `useAuth().admin.email`)
+- Role: read-only Badge showing "Administrateur"
+- "Mettre a jour" button -- saves to AuthContext admin object via a new `updateAdmin()` method + toast success
+- Note: Since AuthContext currently has a simple `Admin` type, we need to add `updateAdmin` method
 
-**Tab 3 -- Page produit**: Cards for Hero (overline, title, subtitle), Configurator section (title, subtitle), Step labels (4 inputs), Order confirmation message (textarea). Save + toast.
+**Card 2: "Informations de l'entreprise"**
+- Fields synced with ContentContext `global`: Nom commercial (brandName), SIRET, Adresse complete (address), TVA intracommunautaire (new field -- stored locally since not in ContentContext), Email facturation (new field -- stored locally)
+- "Mettre a jour" button -- saves brandName/siret/address to ContentContext via `updateGlobal()` + toast
 
-**Tab 4 -- SAV & Contact**: Cards for SAV hero (title, subtitle), Contact info (hours textarea, response delay input). Save + toast.
+### Tab 2 -- Notifications
 
-**Tab 5 -- Temoignages**: Editable list of testimonial cards. Each row: name input, city input, rating select (1-5), text textarea, active toggle, delete button (with inline confirm). "+ Ajouter un temoignage" button. Save + toast.
+**Card: "Alertes email"**
+- Description text about choosing notification events
+- 6 Switch toggles with labels:
+  - Nouvelle commande recue (default: on)
+  - Nouveau lead soumis (default: on)
+  - Lead sans reponse depuis 48h (default: on)
+  - Statut commande mis a jour (default: on)
+  - Rapport hebdomadaire (default: off)
+  - Rapport mensuel (default: off)
+- "Email(s) de notification" Input field (comma-separated)
+- "Sauvegarder" button -- saves to localStorage key `admin_notifications` + toast
 
-**Tab 6 -- FAQ**: Two sub-sections via inner tabs: "FAQ Page d'accueil" and "FAQ Page produit". Each is an editable list of question/answer pairs with active toggle, up/down reorder arrows, delete. "+ Ajouter une question" button. Save + toast.
+### Tab 3 -- Livraison & SAV
 
-**Tab 7 -- Banniere promo**: Card with active toggle, text input, bgColor + textColor color pickers (native input + hex text), CTA text, CTA URL. Live preview bar below showing exact rendering. Save + toast.
+**Card 1: "Delais affiches sur le site"**
+- Delai fabrication + livraison: Input (free text, e.g. "4 a 5 semaines")
+- Message delai personnalise: Textarea
+- Toggle "Afficher ce message exceptionnel sur le site"
+- Preview div showing the message styled as it would appear
+- Saves to localStorage key `admin_delivery_settings` + toast
+
+**Card 2: "Informations SAV"**
+- Telephone SAV (synced with ContentContext `global.phone`)
+- Email SAV (synced with ContentContext `global.email`)
+- Horaires d'ouverture (synced with ContentContext `sav.hours`)
+- Delai de reponse affiche (synced with ContentContext `sav.responseDelay`)
+- "Sauvegarder" button -- saves via `updateGlobal()` + `updateSAV()` + toast
+
+### Tab 4 -- Securite
+
+**Card 1: "Changer le mot de passe"**
+- 3 password inputs: current, new (with show/hide toggle via Eye/EyeOff icons), confirm
+- Validation: min 8 chars, new must match confirm, current must match existing
+- "Mettre a jour le mot de passe" button -- validates against AuthContext credentials, shows toast success/error
+
+**Card 2: "Sessions actives"**
+- Single info row: "Session actuelle . Demarree il y a 2h . Navigateur Chrome . IP: [masked]"
+- Button: "Deconnecter toutes les sessions" (variant destructive/outline) -- calls `logout()` from AuthContext
+
+**Card 3: "Zone de danger"**
+- Card with red/destructive border
+- Title: "Reinitialiser toutes les donnees du configurateur"
+- Description about irreversibility
+- Red "Reinitialiser" button -- opens AlertDialog confirmation modal
+- On confirm: calls `resetToDefaults()` from ConfiguratorSettingsContext + toast
 
 ---
 
-## Modified Files
+## Modified File
 
-### 4. `src/App.tsx`
-- Import `ContentProvider` from ContentContext
-- Wrap app with `<ContentProvider>` (alongside existing ConfiguratorSettingsProvider)
+### `src/contexts/AuthContext.tsx`
 
-### 5. `src/components/Layout.tsx`
-- Import `PromoBanner` component
-- Render `<PromoBanner />` before `<Header />` inside the layout
-
-### 6. `src/components/home/HeroSection.tsx`
-- Import `useContent` from ContentContext
-- Replace hardcoded title/subtitle/overline/CTA texts with `content.homepage.heroTitle`, etc.
-- heroTitle supports `\n` rendered as `<br />`
-
-### 7. `src/components/home/MarqueeSection.tsx`
-- Import `useContent`, replace hardcoded `marqueeText` with `content.homepage.marqueeText`
-
-### 8. `src/components/home/TestimonialsSection.tsx`
-- Import `useContent`, replace hardcoded testimonials array with `content.homepage.testimonials.filter(t => t.active)`
-
-### 9. `src/components/home/FAQSection.tsx`
-- Import `useContent`, replace hardcoded faqs with `content.homepage.faqItems.filter(f => f.active)`
-
-### 10. `src/components/home/ProductHighlightSection.tsx`
-- Import `useContent`, replace hardcoded section title/subtitle with `content.homepage.productSectionTitle` / `productSectionSubtitle`
-
-### 11. `src/components/product/ProductHeroSection.tsx`
-- Import `useContent`, replace hardcoded overline/title/subtitle with `content.productPage.*`
-
-### 12. `src/components/product/ProductFAQSection.tsx`
-- Import `useContent`, replace hardcoded faqs array with `content.productPage.faqItems.filter(f => f.active)`
-
-### 13. `src/components/product/ConfiguratorSection.tsx`
-- Import `useContent`, replace hardcoded configurator section title/subtitle with `content.productPage.configuratorTitle` / `configuratorSubtitle`
-
-### 14. `src/pages/SAVPage.tsx`
-- Import `useContent`, replace hardcoded hero title/subtitle with `content.sav.heroTitle` / `heroSubtitle`
-- Replace hardcoded SAV FAQ array with `content.sav.faqItems.filter(f => f.active)`
-
-### 15. `src/components/Footer.tsx`
-- Import `useContent`, replace hardcoded brand name, email, phone with `content.global.*`
-- Replace hardcoded social links with `content.global.socialInstagram`, etc.
-
-### 16. `src/components/Header.tsx`
-- Import `useContent`, replace `[BRAND]` with `content.global.brandName`
+- Add `updateAdmin` method to AuthContextType interface: `updateAdmin: (data: Partial<Admin>) => void`
+- Implement: merges partial Admin data into current admin state, persists to sessionStorage
+- This allows Tab 1 to update admin name/email
 
 ---
 
 ## Technical Details
 
-- All admin form state is local (useState per tab); "Sauvegarder" commits to context + localStorage
-- Toast notifications via `useToast` from shadcn
-- Testimonials/FAQ items include `active: boolean` for toggle visibility and `id: string` for stable keys
-- FAQ reordering uses ArrowUp/ArrowDown buttons (same pattern as ConfiguratorPage colors)
-- Delete confirmation is inline ("Supprimer ? [Annuler] [Confirmer]")
-- Marquee live preview in Tab 2 uses the same CSS animation class as the front-end
-- Promo banner live preview in Tab 7 renders a styled div with the configured colors/text
-- heroTitle newlines: stored as `\n` in state, rendered by splitting on `\n` and joining with `<br />`
-- No new dependencies needed
+- All form state is local (useState per tab); save buttons commit to respective contexts/localStorage
+- Toast notifications via existing `useToast` hook
+- Password show/hide uses `Eye`/`EyeOff` icons from lucide-react toggling input type
+- AlertDialog from shadcn for the reset confirmation modal
+- Notification settings and delivery settings stored in their own localStorage keys (`admin_notifications`, `admin_delivery_settings`) since they don't have dedicated contexts
+- No new dependencies needed -- uses existing Tabs, Card, Input, Switch, Button, Badge, AlertDialog, Label, Textarea from shadcn
 
