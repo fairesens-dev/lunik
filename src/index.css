@@ -102,3 +102,8 @@
     @apply scale-x-100 origin-bottom-left;
   }
 }
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
