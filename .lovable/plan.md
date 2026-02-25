@@ -1,167 +1,114 @@
 
 
-# Systeme d'emails transactionnels avec Resend
+# Visuel produit dynamique pour le configurateur
 
-## Prerequis
-
-Le secret **RESEND_API_KEY** doit etre configure sur le projet Supabase. Il sera demande a l'utilisateur avant de proceder.
-
-L'utilisateur doit aussi avoir un domaine verifie sur [resend.com/domains](https://resend.com/domains) pour envoyer depuis une adresse personnalisee (sinon, Resend permet d'envoyer depuis `onboarding@resend.dev` en mode test).
-
----
-
-## Architecture
-
-```text
-Frontend (Admin)                    Edge Function
-     |                                  |
-     | supabase.functions.invoke()      |
-     |  "send-order-email"              |
-     +--------------------------------->|
-                                        | Resend API
-                                        +---------> Email envoye
-                                        |
-                                        | Supabase (update emails_sent)
-                                        +---------> orders table
-```
-
-Tous les emails passent par une **seule Edge Function** `send-order-email` qui recoit le type d'email et les donnees de commande, selectionne le bon template, et envoie via Resend.
-
----
-
-## Schema de base de donnees
-
-### Migration sur la table `orders`
-
-Ajout d'une colonne pour tracker les emails envoyes :
-
-| Colonne | Type | Description |
-|---------|------|-------------|
-| emails_sent | jsonb | Array d'objets `{type, sent_at, resend_id}` |
-
-Valeur par defaut : `'[]'::jsonb`
+Remplacement du placeholder statique "Apercu produit" par un visuel SVG qui reagit en temps reel aux choix de l'utilisateur (couleurs, dimensions, options).
 
 ---
 
 ## Fichiers a creer
 
-### 1. `supabase/functions/send-order-email/index.ts`
+### 1. `src/components/product/DynamicProductVisual.tsx`
 
-Edge Function unique qui :
-- Recoit `{ type, orderId }` dans le body
-- Charge la commande depuis Supabase (via service role key)
-- Selectionne le template HTML en fonction du `type` :
-  - `confirmation` : confirmation de commande
-  - `fabrication` : mise en fabrication
-  - `shipped` : expedition avec tracking
-  - `delivered` : livraison + demande d'avis
-  - `review_request` : relance avis 7 jours apres
-  - `cancellation` : annulation
-  - `admin_new_order` : notification admin interne
-- Genere le HTML avec les donnees de la commande
-- Envoie via `Resend` (`npm:resend@2.0.0`)
-- Met a jour la colonne `emails_sent` de la commande (append au tableau)
-- Retourne `{ success: true, emailId }` ou `{ success: false, error }`
+Composant React pur (pas de dependance externe) qui affiche un store banne en SVG composite avec plusieurs couches superposees dans un conteneur `position: relative` :
 
-L'adresse d'expedition sera configurable via les secrets Supabase : `FROM_EMAIL` et `FROM_NAME`. Valeurs par defaut : `commandes@monstore.fr` / `Mon Store`.
+**Props :**
+```text
+toileColor: { hex: string; label: string }
+armatureColor: { hex: string; label: string }
+options: { motorisation: boolean; led: boolean; packConnect: boolean }
+width: number (cm)
+projection: number (cm)
+className?: string
+```
 
-Le `ADMIN_EMAIL` (secret) recoit les notifications admin.
+**Couches (z-order croissant) :**
+- Couche 0 : Fond de scene — gradient ciel vers terrasse (CSS gradients)
+- Couche 1 : Structure SVG armature (coffre, bras, barre frontale, supports muraux) — couleur appliquee via `fill={armatureColor.hex}` directement (pas de CSS filter, plus fiable)
+- Couche 2 : Toile (fabric) — rectangle positionne entre le coffre et la barre frontale, colore avec `toileColor.hex`, texture via `repeating-linear-gradient` subtil, leger `perspective/rotateX` pour l'effet 3D
+- Couche 3 : Lueur LED — bande lumineuse jaune pale sous la barre frontale, visible uniquement si `options.led || options.packConnect`, avec `box-shadow` glow
+- Couche 4 : Badge "Motorise" — pastille en haut a droite, visible si `options.motorisation || options.packConnect`
+- Couche 5 : Overlay dimensions (`width x projection cm`, fond noir semi-transparent, en bas a gauche) + pastilles couleur (en bas a droite)
 
-### 2. Templates HTML (inline dans l'Edge Function)
+**Proportions dynamiques :** Le ratio `projection/width` (clampe entre 0.3 et 0.8) influence la hauteur des bras et de la toile dans le SVG, donnant un apercu proportionnel.
 
-Chaque template est une fonction TypeScript retournant un string HTML. Design :
-- Max-width 600px, inline CSS uniquement
-- Couleurs : header `#F5F0E8`, accent `#4A5E3A`, fond blanc
-- Police : Georgia/serif pour les titres, Arial/Helvetica pour le corps
-- Layout wrapper commun : header logo + footer contact/CGV/ref
+**Transition :** Le conteneur a `transition: all 300ms ease` pour un effet fluide quand les valeurs changent.
 
-**7 templates client + 1 admin :**
+### 2. Vignettes preconfigurees
 
-1. **Confirmation** — checkmark vert, recapitulatif complet, timeline prochaines etapes, CTA "Suivre ma commande"
-2. **Fabrication** — icone usine, barre de progression visuelle, date estimee, rappel config, liens FAQ/SAV
-3. **Expedition** — tracking box avec numero copiable, lien transporteur, adresse de livraison, conseils installation
-4. **Livraison** — felicitations, ressources installation (guide PDF, video), carte de garantie 5 ans, etoiles Trustpilot
-5. **Demande d'avis** — relance 7j, etoiles cliquables vers Trustpilot, section SAV si probleme
-6. **Annulation** — confirmation annulation, info remboursement 5-10 jours, invitation a reconfigurer
-7. **Panier abandonne** — rappel config, urgence prix, objections (questions/echantillons/4x), CTA reprendre
-8. **Admin new order** — format compact interne, lien direct vers `/admin/commandes/{id}`
+3 miniatures sous le visuel principal, chacune est un `DynamicProductVisual` en petit format :
+
+1. **Config actuelle** (bordure accent, label "Votre config")
+2. **Style epure** : Toile Blanc Ecru + Armature Blanc, aucune option
+3. **Style audacieux** : Toile Noir + Armature Noir, toutes options
+
+Clic sur une vignette = previsualisation temporaire dans le visuel principal.
+Bouton "Appliquer cette config" pour valider et mettre a jour les vrais states du configurateur.
 
 ---
 
 ## Fichiers a modifier
 
-### `supabase/config.toml`
-Ajout de la config pour la nouvelle fonction :
-```toml
-[functions.send-order-email]
-verify_jwt = false
+### `src/components/product/ConfiguratorSection.tsx`
+
+**Colonne gauche (lignes 60-84) :**
+- Remplacer le `div` placeholder gris (`aspect-[4/3] bg-stone-200`) par le composant `DynamicProductVisual`
+- Passer les props depuis les valeurs du configurateur
+- Ajouter les 3 vignettes dessous
+- Ajouter un state `previewConfig` pour gerer la previsualisation temporaire d'une vignette
+- Conserver les badges textuels existants (dimensions, couleur toile, armature, options) sous les vignettes
+
+### `src/contexts/ConfiguratorSettingsContext.tsx`
+
+**Type `ColorEntry` (ligne 24-29) :**
+- Ajouter un champ optionnel `photoUrl?: string` au type `ColorEntry`
+
+### `src/pages/admin/AdminConfiguratorPage.tsx`
+
+**Composant `ColorsTab` (lignes 219-298) :**
+- Ajouter dans chaque ligne de couleur un champ d'upload image (uniquement pour le tab "toile")
+- Input `type="file"` accept `image/*`
+- Upload vers Supabase Storage bucket `product-photos`
+- Miniature 60x60px si photo existante + bouton supprimer
+- Helper text : "Photo optionnelle. Si fournie, remplace le rendu CSS."
+
+### `DynamicProductVisual.tsx` — logique photo
+
+Si `toileColor` a un `photoUrl` non vide :
+- Afficher la photo reelle en fond a la place des couches SVG 0-2
+- Appliquer un filtre CSS leger pour adapter la teinte armature
+- Conserver les couches 3-5 (LED, badge, overlays)
+
+---
+
+## Migration SQL
+
+Creation d'un bucket Storage public `product-photos` pour heberger les photos de store par coloris :
+
+```sql
+INSERT INTO storage.buckets (id, name, public) VALUES ('product-photos', 'product-photos', true);
+
+CREATE POLICY "Anyone can view product photos"
+  ON storage.objects FOR SELECT USING (bucket_id = 'product-photos');
+
+CREATE POLICY "Authenticated users can upload product photos"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'product-photos' AND auth.role() = 'authenticated');
+
+CREATE POLICY "Authenticated users can delete product photos"
+  ON storage.objects FOR DELETE
+  USING (bucket_id = 'product-photos' AND auth.role() = 'authenticated');
 ```
 
-### `src/pages/admin/AdminOrderDetailPage.tsx`
-
-**Modifications majeures :**
-
-1. **`handleUpdateStatus`** — apres mise a jour du statut, appelle automatiquement l'Edge Function pour les statuts qui declenchent un email :
-   - `En fabrication` → envoie template `fabrication`
-   - `Expedie` → envoie template `shipped`
-   - `Livre` → envoie template `delivered`
-   - `Annule` → envoie template `cancellation`
-
-2. **Card "Emails envoyes"** — remplace le placeholder `sent = false` par une lecture du champ `emails_sent` de la commande. Affiche la date d'envoi pour chaque type d'email. Les boutons "Renvoyer" appellent l'Edge Function pour renvoyer l'email.
-
-3. **Card "Actions rapides"** — les boutons placeholder deviennent fonctionnels :
-   - "Envoyer confirmation" → appelle `send-order-email` type `confirmation`
-   - "Notifier fabrication" → appelle type `fabrication`
-   - "Envoyer tracking" → appelle type `shipped`
-   - "Demander avis" → appelle type `review_request`
-
-4. Ajout d'un etat `sendingEmail` pour afficher un spinner pendant l'envoi.
-
-### `supabase/functions/create-checkout/index.ts`
-
-Apres l'insertion de la commande (ligne 72-83), ajouter un appel interne a `send-order-email` pour :
-- Envoyer l'email de confirmation au client
-- Envoyer la notification admin
-
-Cela se fait via un `fetch` interne vers l'Edge Function `send-order-email` avec le service role key.
-
 ---
 
-## Secrets a configurer
+## Resume des modifications
 
-3 nouveaux secrets Supabase :
-1. `RESEND_API_KEY` — cle API Resend (obligatoire, sera demandee a l'utilisateur)
-2. `FROM_EMAIL` — adresse d'expedition (ex: `commandes@monstore.fr`)
-3. `ADMIN_EMAIL` — adresse admin pour les notifications (ex: `dev@frenchify.fr`)
-
----
-
-## Flux detaille
-
-### A la creation de commande (checkout)
-1. `create-checkout` insere la commande
-2. Appelle `send-order-email` type `confirmation` + `admin_new_order`
-3. L'email de confirmation part immediatement au client
-4. L'admin recoit une notification
-
-### Depuis la page admin detail
-1. Admin change le statut → `handleUpdateStatus` sauvegarde en base
-2. Appel automatique a `send-order-email` avec le type correspondant
-3. Le champ `emails_sent` est mis a jour
-4. La card "Emails envoyes" se rafraichit pour montrer l'email envoye
-
-### Emails manuels (actions rapides)
-1. Admin clique "Envoyer confirmation" / "Renvoyer"
-2. Appel a `send-order-email`
-3. Toast de confirmation avec le resultat
-
----
-
-## Notes techniques
-
-- L'Edge Function utilise `npm:resend@2.0.0` (import Deno compatible)
-- Pas d'import depuis `src/` dans l'Edge Function (pas dans le contexte Deno)
-- Le panier abandonne est un placeholder template — le declenchement automatique (cron job) sera implemente dans un sprint ulterieur
-- Les liens dans les emails pointent vers le domaine publie (`https://lunik.lovable.app`)
-- Le champ `emails_sent` permet d'eviter les doublons et d'afficher l'historique dans l'admin
+| Fichier | Action |
+|---------|--------|
+| `src/components/product/DynamicProductVisual.tsx` | Creer — composant visuel SVG multicouche |
+| `src/components/product/ConfiguratorSection.tsx` | Modifier — integrer le visuel + vignettes |
+| `src/contexts/ConfiguratorSettingsContext.tsx` | Modifier — ajouter `photoUrl` a `ColorEntry` |
+| `src/pages/admin/AdminConfiguratorPage.tsx` | Modifier — ajouter upload photo par coloris |
+| Migration SQL | Creer bucket `product-photos` |
 
