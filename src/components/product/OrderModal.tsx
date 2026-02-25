@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface OrderModalProps {
   open: boolean;
@@ -18,13 +19,63 @@ interface OrderModalProps {
 
 const OrderModal = ({ open, onOpenChange, width, projection, toileColor, armatureColor, optionsSummary, price }: OrderModalProps) => {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({ prenom: "", nom: "", email: "", telephone: "", codePostal: "", message: "" });
 
   const update = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+
+    try {
+      // Generate order ref
+      const year = new Date().getFullYear();
+      const seqNum = Date.now() % 10000;
+      const ref = `CMD-${year}-${String(seqNum).padStart(3, "0")}`;
+
+      const optionsArray = optionsSummary ? optionsSummary.split(", ").filter(Boolean) : [];
+
+      // Insert order
+      await supabase.from("orders" as any).insert({
+        ref,
+        client_name: `${form.prenom} ${form.nom}`.trim(),
+        client_email: form.email,
+        client_phone: form.telephone,
+        client_postal_code: form.codePostal,
+        width,
+        projection,
+        toile_color: toileColor,
+        armature_color: armatureColor,
+        options: optionsArray,
+        amount: price,
+        message: form.message,
+        status: "Nouveau",
+        status_history: [{ status: "Nouveau", date: new Date().toLocaleDateString("fr-FR") }],
+      } as any);
+
+      // Also insert as lead
+      await supabase.from("leads" as any).insert({
+        first_name: form.prenom,
+        last_name: form.nom,
+        email: form.email,
+        phone: form.telephone,
+        width,
+        projection,
+        toile_color: toileColor,
+        armature_color: armatureColor,
+        options: optionsArray,
+        postal_code: form.codePostal,
+        message: form.message,
+        processed: true,
+      } as any);
+
+      setSubmitted(true);
+    } catch (err) {
+      console.error("Order submission error:", err);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleClose = (v: boolean) => {
@@ -64,8 +115,8 @@ const OrderModal = ({ open, onOpenChange, width, projection, toileColor, armatur
               <Input type="tel" placeholder="Téléphone" required value={form.telephone} onChange={e => update("telephone", e.target.value)} />
               <Input placeholder="Code postal" required value={form.codePostal} onChange={e => update("codePostal", e.target.value)} />
               <Textarea placeholder="Un message ou une question ? (optionnel)" value={form.message} onChange={e => update("message", e.target.value)} />
-              <Button type="submit" className="w-full bg-primary text-primary-foreground py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium h-auto">
-                Envoyer ma commande
+              <Button type="submit" disabled={submitting} className="w-full bg-primary text-primary-foreground py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium h-auto">
+                {submitting ? "Envoi en cours..." : "Envoyer ma commande"}
               </Button>
               <p className="text-[10px] text-muted-foreground text-center">
                 🔒 Vos données sont protégées. Aucun paiement à cette étape. Vous serez recontacté sous 24h pour confirmer votre commande.

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ─── Types ──────────────────────────────────────────── */
 
@@ -55,34 +56,29 @@ export const DEFAULT_SETTINGS: ConfiguratorSettings = {
     width: { min: 150, max: 600, step: 1, unit: "cm" },
     projection: { min: 100, max: 400, step: 1, unit: "cm" },
   },
-  toileColors: [
-    { id: "blanc-ecru", hex: "#F5F0E8", label: "Blanc Écru", active: true },
-    { id: "sable", hex: "#E8DCC8", label: "Sable", active: true },
-    { id: "chanvre", hex: "#C8B89A", label: "Chanvre", active: true },
-    { id: "havane", hex: "#8B7355", label: "Havane", active: true },
-    { id: "moka", hex: "#5C4A32", label: "Moka", active: true },
-    { id: "sauge", hex: "#4A5E3A", label: "Sauge", active: true },
-    { id: "eucalyptus", hex: "#6B8C6B", label: "Eucalyptus", active: true },
-    { id: "bleu-ardoise", hex: "#4A6B8A", label: "Bleu Ardoise", active: true },
-    { id: "terracotta", hex: "#8A4A4A", label: "Terracotta", active: true },
-    { id: "gris-clair", hex: "#C8C8C8", label: "Gris Clair", active: true },
-    { id: "gris-anthracite", hex: "#5A5A5A", label: "Gris Anthracite", active: true },
-    { id: "noir", hex: "#1A1A1A", label: "Noir", active: true },
-  ],
-  armatureColors: [
-    { id: "blanc", hex: "#F0EDE8", label: "Blanc RAL 9016", active: true },
-    { id: "anthracite", hex: "#5A5A5A", label: "Gris Anthracite RAL 7016", active: true },
-    { id: "noir", hex: "#1A1A1A", label: "Noir RAL 9005", active: true },
-    { id: "sable", hex: "#C8B48A", label: "Sable RAL 1015", active: true },
-  ],
-  options: [
-    { id: "motorisation", icon: "⚡", label: "Motorisation Somfy io", description: "Télécommande + app smartphone TaHoma incluses.", price: 390, active: true, highlight: false },
-    { id: "led", icon: "💡", label: "Éclairage LED sous store", description: "Bandeau LED intégré, lumière 3000K, télécommandé.", price: 290, active: true, highlight: false },
-    { id: "pack-connect", icon: "📱", label: "Pack Connect", description: "Motorisation + LED + TaHoma. Tout dans un pack.", price: 590, active: true, highlight: true, savingsLabel: "ÉCONOMISEZ 90 €", includesIds: ["motorisation", "led"] },
-  ],
+  toileColors: [],
+  armatureColors: [],
+  options: [],
 };
 
-const STORAGE_KEY = "configurator_settings";
+/* ─── Supabase helpers ───────────────────────────────── */
+
+async function upsertSetting(id: string, data: unknown) {
+  await supabase.from("configurator_settings" as any).upsert({ id, data } as any, { onConflict: "id" });
+}
+
+async function persistAll(s: ConfiguratorSettings) {
+  const entries = [
+    { id: "pricing", data: s.pricing },
+    { id: "dimensions", data: s.dimensions },
+    { id: "toileColors", data: s.toileColors },
+    { id: "armatureColors", data: s.armatureColors },
+    { id: "options", data: s.options },
+  ];
+  for (const e of entries) {
+    await upsertSetting(e.id, e.data);
+  }
+}
 
 /* ─── Context ────────────────────────────────────────── */
 
@@ -106,44 +102,110 @@ interface ConfiguratorSettingsContextType {
 
 const ConfiguratorSettingsContext = createContext<ConfiguratorSettingsContextType | null>(null);
 
-function loadSettings(): ConfiguratorSettings {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) return { ...DEFAULT_SETTINGS, ...JSON.parse(raw) };
-  } catch {}
-  return DEFAULT_SETTINGS;
-}
-
-function persist(s: ConfiguratorSettings) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
-}
-
 export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<ConfiguratorSettings>(loadSettings);
+  const [settings, setSettings] = useState<ConfiguratorSettings>(DEFAULT_SETTINGS);
 
-  useEffect(() => { persist(settings); }, [settings]);
+  // Load from Supabase on mount
+  useEffect(() => {
+    (async () => {
+      const { data: rows } = await supabase.from("configurator_settings" as any).select("id, data") as any;
+      if (rows && rows.length > 0) {
+        const map: Record<string, any> = {};
+        for (const r of rows) map[r.id] = r.data;
+        setSettings({
+          pricing: map.pricing ?? DEFAULT_SETTINGS.pricing,
+          dimensions: map.dimensions ?? DEFAULT_SETTINGS.dimensions,
+          toileColors: map.toileColors ?? DEFAULT_SETTINGS.toileColors,
+          armatureColors: map.armatureColors ?? DEFAULT_SETTINGS.armatureColors,
+          options: map.options ?? DEFAULT_SETTINGS.options,
+        });
+      }
+    })();
+  }, []);
 
-  const updatePricing = useCallback((p: PricingSettings) => setSettings(s => ({ ...s, pricing: p })), []);
-  const updateDimensions = useCallback((d: DimensionsSettings) => setSettings(s => ({ ...s, dimensions: d })), []);
+  const updatePricing = useCallback((p: PricingSettings) => {
+    setSettings(s => { upsertSetting("pricing", p); return { ...s, pricing: p }; });
+  }, []);
+
+  const updateDimensions = useCallback((d: DimensionsSettings) => {
+    setSettings(s => { upsertSetting("dimensions", d); return { ...s, dimensions: d }; });
+  }, []);
 
   const updateToileColor = useCallback((id: string, data: Partial<Omit<ColorEntry, "id">>) =>
-    setSettings(s => ({ ...s, toileColors: s.toileColors.map(c => c.id === id ? { ...c, ...data } : c) })), []);
-  const addToileColor = useCallback((c: ColorEntry) => setSettings(s => ({ ...s, toileColors: [...s.toileColors, c] })), []);
-  const removeToileColor = useCallback((id: string) => setSettings(s => ({ ...s, toileColors: s.toileColors.filter(c => c.id !== id) })), []);
-  const reorderToileColors = useCallback((colors: ColorEntry[]) => setSettings(s => ({ ...s, toileColors: colors })), []);
+    setSettings(s => {
+      const toileColors = s.toileColors.map(c => c.id === id ? { ...c, ...data } : c);
+      upsertSetting("toileColors", toileColors);
+      return { ...s, toileColors };
+    }), []);
+
+  const addToileColor = useCallback((c: ColorEntry) =>
+    setSettings(s => {
+      const toileColors = [...s.toileColors, c];
+      upsertSetting("toileColors", toileColors);
+      return { ...s, toileColors };
+    }), []);
+
+  const removeToileColor = useCallback((id: string) =>
+    setSettings(s => {
+      const toileColors = s.toileColors.filter(c => c.id !== id);
+      upsertSetting("toileColors", toileColors);
+      return { ...s, toileColors };
+    }), []);
+
+  const reorderToileColors = useCallback((colors: ColorEntry[]) => {
+    setSettings(s => { upsertSetting("toileColors", colors); return { ...s, toileColors: colors }; });
+  }, []);
 
   const updateArmatureColor = useCallback((id: string, data: Partial<Omit<ColorEntry, "id">>) =>
-    setSettings(s => ({ ...s, armatureColors: s.armatureColors.map(c => c.id === id ? { ...c, ...data } : c) })), []);
-  const addArmatureColor = useCallback((c: ColorEntry) => setSettings(s => ({ ...s, armatureColors: [...s.armatureColors, c] })), []);
-  const removeArmatureColor = useCallback((id: string) => setSettings(s => ({ ...s, armatureColors: s.armatureColors.filter(c => c.id !== id) })), []);
-  const reorderArmatureColors = useCallback((colors: ColorEntry[]) => setSettings(s => ({ ...s, armatureColors: colors })), []);
+    setSettings(s => {
+      const armatureColors = s.armatureColors.map(c => c.id === id ? { ...c, ...data } : c);
+      upsertSetting("armatureColors", armatureColors);
+      return { ...s, armatureColors };
+    }), []);
+
+  const addArmatureColor = useCallback((c: ColorEntry) =>
+    setSettings(s => {
+      const armatureColors = [...s.armatureColors, c];
+      upsertSetting("armatureColors", armatureColors);
+      return { ...s, armatureColors };
+    }), []);
+
+  const removeArmatureColor = useCallback((id: string) =>
+    setSettings(s => {
+      const armatureColors = s.armatureColors.filter(c => c.id !== id);
+      upsertSetting("armatureColors", armatureColors);
+      return { ...s, armatureColors };
+    }), []);
+
+  const reorderArmatureColors = useCallback((colors: ColorEntry[]) => {
+    setSettings(s => { upsertSetting("armatureColors", colors); return { ...s, armatureColors: colors }; });
+  }, []);
 
   const updateOption = useCallback((id: string, data: Partial<Omit<OptionEntry, "id">>) =>
-    setSettings(s => ({ ...s, options: s.options.map(o => o.id === id ? { ...o, ...data } : o) })), []);
-  const addOption = useCallback((o: OptionEntry) => setSettings(s => ({ ...s, options: [...s.options, o] })), []);
-  const removeOption = useCallback((id: string) => setSettings(s => ({ ...s, options: s.options.filter(o => o.id !== id) })), []);
+    setSettings(s => {
+      const options = s.options.map(o => o.id === id ? { ...o, ...data } : o);
+      upsertSetting("options", options);
+      return { ...s, options };
+    }), []);
 
-  const resetToDefaults = useCallback(() => { setSettings(DEFAULT_SETTINGS); }, []);
+  const addOption = useCallback((o: OptionEntry) =>
+    setSettings(s => {
+      const options = [...s.options, o];
+      upsertSetting("options", options);
+      return { ...s, options };
+    }), []);
+
+  const removeOption = useCallback((id: string) =>
+    setSettings(s => {
+      const options = s.options.filter(o => o.id !== id);
+      upsertSetting("options", options);
+      return { ...s, options };
+    }), []);
+
+  const resetToDefaults = useCallback(() => {
+    setSettings(DEFAULT_SETTINGS);
+    persistAll(DEFAULT_SETTINGS);
+  }, []);
 
   return (
     <ConfiguratorSettingsContext.Provider value={{

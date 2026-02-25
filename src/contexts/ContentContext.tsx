@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 // ── Types ──────────────────────────────────────────────
 
@@ -104,55 +105,29 @@ const defaultContent: SiteContent = {
     marqueeText: "FABRIQUÉ EN FRANCE · SUR-MESURE · LIVRAISON 4-5 SEMAINES · GARANTIE 5 ANS · MOTORISATION SOMFY · TOILE DICKSON · MADE IN FRANCE · ",
     productSectionTitle: "Le Store Coffre\nrepensé de A à Z",
     productSectionSubtitle: "Un seul produit. Le meilleur de sa catégorie.",
-    testimonials: [
-      { id: "t1", name: "David M.", city: "Lyon", text: "Livraison rapide, produit conforme, équipe réactive. Je recommande sans hésiter.", rating: 5, active: true },
-      { id: "t2", name: "Alain R.", city: "Bordeaux", text: "Très bien conseillé, rdv téléphonique tenu, équipe d'installation au top.", rating: 5, active: true },
-      { id: "t3", name: "Xavier P.", city: "Strasbourg", text: "Deuxième commande, troisième store. Toujours aussi satisfait.", rating: 5, active: true },
-      { id: "t4", name: "Marie L.", city: "Nantes", text: "Excellent rapport qualité/prix, belle finition, parfait pour notre terrasse.", rating: 5, active: true },
-    ],
-    faqItems: [
-      { id: "hf1", question: "Puis-je me faire livrer partout en France ?", answer: "Oui, nous livrons sur l'ensemble du territoire métropolitain. La livraison est assurée par nos transporteurs partenaires, avec prise de rendez-vous.", active: true },
-      { id: "hf2", question: "Quelle est la taille maximum de mon store ?", answer: "Nos stores sont disponibles de 150 cm à 600 cm de largeur, avec une avancée pouvant aller jusqu'à 400 cm selon les modèles.", active: true },
-      { id: "hf3", question: "La motorisation Somfy est-elle incluse ?", answer: "La motorisation Somfy est disponible en option lors de la configuration. Elle inclut un moteur silencieux, une télécommande et la compatibilité avec les assistants vocaux.", active: true },
-      { id: "hf4", question: "Comment se passe l'installation ?", answer: "Vous pouvez installer votre store vous-même grâce à notre guide détaillé, ou opter pour notre service de pose par un installateur certifié dans votre région.", active: true },
-      { id: "hf5", question: "Quels délais de fabrication ?", answer: "Comptez 4 à 5 semaines entre votre commande et la livraison. Votre store est fabriqué sur-mesure dans notre atelier en France.", active: true },
-      { id: "hf6", question: "Y a-t-il une garantie ?", answer: "Tous nos stores sont garantis 5 ans pièces et main d'œuvre. La toile Dickson bénéficie d'une garantie fabricant de 10 ans.", active: true },
-    ],
+    testimonials: [],
+    faqItems: [],
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
     heroOverline: "Store Coffre · Fabrication Française Sur-Mesure",
-    heroSubtitle: "Aluminium premium, toile Dickson, motorisation Somfy. Fabriqué sur-mesure en France selon vos dimensions exactes. Livré ou installé en 4 à 5 semaines.",
+    heroSubtitle: "",
     configuratorTitle: "Créez votre store\nsur-mesure",
-    configuratorSubtitle: "Renseignez vos dimensions, choisissez vos coloris et vos options. Votre prix s'affiche immédiatement, sans engagement.",
+    configuratorSubtitle: "",
     stepLabels: ["VOS DIMENSIONS", "COULEUR DE TOILE", "COULEUR DE L'ARMATURE", "OPTIONS"],
-    orderConfirmationMessage: "Merci pour votre commande ! Notre équipe vous contactera sous 24h pour confirmer les détails.",
-    faqItems: [
-      { id: "pf1", question: "Quelles sont les dimensions maximales du store ?", answer: "La largeur maximale est de 600 cm et l'avancée maximale de 400 cm. Pour des configurations supérieures, contactez-nous.", active: true },
-      { id: "pf2", question: "La motorisation Somfy est-elle difficile à installer ?", answer: "Non. La motorisation Somfy io est plug & play. Elle est précâblée et configurée avant expédition.", active: true },
-      { id: "pf3", question: "Puis-je commander des échantillons de toile ?", answer: "Oui, nous envoyons des échantillons Dickson gratuitement sous 48h. Utilisez le lien présent dans le configurateur.", active: true },
-      { id: "pf4", question: "Quel est le délai de fabrication et de livraison ?", answer: "Votre store est fabriqué et livré en 4 à 5 semaines après confirmation de votre commande et validation du paiement.", active: true },
-      { id: "pf5", question: "Puis-je l'installer moi-même ?", answer: "Oui. Chaque store est livré avec un guide d'installation détaillé. Une option d'installation par nos poseurs certifiés est également disponible.", active: true },
-      { id: "pf6", question: "Quelles garanties ai-je sur mon achat ?", answer: "Garantie légale de conformité, garantie commerciale 5 ans pièces et main d'œuvre, et droit de rétractation de 14 jours.", active: true },
-    ],
+    orderConfirmationMessage: "",
+    faqItems: [],
   },
   sav: {
     heroTitle: "Un SAV qui vous ressemble",
-    heroSubtitle: "Une équipe dédiée, basée en France, à votre écoute du lundi au vendredi. Réponse garantie sous 24h ouvrées.",
+    heroSubtitle: "",
     hours: "Lundi – Vendredi : 9h – 18h",
     responseDelay: "sous 24h",
-    faqItems: [
-      { id: "sf1", question: "Que couvre exactement la garantie ?", answer: "La garantie couvre les défauts de fabrication et de matériaux : 10 ans sur la structure aluminium, 5 ans sur la toile Dickson, et 5 ans sur la motorisation Somfy. Elle ne couvre pas l'usure normale, les dommages causés par une utilisation non conforme ou les intempéries exceptionnelles (grêle, tempête).", active: true },
-      { id: "sf2", question: "Comment demander une réparation ?", answer: "Remplissez le formulaire ci-dessus en sélectionnant « Demande de réparation » et en joignant des photos du problème. Notre équipe vous recontacte sous 24h avec un diagnostic et un devis si nécessaire. Pour les interventions sous garantie, aucun frais ne vous sera facturé.", active: true },
-      { id: "sf3", question: "Comment commander des pièces détachées ?", answer: "Contactez-nous avec votre numéro de commande et la référence de la pièce souhaitée. Toutes les pièces de nos stores sont disponibles : toile, bras articulés, moteur, télécommande, coffre, supports muraux. Expédition sous 48h en France métropolitaine.", active: true },
-      { id: "sf4", question: "Puis-je remplacer la toile de mon store ?", answer: "Oui. Nous proposons un service de retoilage pour tous nos modèles. Envoyez-nous les dimensions de votre toile actuelle et le coloris souhaité. Nous vous adressons un devis sous 48h. La nouvelle toile est livrée prête à poser avec un guide d'installation.", active: true },
-      { id: "sf5", question: "Intervenez-vous dans toute la France ?", answer: "Oui, notre réseau de techniciens couvre l'ensemble de la France métropolitaine. Les délais d'intervention varient selon votre localisation : 48 à 72h en zone urbaine, 5 à 7 jours en zone rurale. Les DOM-TOM sont couverts pour l'envoi de pièces détachées uniquement.", active: true },
-      { id: "sf6", question: "Mon moteur ou ma télécommande ne fonctionne plus, que faire ?", answer: "Commencez par vérifier l'alimentation électrique et remplacer les piles de la télécommande. Si le problème persiste, effectuez une réinitialisation en coupant le courant 10 secondes puis en le rétablissant. Si cela ne résout pas le problème, contactez notre SAV avec votre numéro de commande.", active: true },
-    ],
+    faqItems: [],
   },
   promoBanner: {
     active: false,
-    text: "🎉 PROMO PRÉSAISON — 10% de remise ce mois !",
+    text: "",
     bgColor: "#4A5E3A",
     textColor: "#FFFFFF",
     ctaText: "En profiter",
@@ -177,67 +152,101 @@ interface ContentContextValue {
 
 const ContentContext = createContext<ContentContextValue | undefined>(undefined);
 
-const STORAGE_KEY = "site_content";
-
-function loadFromStorage(): SiteContent {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed = JSON.parse(raw);
-      // Deep merge with defaults to handle new fields
-      return {
-        global: { ...defaultContent.global, ...parsed.global },
-        homepage: { ...defaultContent.homepage, ...parsed.homepage },
-        productPage: { ...defaultContent.productPage, ...parsed.productPage },
-        sav: { ...defaultContent.sav, ...parsed.sav },
-        promoBanner: { ...defaultContent.promoBanner, ...parsed.promoBanner },
-      };
-    }
-  } catch { /* ignore */ }
-  return defaultContent;
+async function upsertContent(id: string, data: unknown) {
+  await supabase.from("site_content" as any).upsert({ id, data } as any, { onConflict: "id" });
 }
 
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [content, setContent] = useState<SiteContent>(loadFromStorage);
+  const [content, setContent] = useState<SiteContent>(defaultContent);
 
+  // Load from Supabase on mount
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(content));
-  }, [content]);
+    (async () => {
+      const { data: rows } = await supabase.from("site_content" as any).select("id, data") as any;
+      if (rows && rows.length > 0) {
+        const map: Record<string, any> = {};
+        for (const r of rows) map[r.id] = r.data;
+        setContent({
+          global: { ...defaultContent.global, ...(map.global || {}) },
+          homepage: { ...defaultContent.homepage, ...(map.homepage || {}) },
+          productPage: { ...defaultContent.productPage, ...(map.productPage || {}) },
+          sav: { ...defaultContent.sav, ...(map.sav || {}) },
+          promoBanner: { ...defaultContent.promoBanner, ...(map.promoBanner || {}) },
+        });
+      }
+    })();
+  }, []);
 
   const updateGlobal = useCallback((data: Partial<GlobalContent>) => {
-    setContent(prev => ({ ...prev, global: { ...prev.global, ...data } }));
+    setContent(prev => {
+      const updated = { ...prev.global, ...data };
+      upsertContent("global", updated);
+      return { ...prev, global: updated };
+    });
   }, []);
 
   const updateHomepage = useCallback((data: Partial<Omit<HomepageContent, "testimonials" | "faqItems">>) => {
-    setContent(prev => ({ ...prev, homepage: { ...prev.homepage, ...data } }));
+    setContent(prev => {
+      const updated = { ...prev.homepage, ...data };
+      upsertContent("homepage", updated);
+      return { ...prev, homepage: updated };
+    });
   }, []);
 
   const updateProductPage = useCallback((data: Partial<Omit<ProductPageContent, "faqItems">>) => {
-    setContent(prev => ({ ...prev, productPage: { ...prev.productPage, ...data } }));
+    setContent(prev => {
+      const updated = { ...prev.productPage, ...data };
+      upsertContent("productPage", updated);
+      return { ...prev, productPage: updated };
+    });
   }, []);
 
   const updateSAV = useCallback((data: Partial<Omit<SAVContent, "faqItems">>) => {
-    setContent(prev => ({ ...prev, sav: { ...prev.sav, ...data } }));
+    setContent(prev => {
+      const updated = { ...prev.sav, ...data };
+      upsertContent("sav", updated);
+      return { ...prev, sav: updated };
+    });
   }, []);
 
   const updatePromoBanner = useCallback((data: Partial<PromoBannerContent>) => {
-    setContent(prev => ({ ...prev, promoBanner: { ...prev.promoBanner, ...data } }));
+    setContent(prev => {
+      const updated = { ...prev.promoBanner, ...data };
+      upsertContent("promoBanner", updated);
+      return { ...prev, promoBanner: updated };
+    });
   }, []);
 
   const updateTestimonials = useCallback((testimonials: Testimonial[]) => {
-    setContent(prev => ({ ...prev, homepage: { ...prev.homepage, testimonials } }));
+    setContent(prev => {
+      const updated = { ...prev.homepage, testimonials };
+      upsertContent("homepage", updated);
+      return { ...prev, homepage: updated };
+    });
   }, []);
 
   const updateHomepageFAQ = useCallback((items: FAQItem[]) => {
-    setContent(prev => ({ ...prev, homepage: { ...prev.homepage, faqItems: items } }));
+    setContent(prev => {
+      const updated = { ...prev.homepage, faqItems: items };
+      upsertContent("homepage", updated);
+      return { ...prev, homepage: updated };
+    });
   }, []);
 
   const updateProductFAQ = useCallback((items: FAQItem[]) => {
-    setContent(prev => ({ ...prev, productPage: { ...prev.productPage, faqItems: items } }));
+    setContent(prev => {
+      const updated = { ...prev.productPage, faqItems: items };
+      upsertContent("productPage", updated);
+      return { ...prev, productPage: updated };
+    });
   }, []);
 
   const updateSAVFAQ = useCallback((items: FAQItem[]) => {
-    setContent(prev => ({ ...prev, sav: { ...prev.sav, faqItems: items } }));
+    setContent(prev => {
+      const updated = { ...prev.sav, faqItems: items };
+      upsertContent("sav", updated);
+      return { ...prev, sav: updated };
+    });
   }, []);
 
   return (

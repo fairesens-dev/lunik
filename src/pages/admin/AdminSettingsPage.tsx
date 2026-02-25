@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { useContent } from "@/contexts/ContentContext";
 import { useConfiguratorSettings } from "@/contexts/ConfiguratorSettingsContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Eye, EyeOff, User, Bell, Truck, Shield, AlertTriangle, Monitor } from "lucide-react";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -32,18 +33,28 @@ function AccountTab() {
   const [brandName, setBrandName] = useState(content.global.brandName);
   const [siret, setSiret] = useState(content.global.siret);
   const [address, setAddress] = useState(content.global.address);
-  const [tva, setTva] = useState(() => localStorage.getItem("admin_tva") || "");
-  const [billingEmail, setBillingEmail] = useState(() => localStorage.getItem("admin_billing_email") || "");
+  const [tva, setTva] = useState("");
+  const [billingEmail, setBillingEmail] = useState("");
+
+  // Load company extras from admin_settings
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_settings" as any).select("data").eq("id", "company").single() as any;
+      if (data?.data) {
+        setTva(data.data.tva || "");
+        setBillingEmail(data.data.billingEmail || "");
+      }
+    })();
+  }, []);
 
   const handleUpdateAdmin = () => {
     updateAdmin({ name: `${firstName} ${lastName}`.trim(), email });
     toast({ title: "Profil mis à jour", description: "Vos informations ont été enregistrées." });
   };
 
-  const handleUpdateCompany = () => {
+  const handleUpdateCompany = async () => {
     updateGlobal({ brandName, siret, address });
-    localStorage.setItem("admin_tva", tva);
-    localStorage.setItem("admin_billing_email", billingEmail);
+    await supabase.from("admin_settings" as any).upsert({ id: "company", data: { tva, billingEmail } } as any, { onConflict: "id" });
     toast({ title: "Entreprise mise à jour", description: "Les informations de l'entreprise ont été enregistrées." });
   };
 
@@ -127,18 +138,20 @@ const defaultNotif: NotifSettings = {
 
 function NotificationsTab() {
   const { toast } = useToast();
-  const [settings, setSettings] = useState<NotifSettings>(() => {
-    try {
-      const raw = localStorage.getItem("admin_notifications");
-      return raw ? { ...defaultNotif, ...JSON.parse(raw) } : defaultNotif;
-    } catch { return defaultNotif; }
-  });
+  const [settings, setSettings] = useState<NotifSettings>(defaultNotif);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_settings" as any).select("data").eq("id", "notifications").single() as any;
+      if (data?.data) setSettings({ ...defaultNotif, ...data.data });
+    })();
+  }, []);
 
   const toggle = (key: keyof NotifSettings) =>
     setSettings(s => ({ ...s, [key]: !s[key] }));
 
-  const save = () => {
-    localStorage.setItem("admin_notifications", JSON.stringify(settings));
+  const save = async () => {
+    await supabase.from("admin_settings" as any).upsert({ id: "notifications", data: settings } as any, { onConflict: "id" });
     toast({ title: "Notifications enregistrées", description: "Vos préférences ont été sauvegardées." });
   };
 
@@ -195,20 +208,22 @@ function DeliverySAVTab() {
   const { toast } = useToast();
   const { content, updateGlobal, updateSAV } = useContent();
 
-  const [delivery, setDelivery] = useState<DeliverySettings>(() => {
-    try {
-      const raw = localStorage.getItem("admin_delivery_settings");
-      return raw ? { ...defaultDelivery, ...JSON.parse(raw) } : defaultDelivery;
-    } catch { return defaultDelivery; }
-  });
+  const [delivery, setDelivery] = useState<DeliverySettings>(defaultDelivery);
 
   const [phone, setPhone] = useState(content.global.phone);
   const [emailSAV, setEmailSAV] = useState(content.global.email);
   const [hours, setHours] = useState(content.sav.hours);
   const [responseDelay, setResponseDelay] = useState(content.sav.responseDelay);
 
-  const saveDelivery = () => {
-    localStorage.setItem("admin_delivery_settings", JSON.stringify(delivery));
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_settings" as any).select("data").eq("id", "delivery").single() as any;
+      if (data?.data) setDelivery({ ...defaultDelivery, ...data.data });
+    })();
+  }, []);
+
+  const saveDelivery = async () => {
+    await supabase.from("admin_settings" as any).upsert({ id: "delivery", data: delivery } as any, { onConflict: "id" });
     toast({ title: "Délais enregistrés", description: "Les paramètres de livraison ont été sauvegardés." });
   };
 
@@ -368,7 +383,7 @@ function SecurityTab() {
             <Monitor className="h-5 w-5 text-muted-foreground" />
             <div className="flex-1 text-sm">
               <span className="font-medium">Session actuelle</span>
-              <span className="text-muted-foreground"> · Démarrée il y a 2h · Navigateur Chrome · IP: 192.168.*.***</span>
+              <span className="text-muted-foreground"> · Navigateur actif</span>
             </div>
           </div>
           <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive/10" onClick={logout}>

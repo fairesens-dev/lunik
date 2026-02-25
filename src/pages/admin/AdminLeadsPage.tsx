@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Search, Mail, Phone, Check, Trash2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,39 +8,50 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Lead {
-  id: number; prenom: string; nom: string; email: string; telephone: string;
+  id: string; prenom: string; nom: string; email: string; telephone: string;
   width: number; projection: number; toileColor: string; armatureColor: string;
   options: string[]; codePostal: string; date: string; message: string; traite: boolean;
 }
 
-const MOCK_LEADS: Lead[] = [
-  { id: 1, prenom: "Camille", nom: "Roux", email: "camille.roux@email.fr", telephone: "06 12 34 56 78", width: 400, projection: 300, toileColor: "Sauge", armatureColor: "Anthracite", options: ["Motorisation"], codePostal: "75015", date: "2024-01-23", message: "Intéressée par un devis.", traite: false },
-  { id: 2, prenom: "Antoine", nom: "Lefevre", email: "a.lefevre@email.fr", telephone: "07 98 76 54 32", width: 350, projection: 250, toileColor: "Ivoire", armatureColor: "Blanc", options: [], codePostal: "69001", date: "2024-01-22", message: "", traite: false },
-  { id: 3, prenom: "Julie", nom: "Martin", email: "julie.m@email.fr", telephone: "06 45 67 89 01", width: 300, projection: 200, toileColor: "Taupe", armatureColor: "Anthracite", options: ["LED"], codePostal: "33000", date: "2024-01-21", message: "Besoin d'infos sur la motorisation.", traite: false },
-  { id: 4, prenom: "Thomas", nom: "Girard", email: "t.girard@email.fr", telephone: "06 23 45 67 89", width: 450, projection: 350, toileColor: "Sauge", armatureColor: "Anthracite", options: ["Motorisation", "LED"], codePostal: "13008", date: "2024-01-20", message: "", traite: true },
-  { id: 5, prenom: "Emma", nom: "Dupont", email: "emma.d@email.fr", telephone: "07 11 22 33 44", width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Blanc", options: [], codePostal: "31000", date: "2024-01-19", message: "Quels sont les délais ?", traite: false },
-  { id: 6, prenom: "Hugo", nom: "Mercier", email: "h.mercier@email.fr", telephone: "06 55 66 77 88", width: 300, projection: 250, toileColor: "Ivoire", armatureColor: "Anthracite", options: ["Pack Connect"], codePostal: "44000", date: "2024-01-18", message: "", traite: true },
-  { id: 7, prenom: "Léa", nom: "Fontaine", email: "lea.f@email.fr", telephone: "07 22 33 44 55", width: 400, projection: 300, toileColor: "Taupe", armatureColor: "Blanc", options: ["Motorisation"], codePostal: "67000", date: "2024-01-17", message: "Peut-on avoir un RDV ?", traite: true },
-  { id: 8, prenom: "Maxime", nom: "Rousseau", email: "m.rousseau@email.fr", telephone: "06 99 88 77 66", width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Anthracite", options: ["LED"], codePostal: "59000", date: "2024-01-16", message: "", traite: false },
-  { id: 9, prenom: "Chloé", nom: "Lambert", email: "c.lambert@email.fr", telephone: "07 44 55 66 77", width: 300, projection: 200, toileColor: "Ivoire", armatureColor: "Blanc", options: [], codePostal: "21000", date: "2024-01-15", message: "Budget limité à 2000€.", traite: true },
-  { id: 10, prenom: "Nicolas", nom: "Bonnet", email: "n.bonnet@email.fr", telephone: "06 33 22 11 00", width: 450, projection: 350, toileColor: "Taupe", armatureColor: "Anthracite", options: ["Motorisation", "Pack Connect"], codePostal: "34000", date: "2024-01-14", message: "", traite: false },
-  { id: 11, prenom: "Laura", nom: "Faure", email: "l.faure@email.fr", telephone: "07 66 55 44 33", width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Blanc", options: ["LED"], codePostal: "06000", date: "2024-01-13", message: "Merci de me recontacter.", traite: true },
-  { id: 12, prenom: "Romain", nom: "Chevalier", email: "r.chevalier@email.fr", telephone: "06 77 88 99 00", width: 400, projection: 300, toileColor: "Ivoire", armatureColor: "Anthracite", options: [], codePostal: "38000", date: "2024-01-12", message: "", traite: true },
-  { id: 13, prenom: "Sarah", nom: "Lemoine", email: "s.lemoine@email.fr", telephone: "07 88 77 66 55", width: 300, projection: 200, toileColor: "Taupe", armatureColor: "Blanc", options: ["Motorisation"], codePostal: "54000", date: "2024-01-11", message: "", traite: false },
-  { id: 14, prenom: "Julien", nom: "Gauthier", email: "j.gauthier@email.fr", telephone: "06 11 22 33 44", width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Anthracite", options: ["Motorisation", "LED"], codePostal: "35000", date: "2024-01-10", message: "Urgent, besoin pour mars.", traite: true },
-  { id: 15, prenom: "Manon", nom: "Perrin", email: "m.perrin@email.fr", telephone: "07 99 88 77 66", width: 400, projection: 300, toileColor: "Ivoire", armatureColor: "Blanc", options: ["Pack Connect"], codePostal: "29000", date: "2024-01-09", message: "", traite: false },
-];
+function mapRow(r: any): Lead {
+  return {
+    id: r.id,
+    prenom: r.first_name,
+    nom: r.last_name,
+    email: r.email,
+    telephone: r.phone || "",
+    width: r.width || 0,
+    projection: r.projection || 0,
+    toileColor: r.toile_color || "",
+    armatureColor: r.armature_color || "",
+    options: r.options || [],
+    codePostal: r.postal_code || "",
+    date: r.created_at?.split("T")[0] || "",
+    message: r.message || "",
+    traite: r.processed || false,
+  };
+}
 
 const PER_PAGE = 10;
 
 const AdminLeadsPage = () => {
-  const [leads, setLeads] = useState<Lead[]>(MOCK_LEADS);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [nonTraitesOnly, setNonTraitesOnly] = useState(false);
   const [period, setPeriod] = useState("Ce mois");
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("leads" as any).select("*").order("created_at", { ascending: false }) as any;
+      if (data) setLeads(data.map(mapRow));
+      setLoading(false);
+    })();
+  }, []);
 
   const filtered = useMemo(() => {
     let result = leads;
@@ -59,8 +70,20 @@ const AdminLeadsPage = () => {
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
 
-  const toggleTraite = (id: number) => setLeads(prev => prev.map(l => l.id === id ? { ...l, traite: !l.traite } : l));
-  const deleteLead = (id: number) => setLeads(prev => prev.filter(l => l.id !== id));
+  const toggleTraite = async (id: string) => {
+    const lead = leads.find(l => l.id === id);
+    if (!lead) return;
+    const newVal = !lead.traite;
+    await supabase.from("leads" as any).update({ processed: newVal } as any).eq("id", id);
+    setLeads(prev => prev.map(l => l.id === id ? { ...l, traite: newVal } : l));
+  };
+
+  const deleteLead = async (id: string) => {
+    await supabase.from("leads" as any).delete().eq("id", id);
+    setLeads(prev => prev.filter(l => l.id !== id));
+  };
+
+  if (loading) return <div className="p-8 text-center text-muted-foreground">Chargement des leads...</div>;
 
   return (
     <div className="space-y-4 font-sans">
@@ -70,7 +93,7 @@ const AdminLeadsPage = () => {
       <Card className="border-gray-200">
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-6 text-sm">
-            <div><span className="font-bold text-gray-900">{totalThisMonth}</span> <span className="text-gray-500">leads ce mois</span></div>
+            <div><span className="font-bold text-gray-900">{totalThisMonth}</span> <span className="text-gray-500">leads</span></div>
             <div><span className="font-bold text-orange-600">{nonTraites}</span> <span className="text-gray-500">non traités</span></div>
             <div><span className="text-gray-500">Taux de traitement :</span> <Badge variant="secondary" className="ml-1">{tauxTraitement}%</Badge></div>
           </div>
@@ -118,6 +141,9 @@ const AdminLeadsPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {paginated.length === 0 && (
+                <TableRow><TableCell colSpan={8} className="text-center text-muted-foreground py-8">Aucun lead</TableCell></TableRow>
+              )}
               {paginated.map(l => (
                 <TableRow key={l.id} className={l.traite ? "opacity-50" : ""}>
                   <TableCell className="text-xs font-medium">{l.prenom} {l.nom}</TableCell>
