@@ -20,6 +20,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
+import { generateInvoicePDF } from "@/lib/generateInvoice";
 
 const STATUS_OPTIONS = ["Nouveau", "En fabrication", "Expédié", "Livré", "Annulé"];
 
@@ -258,6 +259,9 @@ const AdminOrderDetailPage = () => {
             </Button>
             <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => window.print()}>
               <Printer className="w-3.5 h-3.5 mr-1" /> Imprimer
+            </Button>
+            <Button variant="outline" size="sm" className="h-8 text-xs" onClick={() => generateInvoicePDF(order)}>
+              <FileText className="w-3.5 h-3.5 mr-1" /> Facture PDF
             </Button>
 
             <DropdownMenu>

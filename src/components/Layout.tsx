@@ -2,6 +2,8 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import PromoBanner from "./PromoBanner";
+import ContactWidget from "./ContactWidget";
+import CookieBanner from "./CookieBanner";
 
 const Layout = () => {
   return (
@@ -12,6 +14,8 @@ const Layout = () => {
         <Outlet />
       </main>
       <Footer />
+      <ContactWidget />
+      <CookieBanner />
     </div>
   );
 };

@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/accordion";
 import { Phone, Package, BookOpen, Upload } from "lucide-react";
 import { useContent } from "@/contexts/ContentContext";
+import SEOMeta from "@/components/SEOMeta";
 
 const services = [
   {
@@ -42,6 +43,7 @@ const SAVPage = () => {
 
   return (
     <>
+      <SEOMeta title="Service Après-Vente | Mon Store" description="Besoin d'aide ? Notre service après-vente est à votre écoute. Pièces détachées, garantie et support technique." />
       {/* Hero */}
       <section className="py-28 lg:py-36">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">

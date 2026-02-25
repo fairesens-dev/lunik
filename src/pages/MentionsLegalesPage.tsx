@@ -1,8 +1,10 @@
 import AnimatedSection from "@/components/AnimatedSection";
+import SEOMeta from "@/components/SEOMeta";
 
 const MentionsLegalesPage = () => {
   return (
     <section className="py-28 lg:py-36">
+      <SEOMeta title="Mentions Légales | Mon Store" description="Mentions légales du site Mon Store : éditeur, hébergement, propriété intellectuelle et données personnelles." />
       <div className="max-w-[900px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <h1 className="font-serif text-4xl md:text-5xl font-light mb-12">

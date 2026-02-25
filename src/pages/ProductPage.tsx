@@ -13,6 +13,9 @@ import ProductProcessSection from "@/components/product/ProductProcessSection";
 import ProductWarrantySection from "@/components/product/ProductWarrantySection";
 import ProductFAQSection from "@/components/product/ProductFAQSection";
 import ProductFinalCTA from "@/components/product/ProductFinalCTA";
+import ExitIntentPopup from "@/components/ExitIntentPopup";
+import SocialProofToast from "@/components/SocialProofToast";
+import SEOMeta from "@/components/SEOMeta";
 
 const ProductPage = () => {
   const configurator = useConfigurator();
@@ -91,8 +94,36 @@ const ProductPage = () => {
     navigate("/checkout");
   };
 
+  const toileObj = configurator.TOILE_COLORS.find(c => c.name === configurator.toileColor);
+  const armatureObj = configurator.ARMATURE_COLORS.find(c => c.name === configurator.armatureColor);
+
+  const productJsonLd = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": "Store Coffre Sur-Mesure",
+    "brand": { "@type": "Brand", "name": "Mon Store" },
+    "offers": {
+      "@type": "AggregateOffer",
+      "priceCurrency": "EUR",
+      "lowPrice": "1890",
+      "highPrice": "4500",
+      "offerCount": "1",
+    },
+    "aggregateRating": {
+      "@type": "AggregateRating",
+      "ratingValue": "4.9",
+      "reviewCount": "850",
+    },
+  };
+
   return (
     <>
+      <SEOMeta
+        title={`Store Coffre Sur-Mesure ${configurator.width}×${configurator.projection}cm | Mon Store`}
+        description={`Store coffre sur-mesure ${configurator.width}×${configurator.projection}cm, toile ${configurator.toileColor}, armature ${configurator.armatureColor}. Prix : ${configurator.price}€. Fabriqué en France.`}
+        type="product"
+        jsonLd={productJsonLd}
+      />
       <ProductHeroSection />
       <ProductMarqueeSection />
       <ProductFeaturesSection />
@@ -103,6 +134,19 @@ const ProductPage = () => {
       <ProductWarrantySection />
       <ProductFAQSection />
       <ProductFinalCTA />
+      <ExitIntentPopup
+        width={configurator.width}
+        projection={configurator.projection}
+        toileColor={configurator.toileColor}
+        toileHex={toileObj?.hex || "#fff"}
+        armatureColor={configurator.armatureColor}
+        armatureHex={armatureObj?.hex || "#333"}
+        price={configurator.price}
+        motorisation={configurator.motorisation}
+        led={configurator.led}
+        pack={configurator.pack}
+      />
+      <SocialProofToast />
     </>
   );
 };

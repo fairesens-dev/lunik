@@ -17,6 +17,8 @@ import MentionsLegalesPage from "./pages/MentionsLegalesPage";
 import NotFound from "./pages/NotFound";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
+import EchantillonsPage from "./pages/EchantillonsPage";
+import CookiesPage from "./pages/CookiesPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminResetPasswordPage from "./pages/admin/AdminResetPasswordPage";
@@ -53,6 +55,8 @@ const App = () => (
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/conditions-generales-de-vente" element={<CGVPage />} />
               <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+              <Route path="/echantillons" element={<EchantillonsPage />} />
+              <Route path="/cookies" element={<CookiesPage />} />
               <Route path="/suivi" element={<OrderTrackingPage />} />
             </Route>
 

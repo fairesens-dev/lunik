@@ -8,6 +8,7 @@ import { useContent } from "@/contexts/ContentContext";
 const navLinks = [
   { label: "Accueil", href: "/" },
   { label: "Notre Store", href: "/store-coffre" },
+  { label: "Échantillons", href: "/echantillons" },
   { label: "SAV", href: "/service-apres-vente" },
   { label: "Contact", href: "/contact" },
 ];
