@@ -18,9 +18,10 @@ Deno.serve(async (req) => {
     const businessUnitId = Deno.env.get("TRUSTPILOT_BUSINESS_UNIT_ID");
 
     if (!apiKey || !businessUnitId) {
+      // Return empty but valid response so frontend uses fallback gracefully
       return new Response(
-        JSON.stringify({ error: "Trustpilot not configured", code: "NOT_CONFIGURED" }),
-        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        JSON.stringify({ notConfigured: true, reviews: [], trustScore: 0, numberOfReviews: { total: 0 }, stars: 0 }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
 
