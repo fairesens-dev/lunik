@@ -1,113 +1,87 @@
 
 
-# 🇫🇷 Premium French Awning E-Commerce Website
+# Rebuild HomePage with 10 Complete Sections
 
-## Design Foundation
-A luxury e-commerce experience inspired by high-end interior design websites, featuring warm neutral tones, elegant serif typography (Cormorant Garamond + Inter), generous white space, and subtle scroll-triggered animations. All text and UI in French.
-
----
-
-## Phase 1: Design System & Layout Shell
-
-### Custom Theme
-- Warm ecru background (#F5F0E8), sage green accent (#4A5E3A), charcoal text
-- Google Fonts: Cormorant Garamond (serif headlines) + Inter (body/UI)
-- Generous spacing system (py-24 to py-32), 1280px max-width containers
-- Custom button styles: Primary (sage green, square corners, uppercase tracking), Secondary (charcoal outlined), Ghost (underline accent)
-
-### Sticky Header
-- Logo "[BRAND]" in Cormorant Garamond, centered nav links (Accueil, Notre Store, SAV, Contact), CTA button "Configurer mon store"
-- Scroll behavior: transparent → white background with shadow
-- Mobile: hamburger with full-screen overlay menu
-
-### Footer
-- Dark (#1A1A1A) three-column layout: brand tagline + social icons, navigation links, contact info + "Fabriqué en France 🇫🇷" badge
-- Bottom bar with copyright and legal links
+Complete rewrite of `src/pages/Index.tsx` with all 10 sections as specified, plus CSS additions for the marquee animation.
 
 ---
 
-## Phase 2: Home Page (Landing)
+## Files to Modify
 
-### Hero Section
-- Full-width lifestyle image placeholder with overlay text
-- Elegant serif headline introducing the brand
-- CTA button leading to configurator
+### 1. `src/index.css` -- Add marquee keyframe animation
+Add a CSS `@keyframes marquee` animation for the infinite scrolling band (Section 2). This will translate the content from 0 to -50% horizontally, creating a seamless loop.
 
-### Brand Story Section
-- Split layout: large image + text block with brand values
-- Fade-in animations on scroll
+### 2. `tailwind.config.ts` -- Add marquee animation token
+Register the `marquee` keyframe and animation in the Tailwind config so it can be used as `animate-marquee`.
 
-### Product Highlight Section
-- Showcase the store coffre product with key features
-- Icon-based feature grid (motorized, weatherproof, custom colors, etc.)
+### 3. `src/components/Layout.tsx` -- Remove `pt-20` for hero
+The hero section needs to go full-viewport, so the `pt-20` padding on `<main>` should be removed (the hero will handle its own top spacing, and other pages will need their own top padding or we keep it and offset the hero with negative margin). Better approach: keep `pt-20` but make the hero use `-mt-20` to go under the header.
 
-### Testimonials / Social Proof
-- Elegant quote cards from satisfied customers
+### 4. `src/pages/Index.tsx` -- Complete rewrite
+Replace the entire file with all 10 sections:
 
-### Call-to-Action Banner
-- Full-width warm-toned section encouraging configuration
-- "Configurer mon store" primary CTA
+**Section 1 -- Hero (full viewport)**
+- Split layout: left 55% text + right 45% image placeholder
+- Overline in sage green uppercase, H1 in Cormorant 72px, body paragraph
+- Two buttons side-by-side: primary "Configurer mon store" + secondary outlined "Voir le produit"
+- 3 trust micro-badges row below buttons
+- Right side: `bg-stone-200` placeholder with warm overlay gradient
+- Uses `-mt-20` to extend under header, `min-h-screen`
+
+**Section 2 -- Marquee scrolling band**
+- Thin band with `bg-primary text-white`, `overflow-hidden`
+- Duplicated text content inside a flex container with CSS `animate-marquee`
+- Smooth infinite horizontal scroll
+
+**Section 3 -- Product Highlight**
+- Centered title + subtitle
+- 2-column grid: image placeholder left, 4 feature rows right (emoji + bold label + description)
+- CTA link to /store-coffre
+
+**Section 4 -- Values (3 columns)**
+- Background `bg-card` (#FAFAF7)
+- Centered section title
+- 3 columns with large serif number "01"/"02"/"03", title, and description text
+
+**Section 5 -- Configurator CTA (dark section)**
+- Background `bg-[#1A1A1A]`, all text white
+- Overline, H2 in Cormorant, body text
+- 5 step indicators connected by lines (flexbox with dividers)
+- Outlined white CTA button
+
+**Section 6 -- Gallery**
+- Section title + subtitle
+- 3-column masonry-like grid with 6 `bg-stone-200` placeholders of varying heights
+- Trustpilot link below
+
+**Section 7 -- Testimonials**
+- Background `bg-background` (warm ecru)
+- Title + star rating display
+- Horizontal scrollable slider using `useState` for current index, with 4 testimonial cards
+- White card with shadow, Cormorant italic quote, author + city
+- Left/right arrow buttons + dot indicators
+
+**Section 8 -- Process timeline**
+- Background `bg-card`
+- Title centered
+- Horizontal timeline on desktop (flex row with connecting lines), vertical stack on mobile
+- 5 steps with emoji, title, description
+
+**Section 9 -- FAQ Accordion**
+- 6 questions using the existing `Accordion` component from shadcn/ui
+- Clean styling matching site design
+
+**Section 10 -- Contact/Footer CTA**
+- Dark background `bg-[#1A1A1A]`, centered text
+- Title, subtitle, two CTA buttons: ghost "Nous appeler" + primary "Envoyer un message" linking to /contact
 
 ---
 
-## Phase 3: Product Page with Configurator (/store-coffre)
+## Technical Details
 
-### Product Hero
-- Large product imagery with elegant description
-
-### Interactive Configurator
-A step-by-step visual configurator allowing users to customize their awning:
-- **Step 1 — Dimensions**: Width and projection selectors
-- **Step 2 — Toile (Fabric)**: Color/pattern swatches to choose from
-- **Step 3 — Coffre (Housing) Color**: Color options for the cassette
-- **Step 4 — Motorisation**: Manual, motorized, or motorized + remote options
-- **Step 5 — Options**: Wind sensor, LED lighting, etc.
-
-### Live Summary Panel
-- Sticky sidebar showing selected configuration and estimated price
-- "Demander un devis" (request quote) CTA
-
-### Product Details
-- Accordion sections: technical specs, installation info, warranty details
-
----
-
-## Phase 4: Supporting Pages
-
-### SAV Page (/service-apres-vente)
-- FAQ accordion with common after-sales questions
-- Contact form for support requests
-- Warranty information section
-
-### Contact Page (/contact)
-- Elegant contact form (name, email, phone, message, subject dropdown)
-- Business information and opening hours
-- Optional embedded map placeholder
-
-### CGV Page (/conditions-generales-de-vente)
-- Clean typographic layout for legal terms
-- Table of contents with anchor links
-
-### Mentions Légales (/mentions-legales)
-- Standard French legal notice page with proper formatting
-
----
-
-## Phase 5: Animations & Polish
-
-### Scroll Animations
-- Fade-in-up animations for sections as they enter viewport
-- Subtle parallax on hero images
-- Smooth hover transitions on buttons and cards
-
-### Micro-interactions
-- Header background transition on scroll
-- Image hover zoom effects
-- Configurator step transitions
-- Underline animations on navigation links
-
-### Responsive Design
-- Fully responsive across all breakpoints
-- Mobile-optimized configurator with stacked layout
-- Touch-friendly interactions
+- **Marquee animation**: Pure CSS using `@keyframes marquee { from { transform: translateX(0) } to { transform: translateX(-50%) } }` with duplicated content for seamless loop
+- **Testimonial slider**: React `useState` for index, `transform: translateX(...)` with transition for smooth sliding, `ChevronLeft`/`ChevronRight` from lucide-react for arrows
+- **All sections** use the existing `AnimatedSection` component for scroll-triggered fade-in animations
+- **Responsive**: All grids collapse to single column on mobile, timeline goes vertical, slider stays swipeable
+- **No new dependencies needed** -- everything uses existing UI components, framer-motion, lucide-react, and CSS
 
