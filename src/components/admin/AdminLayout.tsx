@@ -55,7 +55,9 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const pageTitle = routeTitles[location.pathname] || "Admin";
+  const pageTitle = location.pathname.match(/^\/admin\/commandes\/.+/)
+    ? "Détail commande"
+    : routeTitles[location.pathname] || "Admin";
 
   const handleLogout = () => {
     logout();

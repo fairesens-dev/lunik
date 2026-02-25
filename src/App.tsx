@@ -29,6 +29,7 @@ import AdminConfiguratorPage from "./pages/admin/AdminConfiguratorPage";
 import AdminContentPage from "./pages/admin/AdminContentPage";
 import AdminMarketingPage from "./pages/admin/AdminMarketingPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
+import AdminOrderDetailPage from "./pages/admin/AdminOrderDetailPage";
 
 const queryClient = new QueryClient();
 
@@ -68,6 +69,7 @@ const App = () => (
                 <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                 <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
                 <Route path="/admin/commandes" element={<AdminOrdersPage />} />
+                <Route path="/admin/commandes/:orderId" element={<AdminOrderDetailPage />} />
                 <Route path="/admin/leads" element={<AdminLeadsPage />} />
                 <Route path="/admin/configurateur" element={<AdminConfiguratorPage />} />
                 <Route path="/admin/contenu" element={<AdminContentPage />} />
