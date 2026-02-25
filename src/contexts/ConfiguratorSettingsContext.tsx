@@ -26,6 +26,7 @@ export interface ColorEntry {
   hex: string;
   label: string;
   active: boolean;
+  photoUrl?: string;
 }
 
 export interface OptionEntry {
