@@ -1,15 +1,13 @@
 import { useState, useMemo, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Eye, Mail, Download, Search, Zap, Lightbulb, Smartphone } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Textarea } from "@/components/ui/textarea";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { supabase } from "@/integrations/supabase/client";
 
 interface Order {
@@ -72,8 +70,6 @@ const AdminOrdersPage = () => {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [drawerNotes, setDrawerNotes] = useState<Record<string, string>>({});
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
   useEffect(() => {
@@ -114,15 +110,8 @@ const AdminOrdersPage = () => {
     const newHistory = [...order.statusHistory, { status: newStatus, date: new Date().toLocaleDateString("fr-FR") }];
     await supabase.from("orders" as any).update({ status: newStatus, status_history: newHistory } as any).eq("id", id);
     setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus, statusHistory: newHistory } : o));
-    if (selectedOrder?.id === id) setSelectedOrder(prev => prev ? { ...prev, status: newStatus, statusHistory: newHistory } : null);
   };
 
-  const saveNotes = async (id: string, notes: string) => {
-    await supabase.from("orders" as any).update({ notes } as any).eq("id", id);
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, notes } : o));
-  };
-
-  const area = selectedOrder ? ((selectedOrder.width * selectedOrder.projection) / 10000).toFixed(2) : "";
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Chargement des commandes...</div>;
 
@@ -201,7 +190,7 @@ const AdminOrdersPage = () => {
                   <TableCell className="text-xs text-gray-500">{new Date(o.date).toLocaleDateString("fr-FR")}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => setSelectedOrder(o)}><Eye className="w-3.5 h-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" asChild><Link to={`/admin/commandes/${o.id}`}><Eye className="w-3.5 h-3.5" /></Link></Button>
                       <Select value="" onValueChange={(v) => updateStatus(o.id, v)}>
                         <SelectTrigger className="h-7 w-20 text-[10px]"><SelectValue placeholder="Statut" /></SelectTrigger>
                         <SelectContent>{STATUS_OPTIONS.filter(s => s !== "Tous" && s !== o.status).map(s => <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>)}</SelectContent>
@@ -227,112 +216,6 @@ const AdminOrdersPage = () => {
         </CardContent>
       </Card>
 
-      {/* Detail Drawer */}
-      <Sheet open={!!selectedOrder} onOpenChange={(open) => { if (!open) setSelectedOrder(null); }}>
-        <SheetContent className="w-[400px] sm:w-[400px] overflow-y-auto">
-          {selectedOrder && (
-            <>
-              <SheetHeader>
-                <SheetTitle className="font-sans">{selectedOrder.ref}</SheetTitle>
-                <p className="text-sm text-gray-500">{new Date(selectedOrder.date).toLocaleDateString("fr-FR")}</p>
-              </SheetHeader>
-
-              <div className="mt-6 space-y-5">
-                {/* Client */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Client</h3>
-                  <div className="text-sm space-y-1">
-                    <p className="font-medium">{selectedOrder.client.name}</p>
-                    <p className="text-gray-500">{selectedOrder.client.email}</p>
-                    <p className="text-gray-500">{selectedOrder.client.phone}</p>
-                    <p className="text-gray-500">CP : {selectedOrder.client.cp}</p>
-                  </div>
-                </div>
-                <Separator />
-
-                {/* Config */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Configuration</h3>
-                  <div className="text-sm space-y-1.5">
-                    <p>Dimensions : {selectedOrder.width} × {selectedOrder.projection} cm ({area} m²)</p>
-                    <p>Toile : {selectedOrder.toileColor}</p>
-                    <p>Armature : {selectedOrder.armatureColor}</p>
-                    {selectedOrder.options.length > 0 && <p>Options : {selectedOrder.options.join(", ")}</p>}
-                  </div>
-                </div>
-                <Separator />
-
-                {/* Price */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Montant</h3>
-                  <p className="text-sm font-bold">{selectedOrder.montant.toLocaleString("fr-FR")} €</p>
-                </div>
-                <Separator />
-
-                {/* Message */}
-                {selectedOrder.message && (
-                  <>
-                    <div>
-                      <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Message client</h3>
-                      <p className="text-sm text-gray-700 bg-gray-50 p-3 rounded">{selectedOrder.message}</p>
-                    </div>
-                    <Separator />
-                  </>
-                )}
-
-                {/* Timeline */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Historique</h3>
-                  <div className="space-y-0">
-                    {selectedOrder.statusHistory.map((h, i) => (
-                      <div key={i} className="flex items-start gap-3 pb-3">
-                        <div className="flex flex-col items-center">
-                          <div className="w-2.5 h-2.5 rounded-full bg-gray-400 mt-1" />
-                          {i < selectedOrder.statusHistory.length - 1 && <div className="w-px h-full bg-gray-200 min-h-[16px]" />}
-                        </div>
-                        <div className="text-sm"><span className="font-medium">{h.status}</span> <span className="text-gray-400">— {h.date}</span></div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <Separator />
-
-                {/* Status update */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Mettre à jour le statut</h3>
-                  <div className="flex gap-2">
-                    <Select onValueChange={(v) => updateStatus(selectedOrder.id, v)}>
-                      <SelectTrigger className="flex-1"><SelectValue placeholder="Choisir un statut" /></SelectTrigger>
-                      <SelectContent>{STATUS_OPTIONS.filter(s => s !== "Tous").map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {/* Notes */}
-                <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Notes internes</h3>
-                  <Textarea
-                    placeholder="Ajouter une note..."
-                    value={drawerNotes[selectedOrder.id] ?? selectedOrder.notes}
-                    onChange={e => setDrawerNotes(prev => ({ ...prev, [selectedOrder.id]: e.target.value }))}
-                    onBlur={() => {
-                      const notes = drawerNotes[selectedOrder.id];
-                      if (notes !== undefined && notes !== selectedOrder.notes) {
-                        saveNotes(selectedOrder.id, notes);
-                      }
-                    }}
-                    className="text-sm"
-                  />
-                </div>
-
-                <Button className="w-full" variant="outline" asChild>
-                  <a href={`mailto:${selectedOrder.client.email}`}><Mail className="w-4 h-4 mr-2" /> Envoyer un email au client</a>
-                </Button>
-              </div>
-            </>
-          )}
-        </SheetContent>
-      </Sheet>
     </div>
   );
 };

@@ -111,3 +111,39 @@
   from { transform: translateX(0); }
   to { transform: translateX(-50%); }
 }
+
+@media print {
+  /* Hide chrome */
+  aside, header, #action-bar, #notes-card, #quick-actions, .print\\:hidden {
+    display: none !important;
+  }
+
+  /* Reset layout */
+  main {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #order-detail {
+    max-width: 100%;
+  }
+
+  #order-detail > .grid {
+    display: block !important;
+  }
+
+  /* Show print elements */
+  .print\\:block {
+    display: block !important;
+  }
+
+  /* Page break */
+  .print\\:break-before-page {
+    break-before: page;
+  }
+
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
