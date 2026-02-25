@@ -1,83 +1,86 @@
 
 
-# Add Secure Admin Authentication System
+# Build Admin Dashboard, Orders & Leads Pages
 
-Complete admin panel with authentication, protected routes, persistent sidebar layout, and placeholder pages for all admin sections.
-
----
-
-## New Files to Create
-
-### 1. Auth Context (`src/contexts/AuthContext.tsx`)
-- React Context providing `isAuthenticated`, `admin` (name/email/role), `login()`, `logout()`
-- Hardcoded credentials: `admin@monstore.fr` / `admin2024!`
-- Persists auth state in `sessionStorage` (expires on browser close)
-- On mount, reads sessionStorage to restore session
-- `login()` validates credentials, stores in sessionStorage, returns success/error
-- `logout()` clears sessionStorage, navigates to `/admin/login`
-
-### 2. Protected Route (`src/components/admin/ProtectedRoute.tsx`)
-- Checks `isAuthenticated` from AuthContext
-- If false, redirects to `/admin/login` via `<Navigate />`
-- If true, renders `<Outlet />` or children
-
-### 3. Admin Layout (`src/components/admin/AdminLayout.tsx`)
-- Persistent shell for all protected admin pages
-- **Sidebar** (fixed left, 240px, bg-gray-900, white text):
-  - Top: "[BRAND] Admin" branding
-  - Grouped nav items with icons (lucide-react): Dashboard, Commandes, Leads, Configurateur, Contenu, Marketing, Parametres, Deconnexion
-  - Active state: bg-gray-700 + left sage green border
-  - Bottom: avatar circle + admin name/email
-  - Mobile: collapsible via hamburger (useState toggle)
-- **Topbar** (fixed top, h-16, white, border-b):
-  - Left: page title (derived from current route)
-  - Right: notification bell, "Voir le site" link (target _blank), avatar dropdown
-- **Content area**: ml-60 mt-16 bg-gray-50 p-8, renders `<Outlet />`
-
-### 4. Login Page (`src/pages/admin/AdminLoginPage.tsx`)
-- Centered card on #F3F4F6 background, max-w-sm
-- "[BRAND] Admin" + "Espace de gestion" subtitle
-- Email + password inputs (password with show/hide toggle using Eye/EyeOff icons)
-- "Connexion" button (bg-gray-900)
-- Error banner on failed login
-- "Retour au site" link to "/"
-- On success: navigate to `/admin/dashboard`
-- Does NOT use the public site Layout (no Header/Footer)
-
-### 5. Dashboard Page (`src/pages/admin/AdminDashboardPage.tsx`)
-- Placeholder with title "Tableau de bord" and summary stat cards (commandes, CA, leads, taux conversion) with placeholder data
-
-### 6. Placeholder Pages
-- `src/pages/admin/AdminOrdersPage.tsx` -- "Commandes" placeholder
-- `src/pages/admin/AdminLeadsPage.tsx` -- "Leads" placeholder
-- `src/pages/admin/AdminConfiguratorPage.tsx` -- "Configurateur" placeholder
-- `src/pages/admin/AdminContentPage.tsx` -- "Contenu" placeholder
-- `src/pages/admin/AdminMarketingPage.tsx` -- "Marketing" placeholder
-- `src/pages/admin/AdminSettingsPage.tsx` -- "Parametres" placeholder
-
-Each placeholder: simple card with page title and "Coming soon" description.
+Rewrite 3 existing placeholder pages into fully functional admin interfaces with charts, tables, filters, and detail drawers -- all using mock data.
 
 ---
 
-## Modified Files
+## Files to Modify
 
-### `src/App.tsx`
-- Import AuthProvider, AdminLayout, ProtectedRoute, and all admin pages
-- Wrap entire app (or just the router) with `<AuthProvider>`
-- Add routes:
-  - `/admin/login` -- public, renders AdminLoginPage (no Layout wrapper)
-  - `/admin` -- wrapped in ProtectedRoute + AdminLayout:
-    - index redirects to `/admin/dashboard` via `<Navigate />`
-    - `/admin/dashboard`, `/admin/commandes`, `/admin/leads`, `/admin/configurateur`, `/admin/contenu`, `/admin/marketing`, `/admin/parametres`
+### 1. `src/pages/admin/AdminDashboardPage.tsx` -- REWRITE
+
+**Row 1 -- KPI Cards (4 columns)**
+- 4 cards: Commandes (23, +12%), CA (47 320 euros, +8%), Visiteurs (3 847, +23%), Taux conversion (2.8%, -0.2%)
+- Each card includes a recharts `LineChart` sparkline (height 40px, no axes/tooltip, just stroke line)
+- Trend badge: green `ArrowUp` or red `ArrowDown` icon + percentage text
+- Mock sparkline data arrays (7 data points each)
+
+**Row 2 -- Main Charts (2 columns, 60/40 split)**
+- Left: recharts `ComposedChart` with `Bar` (commandes, gray) + `Line` (CA, sage green #4A5E3A), dual Y axes, X axis months Jan-Dec, Tooltip, Legend
+- Right: recharts `PieChart` (donut via `innerRadius`) -- 4 segments (Sans option 38%, Motorisation 35%, LED 12%, Pack Connect 15%), colors #4A5E3A, #8FA07A, #C8B89A, #1A1A1A, legend with percentages
+
+**Row 3 -- Split Tables (2 columns)**
+- Left: "Dernieres commandes" -- Table with 5 rows (Ref, Client, Dimensions, Options, Montant, Statut badge, Date). Status badges color-coded. Link to /admin/commandes
+- Right: "Derniers leads non traites" -- 5 card-style entries (name, email, phone, config, date). "Contacter" mailto link + "Marquer traite" checkbox. Link to /admin/leads
+
+**Row 4 -- Alerts**
+- Full-width card with 3 mock alerts using colored left borders (orange warning, green success, blue info)
+
+Uses: `useAuth` for admin name, recharts components, Card, Table, Badge, Checkbox from shadcn
+
+---
+
+### 2. `src/pages/admin/AdminOrdersPage.tsx` -- REWRITE
+
+**Mock Data**: 15 realistic order objects with: id, ref, client (name/email/phone/cp), width, projection, toileColor, armatureColor, options array, montant, status, date, message, statusHistory array, notes
+
+**Filter Bar**: 
+- Search Input (filters by name/email/ref)
+- Select for Status (Tous, Nouveau, En fabrication, Expedie, Livre, Annule)
+- Select for Period (Ce mois, 3 mois, 6 mois, Cette annee, Personnalise)
+- DatePicker range (visible only when Personnalise selected) -- use simple date inputs
+- "Exporter CSV" button (generates and downloads a CSV blob from filtered data)
+
+**Orders Table**:
+- Checkbox column, Ref, Client, Configuration ("350x250 cm . Sauge . Anthracite"), Options (icon badges), Montant, Status (colored pill Badge), Date, Actions
+- Actions: Eye icon "Voir" (opens drawer), dropdown for status change, Mail icon (mailto)
+- Client-side filtering + pagination (10 per page) using useState
+- Pagination component at bottom
+
+**Order Detail Drawer**:
+- Sheet component sliding from right (w-[400px])
+- Displays: ref + date, client info block, full configuration details with color swatches, price breakdown table, client message, status history timeline (vertical with dots and lines), status update Select + Button, internal notes Textarea, "Envoyer email" button
+- State managed locally: selectedOrder, notes per order
+
+---
+
+### 3. `src/pages/admin/AdminLeadsPage.tsx` -- REWRITE
+
+**Mock Data**: 15 lead objects with: id, prenom, nom, email, telephone, width, projection, toileColor, armatureColor, options, codePostal, date, message, traite (boolean)
+
+**Stat Banner**: Card at top showing "12 leads ce mois . 5 non traites . Taux de traitement : 58%" with computed values from mock data
+
+**Filter Bar**:
+- Search input (name/email/phone)
+- Switch toggle "Non traites uniquement" 
+- Select for Period
+
+**Leads Table**:
+- Columns: Prenom+Nom, Email, Telephone, Configuration summary, Code Postal, Date, Traite (toggle Checkbox), Actions
+- Treated rows get `opacity-50` styling
+- Actions: Mail icon (mailto), Phone icon (tel: link), Check icon (toggle traite), Trash icon (removes from local state)
+- Pagination (10 per page)
 
 ---
 
 ## Technical Details
 
-- **No Supabase** -- uses hardcoded credentials as specified, easily replaceable later
-- **sessionStorage** keys: `admin_auth` storing JSON `{ isAuthenticated, admin: { name, email, role } }`
-- **Sidebar navigation** uses `NavLink` from react-router-dom for active state detection
-- **Mobile sidebar**: toggled via state, renders as fixed overlay with backdrop
-- **All admin pages** use Inter font (already available), neutral gray palette, no Cormorant serif
-- **No new dependencies needed** -- uses existing lucide-react, react-router-dom, tailwind
+- **recharts** is already installed -- use LineChart, ComposedChart, Bar, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
+- **shadcn components** used: Card, Table (+ all sub-components), Badge, Button, Input, Select, Checkbox, Sheet, Switch, Textarea, Separator
+- All state is local (useState) -- no backend, all mock data
+- CSV export: create Blob with comma-separated data, trigger download via temporary anchor element
+- All pages use `font-sans` class consistently with the AdminLayout shell
+- No new files needed beyond the 3 rewrites
+- No new dependencies needed
 
