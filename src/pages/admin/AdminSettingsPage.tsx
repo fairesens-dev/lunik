@@ -286,19 +286,15 @@ function DeliverySAVTab() {
 
 function SecurityTab() {
   const { toast } = useToast();
-  const { logout } = useAuth();
+  const { logout, updatePassword } = useAuth();
   const { resetToDefaults } = useConfiguratorSettings();
 
-  const [currentPwd, setCurrentPwd] = useState("");
   const [newPwd, setNewPwd] = useState("");
   const [confirmPwd, setConfirmPwd] = useState("");
   const [showNew, setShowNew] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleChangePassword = () => {
-    if (currentPwd !== "admin2024!") {
-      toast({ title: "Erreur", description: "Le mot de passe actuel est incorrect.", variant: "destructive" });
-      return;
-    }
+  const handleChangePassword = async () => {
     if (newPwd.length < 8) {
       toast({ title: "Erreur", description: "Le nouveau mot de passe doit contenir au moins 8 caractères.", variant: "destructive" });
       return;
@@ -307,8 +303,15 @@ function SecurityTab() {
       toast({ title: "Erreur", description: "Les mots de passe ne correspondent pas.", variant: "destructive" });
       return;
     }
-    setCurrentPwd(""); setNewPwd(""); setConfirmPwd("");
-    toast({ title: "Mot de passe mis à jour", description: "Votre mot de passe a été modifié avec succès." });
+    setLoading(true);
+    const result = await updatePassword(newPwd);
+    setLoading(false);
+    if (result.success) {
+      setNewPwd(""); setConfirmPwd("");
+      toast({ title: "Mot de passe mis à jour", description: "Votre mot de passe a été modifié avec succès." });
+    } else {
+      toast({ title: "Erreur", description: result.error || "Impossible de mettre à jour le mot de passe.", variant: "destructive" });
+    }
   };
 
   const handleReset = () => {
@@ -323,10 +326,6 @@ function SecurityTab() {
           <CardTitle className="text-lg">Changer le mot de passe</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <Label>Mot de passe actuel</Label>
-            <Input type="password" value={currentPwd} onChange={e => setCurrentPwd(e.target.value)} />
-          </div>
           <div className="space-y-2">
             <Label>Nouveau mot de passe</Label>
             <div className="relative">
@@ -354,7 +353,9 @@ function SecurityTab() {
               <p className="text-xs text-destructive">Les mots de passe ne correspondent pas</p>
             )}
           </div>
-          <Button onClick={handleChangePassword}>Mettre à jour le mot de passe</Button>
+          <Button onClick={handleChangePassword} disabled={loading}>
+            {loading ? "Mise à jour..." : "Mettre à jour le mot de passe"}
+          </Button>
         </CardContent>
       </Card>
 
