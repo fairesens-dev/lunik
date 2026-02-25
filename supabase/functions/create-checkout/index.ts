@@ -69,13 +69,13 @@ serve(async (req) => {
         Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
       );
 
-      const { error: insertError } = await supabaseAdmin.from("orders").insert({
+      const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
         ...orderData,
         payment_status: "pending",
         stripe_payment_intent_id: session.id,
         status: "Nouveau",
         status_history: [{ status: "Nouveau", date: new Date().toISOString() }],
-      });
+      }).select("id").single();
 
       if (insertError) {
         console.error("Order insert error:", insertError);
@@ -100,6 +100,31 @@ serve(async (req) => {
         postal_code: orderData.client_postal_code || "",
         message: orderData.message || "",
       });
+
+      // Send confirmation + admin notification emails
+      if (insertedOrder?.id) {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+        const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+        const sendEmail = async (type: string) => {
+          try {
+            await fetch(`${supabaseUrl}/functions/v1/send-order-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${serviceRoleKey}`,
+              },
+              body: JSON.stringify({ type, orderId: insertedOrder.id }),
+            });
+          } catch (e) {
+            console.error(`Failed to send ${type} email:`, e);
+          }
+        };
+
+        // Fire and forget - don't block checkout redirect
+        sendEmail("confirmation");
+        sendEmail("admin_new_order");
+      }
     }
 
     return new Response(JSON.stringify({ url: session.url }), {

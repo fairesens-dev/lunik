@@ -5,7 +5,7 @@ import {
   ChevronRight, Mail, Printer, MoreHorizontal, Copy, Check,
   Zap, Lightbulb, Smartphone, FileText, Star, RefreshCw,
   Bell, Truck, Ban, CreditCard, Eye, Send, Package, ClipboardCheck,
-  Search as SearchIcon, MapPin, CheckCircle2, Sun, Trash2,
+  Search as SearchIcon, MapPin, CheckCircle2, Sun, Trash2, Loader2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -59,6 +59,7 @@ const AdminOrderDetailPage = () => {
   const [newStatus, setNewStatus] = useState("");
   const [noteText, setNoteText] = useState("");
   const [copied, setCopied] = useState(false);
+  const [sendingEmail, setSendingEmail] = useState<string | null>(null);
   const [clientStats, setClientStats] = useState<{ count: number; total: number; first: string; last: string } | null>(null);
 
   // Tracking stages state
@@ -120,6 +121,29 @@ const AdminOrderDetailPage = () => {
   const options = order.options || [];
   const statusHistory = (order.status_history as any[]) || [];
 
+  const sendOrderEmail = async (type: string, extra?: any) => {
+    setSendingEmail(type);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-order-email", {
+        body: { type, orderId: order.id, extra },
+      });
+      if (error) throw error;
+      if (data?.success) {
+        toast({ title: "Email envoyé", description: `Email "${type}" envoyé avec succès.` });
+        // Refresh order to get updated emails_sent
+        const { data: refreshed } = await supabase.from("orders").select("*").eq("id", order.id).single();
+        if (refreshed) setOrder(refreshed);
+      } else {
+        throw new Error(data?.error || "Erreur inconnue");
+      }
+    } catch (err: any) {
+      console.error("Email error:", err);
+      toast({ title: "Erreur d'envoi", description: err.message || "Impossible d'envoyer l'email.", variant: "destructive" });
+    } finally {
+      setSendingEmail(null);
+    }
+  };
+
   const handleUpdateStatus = async () => {
     if (!newStatus || newStatus === order.status) return;
     const newHistory = [...statusHistory, { status: newStatus, date: new Date().toISOString() }];
@@ -127,6 +151,19 @@ const AdminOrderDetailPage = () => {
     if (!error) {
       setOrder({ ...order, status: newStatus, status_history: newHistory });
       toast({ title: "Statut mis à jour", description: `Commande ${order.ref} → ${newStatus}` });
+
+      // Auto-trigger emails based on status change
+      const emailMap: Record<string, string> = {
+        "En fabrication": "fabrication",
+        "Expédié": "shipped",
+        "Livré": "delivered",
+        "Annulé": "cancellation",
+      };
+      const emailType = emailMap[newStatus];
+      if (emailType) {
+        const extra = emailType === "shipped" ? { tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } } : undefined;
+        await sendOrderEmail(emailType, extra);
+      }
     }
   };
 
@@ -442,8 +479,15 @@ const AdminOrderDetailPage = () => {
                       <label className="text-xs text-muted-foreground mb-1 block">URL de tracking</label>
                       <Input className="h-8 text-xs" value={trackingUrl} onChange={e => setTrackingUrl(e.target.value)} placeholder="https://..." />
                     </div>
-                    <Button variant="outline" size="sm" className="text-xs" onClick={() => toast({ title: "Fonctionnalité à venir", description: "L'envoi d'email de tracking sera disponible prochainement." })}>
-                      <Send className="w-3.5 h-3.5 mr-1" /> Envoyer le tracking au client
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-xs"
+                      disabled={sendingEmail === "shipped"}
+                      onClick={() => sendOrderEmail("shipped", { tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } })}
+                    >
+                      {sendingEmail === "shipped" ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Send className="w-3.5 h-3.5 mr-1" />}
+                      Envoyer le tracking au client
                     </Button>
                   </div>
                 </>
@@ -575,19 +619,27 @@ const AdminOrderDetailPage = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               {TRANSACTIONAL_EMAILS.map((email) => {
-                const sent = false; // placeholder
+                const emailsSent = (order.emails_sent as any[]) || [];
+                const sentEntry = emailsSent.filter((e: any) => e.type === email.key).pop();
+                const sent = !!sentEntry;
                 return (
                   <div key={email.key} className="flex items-center justify-between text-xs py-1.5">
                     <div className="flex items-center gap-2">
                       {sent ? <CheckCircle2 className="w-3.5 h-3.5 text-green-600" /> : <span className="w-3.5 h-3.5 rounded-full border-2 border-gray-300 inline-block" />}
-                      <span className={sent ? "font-medium" : "text-muted-foreground"}>{email.label}</span>
+                      <span className={sent ? "font-medium" : "text-muted-foreground"}>
+                        {email.label}
+                        {sent && sentEntry?.sent_at && <span className="text-muted-foreground ml-1">— {formatDate(sentEntry.sent_at)}</span>}
+                      </span>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2" onClick={() => toast({ title: "Fonctionnalité à venir" })}>
-                        Renvoyer
-                      </Button>
-                      <Button variant="ghost" size="sm" className="h-6 text-[10px] px-2" onClick={() => toast({ title: "Fonctionnalité à venir" })}>
-                        Prévisualiser
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-6 text-[10px] px-2"
+                        disabled={sendingEmail === email.key}
+                        onClick={() => sendOrderEmail(email.key)}
+                      >
+                        {sendingEmail === email.key ? <Loader2 className="w-3 h-3 animate-spin" /> : (sent ? "Renvoyer" : "Envoyer")}
                       </Button>
                     </div>
                   </div>
@@ -621,13 +673,23 @@ const AdminOrderDetailPage = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               {[
-                { label: "Envoyer confirmation commande", icon: Mail, variant: "outline" as const },
-                { label: "Notifier mise en fabrication", icon: Bell, variant: "outline" as const },
-                { label: "Envoyer numéro de suivi", icon: Truck, variant: "outline" as const },
-                { label: "Demander un avis", icon: Star, variant: "outline" as const },
+                { label: "Envoyer confirmation commande", icon: Mail, type: "confirmation" },
+                { label: "Notifier mise en fabrication", icon: Bell, type: "fabrication" },
+                { label: "Envoyer numéro de suivi", icon: Truck, type: "shipped" },
+                { label: "Demander un avis", icon: Star, type: "review_request" },
               ].map((action) => (
-                <Button key={action.label} variant={action.variant} className="w-full justify-start text-xs h-9" onClick={() => toast({ title: "Fonctionnalité à venir" })}>
-                  <action.icon className="w-3.5 h-3.5 mr-2" /> {action.label}
+                <Button
+                  key={action.type}
+                  variant="outline"
+                  className="w-full justify-start text-xs h-9"
+                  disabled={sendingEmail === action.type}
+                  onClick={() => {
+                    const extra = action.type === "shipped" ? { tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } } : undefined;
+                    sendOrderEmail(action.type, extra);
+                  }}
+                >
+                  {sendingEmail === action.type ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <action.icon className="w-3.5 h-3.5 mr-2" />}
+                  {action.label}
                 </Button>
               ))}
               <Separator />
