@@ -1,150 +1,173 @@
 
 
-# Migration des donnees vers Supabase
+# Tunnel de Checkout Complet avec Stripe
 
-Toutes les donnees de l'application sont actuellement stockees en localStorage ou en dur dans le code (mock data). Ce plan cree les tables Supabase optimisees et adapte les contexts/pages pour lire et ecrire depuis la base de donnees.
+## Prerequis : Activation de Stripe
+
+Avant de coder quoi que ce soit, il faut activer l'integration Stripe sur le projet. Cela va :
+- Vous demander votre cle secrete Stripe (sk_test_xxx)
+- Configurer automatiquement les secrets Supabase
+- Debloquer les outils et patterns d'integration specifiques a Stripe (Edge Functions, webhooks, etc.)
+
+**Cette etape sera faite en premier lors de l'implementation.**
 
 ---
 
-## Tables a creer (1 migration SQL)
+## Architecture Globale
 
-### 1. `site_content` -- Contenu du site (key-value)
-Stocke les sections du ContentContext en une seule ligne par cle de section.
+```text
+[Configurateur] --> "Commander" --> [/checkout]
+     |                                  |
+     v                                  v
+  CartContext                   Step 1: Coordonnees
+  (sessionStorage)              Step 2: Livraison
+                                Step 3: Paiement (Stripe Elements)
+                                        |
+                                        v
+                                Edge Function: create-checkout
+                                (cree PaymentIntent Stripe)
+                                        |
+                                        v
+                                [/merci?ref=SC-XXX]
+                                        |
+                                [/suivi] (lookup public)
+```
+
+---
+
+## Schema de la base de donnees
+
+### Modifications sur la table `orders`
+
+Ajout de colonnes pour le checkout et le paiement :
 
 | Colonne | Type | Description |
 |---------|------|-------------|
-| id | text PK | Cle de section : `global`, `homepage`, `productPage`, `sav`, `promoBanner` |
-| data | jsonb NOT NULL | Contenu JSON de la section |
-| updated_at | timestamptz | Mis a jour automatiquement |
+| client_address | text | Adresse ligne 1 |
+| client_address2 | text | Adresse ligne 2 (optionnel) |
+| client_city | text | Ville |
+| client_country | text | Pays (default 'France') |
+| civility | text | M. ou Mme |
+| delivery_option | text | 'standard' ou 'installation' |
+| payment_method | text | 'card' ou '4x' |
+| payment_status | text | 'pending', 'paid', 'failed' |
+| stripe_payment_intent_id | text | ID du PaymentIntent Stripe |
+| newsletter_optin | boolean | Opt-in marketing |
 
-### 2. `configurator_settings` -- Parametres du configurateur
-Meme approche key-value pour les settings du configurateur.
-
-| Colonne | Type | Description |
-|---------|------|-------------|
-| id | text PK | Cle : `pricing`, `dimensions`, `toileColors`, `armatureColors`, `options` |
-| data | jsonb NOT NULL | Contenu JSON |
-| updated_at | timestamptz | |
-
-### 3. `orders` -- Commandes
-| Colonne | Type |
-|---------|------|
-| id | uuid PK (gen_random_uuid) |
-| ref | text UNIQUE NOT NULL |
-| client_name | text NOT NULL |
-| client_email | text NOT NULL |
-| client_phone | text |
-| client_postal_code | text |
-| width | integer NOT NULL |
-| projection | integer NOT NULL |
-| toile_color | text |
-| armature_color | text |
-| options | text[] DEFAULT '{}' |
-| amount | integer NOT NULL |
-| status | text NOT NULL DEFAULT 'Nouveau' |
-| message | text DEFAULT '' |
-| status_history | jsonb DEFAULT '[]' |
-| notes | text DEFAULT '' |
-| created_at | timestamptz DEFAULT now() |
-
-### 4. `leads` -- Leads / demandes de devis
-| Colonne | Type |
-|---------|------|
-| id | uuid PK (gen_random_uuid) |
-| first_name | text NOT NULL |
-| last_name | text NOT NULL |
-| email | text NOT NULL |
-| phone | text |
-| width | integer |
-| projection | integer |
-| toile_color | text |
-| armature_color | text |
-| options | text[] DEFAULT '{}' |
-| postal_code | text |
-| message | text DEFAULT '' |
-| processed | boolean DEFAULT false |
-| created_at | timestamptz DEFAULT now() |
-
-### 5. `contact_messages` -- Messages du formulaire de contact
-| Colonne | Type |
-|---------|------|
-| id | uuid PK (gen_random_uuid) |
-| first_name | text NOT NULL |
-| last_name | text NOT NULL |
-| email | text NOT NULL |
-| phone | text |
-| subject | text |
-| message | text NOT NULL |
-| created_at | timestamptz DEFAULT now() |
-
-### 6. `admin_settings` -- Parametres admin (notifications, livraison, etc.)
-| Colonne | Type |
-|---------|------|
-| id | text PK | Cle : `notifications`, `delivery`, `company` |
-| data | jsonb NOT NULL |
-| updated_at | timestamptz |
+Ajout d'une RLS policy pour permettre le SELECT public par ref + email (suivi commande).
 
 ---
 
-## Politiques RLS
+## Nouveaux fichiers
 
-- **`site_content`**, **`configurator_settings`**, **`admin_settings`** : SELECT public (le site doit lire le contenu), INSERT/UPDATE/DELETE uniquement pour les utilisateurs authentifies
-- **`orders`**, **`leads`**, **`contact_messages`** : INSERT public (les visiteurs soumettent des commandes/leads/messages), SELECT/UPDATE/DELETE uniquement pour les utilisateurs authentifies
-- Trigger `moddatetime` sur `updated_at` pour les tables key-value
+### 1. `src/contexts/CartContext.tsx`
+- Stocke la configuration du store (produit, dimensions, couleurs, options, prix detaille)
+- Persiste en `sessionStorage`
+- `setItem()` appele depuis le configurateur au clic "Commander"
+- `clearCart()` appele apres paiement reussi
+
+### 2. `src/pages/CheckoutPage.tsx`
+- Layout epure (pas de Header/Footer du site)
+- Header custom : logo + "Commande securisee" + bouton Retour
+- Barre de progression 3 etapes
+- Redirection vers `/store-coffre` si panier vide
+- Gere le state de l'etape courante (1, 2, 3)
+
+### 3. `src/components/checkout/CheckoutStep1.tsx` -- Coordonnees
+- Formulaire complet (civilite, nom, prenom, email, telephone, adresse, CP, ville, pays)
+- Autocompletion code postal -> ville (basique, dictionnaire local)
+- Section note collapsible
+- Cases a cocher CGV (obligatoire) + newsletter (optionnel)
+- Validation client-side avec zod + react-hook-form
+- Colonne droite : resume commande sticky
+
+### 4. `src/components/checkout/CheckoutStep2.tsx` -- Livraison
+- 2 options radio card : Livraison standard (gratuite) / Livraison + Installation (sur devis)
+- Date estimee calculee dynamiquement
+- Timeline visuelle de fabrication
+- Resume commande a droite
+
+### 5. `src/components/checkout/CheckoutStep3.tsx` -- Paiement
+- Choix CB comptant ou 4x sans frais (radio cards)
+- Stripe Elements (CardElement) pour la saisie carte
+- Simulation 4x : affichage du montant / 4 avec echeancier
+- Badges de securite
+- Bouton "Payer X euros" qui :
+  1. Appelle l'Edge Function `create-checkout` pour creer un PaymentIntent
+  2. Confirme le paiement avec `stripe.confirmCardPayment(clientSecret)`
+  3. Insere la commande dans Supabase
+  4. Redirige vers `/merci`
+
+### 6. `src/components/checkout/OrderSummary.tsx`
+- Composant reutilise dans les 3 etapes et la page merci
+- Affiche produit, config, options, prix detaille, TVA, badges confiance
+
+### 7. `supabase/functions/create-checkout/index.ts` -- Edge Function
+- Recoit le montant et les details commande
+- Cree un PaymentIntent Stripe cote serveur
+- Retourne le `clientSecret` au frontend
+- Gere aussi le mode 4x (metadata Stripe ou simulation)
+
+### 8. `src/pages/ThankYouPage.tsx` -- /merci
+- Animation checkmark CSS
+- Reference commande, email de confirmation
+- Resume commande (lecture seule)
+- Timeline "Et maintenant ?" (email, appel, fabrication, livraison)
+- Boutons retour accueil + suivi commande
+
+### 9. `src/pages/OrderTrackingPage.tsx` -- /suivi
+- Formulaire lookup : reference + email
+- Requete Supabase sur `orders` filtree par ref et email
+- Timeline verticale avec statut courant
+- Barre de progression visuelle
 
 ---
 
-## Seed des donnees par defaut
+## Modifications de fichiers existants
 
-La migration inclura des INSERT avec les valeurs par defaut actuelles (contenu du site, parametres configurateur) pour que la base soit operationnelle immediatement.
+### `src/App.tsx`
+- Ajout des routes `/checkout`, `/merci`, `/suivi`
+- `/checkout` hors du Layout principal (pas de Header/Footer)
+- `/merci` et `/suivi` dans le Layout ou avec layout custom
+- Wrapping avec `CartProvider`
 
----
+### `src/components/product/ConfiguratorSection.tsx`
+- Le bouton "Commander ce store" appelle `setItem()` du CartContext puis `navigate('/checkout')`
+- Supprime l'ouverture du OrderModal (remplace par le tunnel checkout)
 
-## Fichiers modifies
+### `src/pages/ProductPage.tsx`
+- Supprime le state `orderOpen` et le composant `OrderModal`
+- Le configurateur redirige directement vers `/checkout`
 
-### `src/contexts/ContentContext.tsx`
-- Remplacer localStorage par des requetes Supabase (`supabase.from('site_content')`)
-- Charger les donnees au mount avec `useEffect` + `supabase.select()`
-- Chaque `update*` fait un `upsert` dans la table `site_content`
-- Garder les valeurs par defaut comme fallback si la base est vide
-
-### `src/contexts/ConfiguratorSettingsContext.tsx`
-- Meme approche : remplacer localStorage par Supabase `configurator_settings`
-- `loadSettings()` fait un SELECT, `persist()` fait un UPSERT
-- Fallback sur DEFAULT_SETTINGS
-
-### `src/pages/admin/AdminOrdersPage.tsx`
-- Remplacer `MOCK_ORDERS` par un `useEffect` + `supabase.from('orders').select()` au mount
-- `updateStatus()` fait un UPDATE sur la table
-- Export CSV utilise les donnees de la base
-
-### `src/pages/admin/AdminLeadsPage.tsx`
-- Remplacer `MOCK_LEADS` par un SELECT sur la table `leads`
-- `toggleTraite()` fait un UPDATE (`processed`)
-- `deleteLead()` fait un DELETE
-
-### `src/components/product/OrderModal.tsx`
-- `handleSubmit()` fait un INSERT dans `orders` (genere la ref auto)
-- Fait aussi un INSERT dans `leads`
-
-### `src/pages/ContactPage.tsx`
-- `handleSubmit()` fait un INSERT dans `contact_messages`
-
-### `src/pages/admin/AdminSettingsPage.tsx`
-- Tabs Notifications et Livraison : remplacer localStorage par la table `admin_settings`
-- Tab Mon compte (entreprise) : reste synce avec `site_content.global`
-
-### `src/pages/admin/AdminDashboardPage.tsx`
-- Les KPIs et commandes recentes liront depuis `orders` et `leads` avec des requetes d'agregation
+### `src/integrations/supabase/types.ts`
+- Mis a jour automatiquement apres la migration SQL
 
 ---
 
-## Details techniques
+## Flux de paiement detaille
 
-- Les tables key-value (`site_content`, `configurator_settings`, `admin_settings`) utilisent un `id` text comme cle primaire pour simplifier les upserts
-- Extension `moddatetime` activee pour `updated_at` automatique
-- Les donnees mock actuelles seront inserees comme seed dans la migration pour une transition sans perte
-- Le ref des commandes sera genere cote client avec le pattern `CMD-YYYY-NNN` (numero sequentiel base sur un compteur dans la table)
-- Pas de foreign key vers `auth.users` (conformement aux guidelines Supabase)
-- Les contexts gardent un state local pour la reactivite UI, synchronise avec Supabase en arriere-plan
+1. Utilisateur remplit les 3 etapes du checkout
+2. Au clic "Payer", le frontend appelle l'Edge Function `create-checkout`
+3. L'Edge Function cree un `PaymentIntent` Stripe avec le montant en centimes
+4. Le frontend recoit le `clientSecret` et appelle `stripe.confirmCardPayment()`
+5. Si succes : INSERT dans `orders` avec `payment_status: 'paid'` + INSERT dans `leads`
+6. Redirection vers `/merci?ref=SC-XXX`
+7. Si echec : message d'erreur inline sous le formulaire carte
+
+### Option 4x sans frais
+- Pour le MVP : meme flow Stripe mais le montant affiche est divise par 4
+- Le paiement reel est du montant total (simulation visuelle uniquement)
+- Commentaire `// TODO: Replace with Alma API or Stripe installments` pour la production
+- En production : utiliser Stripe Payment Intents avec `payment_method_options.card.installments` ou integrer Alma
+
+---
+
+## Section technique
+
+- **Stripe Elements** : utilise `@stripe/react-stripe-js` avec `loadStripe(pk_test_xxx)`
+- **Edge Function** : utilise le secret `STRIPE_SECRET_KEY` configure via l'outil Stripe
+- **Validation** : schemas zod pour chaque etape du formulaire
+- **Persistance panier** : `sessionStorage` pour eviter la perte au refresh mais nettoyer a la fermeture du navigateur
+- **RLS suivi** : nouvelle policy SELECT sur `orders` avec condition `ref = $ref AND client_email = $email` via une fonction RPC Supabase (pour ne pas exposer toutes les commandes)
+- **TVA** : calculee a 20% (`total / 1.2 * 0.2`)
 
