@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { ExternalLink, Eye, ArrowUp, ArrowDown, Trash2, Plus, Save } from "lucide-react";
+import { ExternalLink, Eye, ArrowUp, ArrowDown, Trash2, Plus, Save, Upload, X } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useConfiguratorSettings, type ColorEntry, type OptionEntry } from "@/contexts/ConfiguratorSettingsContext";
+import { supabase } from "@/integrations/supabase/client";
 
 /* ═══════════════════════════════════════════════════════ */
 
@@ -53,6 +54,7 @@ const AdminConfiguratorPage = () => {
             subtitle="Activez ou désactivez les coloris affichés dans le configurateur"
             colors={settings.toileColors}
             swatchType="circle"
+            showPhotoUpload
             onSave={(colors) => { reorderToileColors(colors); toast({ title: "✅ Couleurs de toile mises à jour" }); }}
             onAdd={addToileColor}
             onRemove={removeToileColor}
@@ -216,12 +218,13 @@ function DimensionsTab({ settings, onSave, toast }: { settings: any; onSave: any
    TAB 3 & 4 — COLORS (shared)
    ═══════════════════════════════════════════════════════ */
 
-function ColorsTab({ title, subtitle, colors: initialColors, swatchType, onSave, onAdd, onRemove, onUpdate }: {
-  title: string; subtitle: string; colors: ColorEntry[]; swatchType: "circle" | "rectangle";
+function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPhotoUpload, onSave, onAdd, onRemove, onUpdate }: {
+  title: string; subtitle: string; colors: ColorEntry[]; swatchType: "circle" | "rectangle"; showPhotoUpload?: boolean;
   onSave: (c: ColorEntry[]) => void; onAdd: (c: ColorEntry) => void; onRemove: (id: string) => void; onUpdate: (id: string, d: Partial<Omit<ColorEntry, "id">>) => void;
 }) {
   const [local, setLocal] = useState<ColorEntry[]>(initialColors);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
 
   const move = (idx: number, dir: -1 | 1) => {
     const next = [...local];
@@ -246,6 +249,34 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, onSave,
   const confirmDelete = (id: string) => {
     setLocal(local.filter(c => c.id !== id));
     setDeleting(null);
+  };
+
+  const handlePhotoUpload = async (idx: number, file: File) => {
+    const colorId = local[idx].id;
+    setUploading(colorId);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `toile/${colorId}.${ext}`;
+      const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
+      updateField(idx, "photoUrl" as keyof ColorEntry, urlData.publicUrl);
+    } catch (e: any) {
+      console.error("Upload error:", e);
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const handlePhotoRemove = async (idx: number) => {
+    const c = local[idx];
+    if (c.photoUrl) {
+      const pathMatch = c.photoUrl.match(/product-photos\/(.+)$/);
+      if (pathMatch) {
+        await supabase.storage.from("product-photos").remove([pathMatch[1]]);
+      }
+    }
+    updateField(idx, "photoUrl" as keyof ColorEntry, undefined);
   };
 
   const save = () => {
@@ -283,6 +314,32 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, onSave,
                   <Input value={c.hex} onChange={e => updateField(i, "hex", e.target.value)} className="w-24 h-8 text-sm font-mono" />
                   <input type="color" value={c.hex} onChange={e => updateField(i, "hex", e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0" />
                 </div>
+                {showPhotoUpload && (
+                  <div className="flex items-center gap-2">
+                    {c.photoUrl ? (
+                      <>
+                        <img src={c.photoUrl} alt="" className="w-10 h-10 object-cover rounded border" />
+                        <button onClick={() => handlePhotoRemove(i)} className="text-gray-400 hover:text-red-500" title="Supprimer la photo">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </>
+                    ) : (
+                      <label className="cursor-pointer flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700">
+                        <Upload className="w-3.5 h-3.5" />
+                        <span>{uploading === c.id ? "…" : "Photo"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) handlePhotoUpload(i, f);
+                          }}
+                        />
+                      </label>
+                    )}
+                  </div>
+                )}
                 <Switch checked={c.active} onCheckedChange={v => updateField(i, "active", v)} />
                 <button onClick={() => setDeleting(c.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
               </>
