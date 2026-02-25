@@ -15,6 +15,7 @@ import CGVPage from "./pages/CGVPage";
 import MentionsLegalesPage from "./pages/MentionsLegalesPage";
 import NotFound from "./pages/NotFound";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
+import AdminResetPasswordPage from "./pages/admin/AdminResetPasswordPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboardPage from "./pages/admin/AdminDashboardPage";
@@ -49,6 +50,7 @@ const App = () => (
 
             {/* Admin login (public, no layout) */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
+            <Route path="/admin/reset-password" element={<AdminResetPasswordPage />} />
 
             {/* Admin protected routes */}
             <Route element={<ProtectedRoute />}>
