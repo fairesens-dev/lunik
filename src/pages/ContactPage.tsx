@@ -1,3 +1,4 @@
+import { useState } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,9 +10,38 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Phone, Mail, Clock, MapPin } from "lucide-react";
+import { Phone, Mail, Clock, MapPin, CheckCircle } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const ContactPage = () => {
+  const { toast } = useToast();
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [form, setForm] = useState({ prenom: "", nom: "", email: "", telephone: "", subject: "", message: "" });
+
+  const update = (field: string, value: string) => setForm(prev => ({ ...prev, [field]: value }));
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmitting(true);
+    try {
+      await supabase.from("contact_messages" as any).insert({
+        first_name: form.prenom,
+        last_name: form.nom,
+        email: form.email,
+        phone: form.telephone,
+        subject: form.subject,
+        message: form.message,
+      } as any);
+      setSubmitted(true);
+    } catch {
+      toast({ title: "Erreur", description: "Impossible d'envoyer le message.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <section className="py-28 lg:py-36">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
@@ -80,35 +110,46 @@ const ContactPage = () => {
 
           {/* Right — Form */}
           <AnimatedSection delay={0.2} className="lg:col-span-2">
-            <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input placeholder="Prénom" className="rounded-none border-border bg-transparent h-12 text-sm" />
-                <Input placeholder="Nom" className="rounded-none border-border bg-transparent h-12 text-sm" />
+            {submitted ? (
+              <div className="text-center py-16">
+                <CheckCircle className="w-12 h-12 text-primary mx-auto mb-4" />
+                <h3 className="font-serif text-2xl mb-2">Message envoyé !</h3>
+                <p className="text-sm text-muted-foreground">Nous vous répondrons sous 24h.</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input placeholder="Email" type="email" className="rounded-none border-border bg-transparent h-12 text-sm" />
-                <Input placeholder="Téléphone" type="tel" className="rounded-none border-border bg-transparent h-12 text-sm" />
-              </div>
-              <Select>
-                <SelectTrigger className="rounded-none border-border bg-transparent h-12 text-sm">
-                  <SelectValue placeholder="Objet de votre demande" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="devis">Demande de devis</SelectItem>
-                  <SelectItem value="info">Renseignements</SelectItem>
-                  <SelectItem value="sav">Service après-vente</SelectItem>
-                  <SelectItem value="partenariat">Partenariat</SelectItem>
-                  <SelectItem value="autre">Autre</SelectItem>
-                </SelectContent>
-              </Select>
-              <Textarea
-                placeholder="Votre message..."
-                className="rounded-none border-border bg-transparent min-h-[180px] text-sm resize-none"
-              />
-              <Button className="bg-primary text-primary-foreground px-10 py-4 rounded-none tracking-[0.15em] uppercase text-xs font-medium hover:bg-primary/90 transition-colors h-auto w-full">
-                Envoyer
-              </Button>
-            </form>
+            ) : (
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input placeholder="Prénom" required value={form.prenom} onChange={e => update("prenom", e.target.value)} className="rounded-none border-border bg-transparent h-12 text-sm" />
+                  <Input placeholder="Nom" required value={form.nom} onChange={e => update("nom", e.target.value)} className="rounded-none border-border bg-transparent h-12 text-sm" />
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input placeholder="Email" type="email" required value={form.email} onChange={e => update("email", e.target.value)} className="rounded-none border-border bg-transparent h-12 text-sm" />
+                  <Input placeholder="Téléphone" type="tel" value={form.telephone} onChange={e => update("telephone", e.target.value)} className="rounded-none border-border bg-transparent h-12 text-sm" />
+                </div>
+                <Select value={form.subject} onValueChange={v => update("subject", v)}>
+                  <SelectTrigger className="rounded-none border-border bg-transparent h-12 text-sm">
+                    <SelectValue placeholder="Objet de votre demande" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="devis">Demande de devis</SelectItem>
+                    <SelectItem value="info">Renseignements</SelectItem>
+                    <SelectItem value="sav">Service après-vente</SelectItem>
+                    <SelectItem value="partenariat">Partenariat</SelectItem>
+                    <SelectItem value="autre">Autre</SelectItem>
+                  </SelectContent>
+                </Select>
+                <Textarea
+                  placeholder="Votre message..."
+                  required
+                  value={form.message}
+                  onChange={e => update("message", e.target.value)}
+                  className="rounded-none border-border bg-transparent min-h-[180px] text-sm resize-none"
+                />
+                <Button disabled={submitting} className="bg-primary text-primary-foreground px-10 py-4 rounded-none tracking-[0.15em] uppercase text-xs font-medium hover:bg-primary/90 transition-colors h-auto w-full">
+                  {submitting ? "Envoi en cours..." : "Envoyer"}
+                </Button>
+              </form>
+            )}
           </AnimatedSection>
         </div>
       </div>

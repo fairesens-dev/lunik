@@ -1,6 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Eye, Mail, Download, Search, Zap, Lightbulb, Smartphone } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,10 @@ import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Order {
-  id: number; ref: string;
+  id: string; ref: string;
   client: { name: string; email: string; phone: string; cp: string };
   width: number; projection: number;
   toileColor: string; armatureColor: string;
@@ -22,23 +23,24 @@ interface Order {
   notes: string;
 }
 
-const MOCK_ORDERS: Order[] = [
-  { id: 1, ref: "CMD-2024-047", client: { name: "Pierre Durand", email: "p.durand@email.fr", phone: "06 12 34 56 78", cp: "75008" }, width: 400, projection: 300, toileColor: "Sauge", armatureColor: "Anthracite", options: ["Motorisation", "LED"], montant: 3210, status: "Nouveau", date: "2024-01-22", message: "Merci de livrer avant fin février.", statusHistory: [{ status: "Nouveau", date: "22/01/2024" }], notes: "" },
-  { id: 2, ref: "CMD-2024-046", client: { name: "Marie Laurent", email: "m.laurent@email.fr", phone: "07 98 76 54 32", cp: "69003" }, width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Blanc", options: ["Motorisation"], montant: 2710, status: "En fabrication", date: "2024-01-20", message: "", statusHistory: [{ status: "Nouveau", date: "20/01" }, { status: "En fabrication", date: "21/01" }], notes: "Client contacté par tel." },
-  { id: 3, ref: "CMD-2024-045", client: { name: "Jean Moreau", email: "j.moreau@email.fr", phone: "06 55 44 33 22", cp: "33000" }, width: 300, projection: 200, toileColor: "Ivoire", armatureColor: "Anthracite", options: [], montant: 1890, status: "Expédié", date: "2024-01-18", message: "RAS", statusHistory: [{ status: "Nouveau", date: "18/01" }, { status: "En fabrication", date: "19/01" }, { status: "Expédié", date: "22/01" }], notes: "" },
-  { id: 4, ref: "CMD-2024-044", client: { name: "Sophie Bernard", email: "s.bernard@email.fr", phone: "06 11 22 33 44", cp: "13001" }, width: 450, projection: 350, toileColor: "Taupe", armatureColor: "Anthracite", options: ["Motorisation", "LED", "Pack Connect"], montant: 4560, status: "Livré", date: "2024-01-15", message: "", statusHistory: [{ status: "Nouveau", date: "15/01" }, { status: "En fabrication", date: "16/01" }, { status: "Expédié", date: "19/01" }, { status: "Livré", date: "22/01" }], notes: "Livraison OK, client satisfait." },
-  { id: 5, ref: "CMD-2024-043", client: { name: "Luc Petit", email: "l.petit@email.fr", phone: "07 66 55 44 33", cp: "31000" }, width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Blanc", options: ["LED"], montant: 2320, status: "En fabrication", date: "2024-01-14", message: "Pouvez-vous me rappeler ?", statusHistory: [{ status: "Nouveau", date: "14/01" }, { status: "En fabrication", date: "16/01" }], notes: "" },
-  { id: 6, ref: "CMD-2024-042", client: { name: "Claire Dubois", email: "c.dubois@email.fr", phone: "06 77 88 99 00", cp: "44000" }, width: 300, projection: 250, toileColor: "Ivoire", armatureColor: "Anthracite", options: ["Motorisation"], montant: 2420, status: "Nouveau", date: "2024-01-12", message: "", statusHistory: [{ status: "Nouveau", date: "12/01" }], notes: "" },
-  { id: 7, ref: "CMD-2024-041", client: { name: "François Martin", email: "f.martin@email.fr", phone: "06 33 22 11 00", cp: "67000" }, width: 400, projection: 300, toileColor: "Taupe", armatureColor: "Blanc", options: [], montant: 2030, status: "Livré", date: "2024-01-10", message: "", statusHistory: [{ status: "Nouveau", date: "10/01" }, { status: "Livré", date: "18/01" }], notes: "" },
-  { id: 8, ref: "CMD-2024-040", client: { name: "Nathalie Roux", email: "n.roux@email.fr", phone: "07 44 55 66 77", cp: "59000" }, width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Anthracite", options: ["Motorisation", "LED"], montant: 3210, status: "Expédié", date: "2024-01-08", message: "Livraison le matin SVP.", statusHistory: [{ status: "Nouveau", date: "08/01" }, { status: "En fabrication", date: "09/01" }, { status: "Expédié", date: "14/01" }], notes: "" },
-  { id: 9, ref: "CMD-2024-039", client: { name: "Alain Lefevre", email: "a.lefevre@email.fr", phone: "06 88 77 66 55", cp: "21000" }, width: 300, projection: 200, toileColor: "Ivoire", armatureColor: "Blanc", options: ["Pack Connect"], montant: 2280, status: "Annulé", date: "2024-01-06", message: "J'annule ma commande.", statusHistory: [{ status: "Nouveau", date: "06/01" }, { status: "Annulé", date: "08/01" }], notes: "Remboursement effectué." },
-  { id: 10, ref: "CMD-2024-038", client: { name: "Isabelle Garcia", email: "i.garcia@email.fr", phone: "07 99 88 77 66", cp: "34000" }, width: 450, projection: 350, toileColor: "Taupe", armatureColor: "Anthracite", options: ["Motorisation"], montant: 3420, status: "En fabrication", date: "2024-01-05", message: "", statusHistory: [{ status: "Nouveau", date: "05/01" }, { status: "En fabrication", date: "07/01" }], notes: "" },
-  { id: 11, ref: "CMD-2024-037", client: { name: "David Thomas", email: "d.thomas@email.fr", phone: "06 22 33 44 55", cp: "06000" }, width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Anthracite", options: ["LED"], montant: 2320, status: "Nouveau", date: "2024-01-03", message: "", statusHistory: [{ status: "Nouveau", date: "03/01" }], notes: "" },
-  { id: 12, ref: "CMD-2024-036", client: { name: "Émilie Blanc", email: "e.blanc@email.fr", phone: "07 11 00 99 88", cp: "38000" }, width: 400, projection: 300, toileColor: "Ivoire", armatureColor: "Blanc", options: ["Motorisation", "Pack Connect"], montant: 3460, status: "Livré", date: "2023-12-28", message: "", statusHistory: [{ status: "Nouveau", date: "28/12" }, { status: "Livré", date: "10/01" }], notes: "" },
-  { id: 13, ref: "CMD-2024-035", client: { name: "Philippe Morel", email: "p.morel@email.fr", phone: "06 44 33 22 11", cp: "54000" }, width: 300, projection: 200, toileColor: "Taupe", armatureColor: "Anthracite", options: [], montant: 1890, status: "Expédié", date: "2023-12-22", message: "", statusHistory: [{ status: "Nouveau", date: "22/12" }, { status: "Expédié", date: "02/01" }], notes: "" },
-  { id: 14, ref: "CMD-2024-034", client: { name: "Valérie Simon", email: "v.simon@email.fr", phone: "07 55 44 33 22", cp: "35000" }, width: 350, projection: 250, toileColor: "Sauge", armatureColor: "Blanc", options: ["Motorisation", "LED"], montant: 3210, status: "En fabrication", date: "2023-12-20", message: "Urgent SVP", statusHistory: [{ status: "Nouveau", date: "20/12" }, { status: "En fabrication", date: "22/12" }], notes: "" },
-  { id: 15, ref: "CMD-2024-033", client: { name: "Marc Fournier", email: "m.fournier@email.fr", phone: "06 66 77 88 99", cp: "29000" }, width: 400, projection: 300, toileColor: "Ivoire", armatureColor: "Anthracite", options: ["LED", "Pack Connect"], montant: 3180, status: "Nouveau", date: "2023-12-18", message: "", statusHistory: [{ status: "Nouveau", date: "18/12" }], notes: "" },
-];
+function mapRow(r: any): Order {
+  return {
+    id: r.id,
+    ref: r.ref,
+    client: { name: r.client_name, email: r.client_email, phone: r.client_phone || "", cp: r.client_postal_code || "" },
+    width: r.width,
+    projection: r.projection,
+    toileColor: r.toile_color || "",
+    armatureColor: r.armature_color || "",
+    options: r.options || [],
+    montant: r.amount,
+    status: r.status,
+    date: r.created_at?.split("T")[0] || "",
+    message: r.message || "",
+    statusHistory: r.status_history || [],
+    notes: r.notes || "",
+  };
+}
 
 const STATUS_OPTIONS = ["Tous", "Nouveau", "En fabrication", "Expédié", "Livré", "Annulé"];
 const PERIOD_OPTIONS = ["Ce mois", "3 mois", "6 mois", "Cette année", "Personnalisé"];
@@ -53,14 +55,17 @@ const statusColor: Record<string, string> = {
 
 const optionIcon: Record<string, React.ReactNode> = {
   Motorisation: <Zap className="w-3.5 h-3.5" />,
+  "Motorisation Somfy io": <Zap className="w-3.5 h-3.5" />,
   LED: <Lightbulb className="w-3.5 h-3.5" />,
+  "Éclairage LED sous store": <Lightbulb className="w-3.5 h-3.5" />,
   "Pack Connect": <Smartphone className="w-3.5 h-3.5" />,
 };
 
 const PER_PAGE = 10;
 
 const AdminOrdersPage = () => {
-  const [orders, setOrders] = useState<Order[]>(MOCK_ORDERS);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("Tous");
   const [period, setPeriod] = useState("Ce mois");
@@ -68,8 +73,16 @@ const AdminOrdersPage = () => {
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [drawerNotes, setDrawerNotes] = useState<Record<number, string>>({});
-  const [selected, setSelected] = useState<Set<number>>(new Set());
+  const [drawerNotes, setDrawerNotes] = useState<Record<string, string>>({});
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("orders" as any).select("*").order("created_at", { ascending: false }) as any;
+      if (data) setOrders(data.map(mapRow));
+      setLoading(false);
+    })();
+  }, []);
 
   const filtered = useMemo(() => {
     let result = orders;
@@ -95,12 +108,23 @@ const AdminOrdersPage = () => {
     URL.revokeObjectURL(url);
   };
 
-  const updateStatus = (id: number, newStatus: string) => {
-    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus, statusHistory: [...o.statusHistory, { status: newStatus, date: new Date().toLocaleDateString("fr-FR") }] } : o));
-    if (selectedOrder?.id === id) setSelectedOrder(prev => prev ? { ...prev, status: newStatus, statusHistory: [...prev.statusHistory, { status: newStatus, date: new Date().toLocaleDateString("fr-FR") }] } : null);
+  const updateStatus = async (id: string, newStatus: string) => {
+    const order = orders.find(o => o.id === id);
+    if (!order) return;
+    const newHistory = [...order.statusHistory, { status: newStatus, date: new Date().toLocaleDateString("fr-FR") }];
+    await supabase.from("orders" as any).update({ status: newStatus, status_history: newHistory } as any).eq("id", id);
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, status: newStatus, statusHistory: newHistory } : o));
+    if (selectedOrder?.id === id) setSelectedOrder(prev => prev ? { ...prev, status: newStatus, statusHistory: newHistory } : null);
+  };
+
+  const saveNotes = async (id: string, notes: string) => {
+    await supabase.from("orders" as any).update({ notes } as any).eq("id", id);
+    setOrders(prev => prev.map(o => o.id === id ? { ...o, notes } : o));
   };
 
   const area = selectedOrder ? ((selectedOrder.width * selectedOrder.projection) / 10000).toFixed(2) : "";
+
+  if (loading) return <div className="p-8 text-center text-muted-foreground">Chargement des commandes...</div>;
 
   return (
     <div className="space-y-4 font-sans">
@@ -153,6 +177,9 @@ const AdminOrdersPage = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
+              {paginated.length === 0 && (
+                <TableRow><TableCell colSpan={9} className="text-center text-muted-foreground py-8">Aucune commande</TableCell></TableRow>
+              )}
               {paginated.map(o => (
                 <TableRow key={o.id}>
                   <TableCell><Checkbox checked={selected.has(o.id)} onCheckedChange={(c) => { const n = new Set(selected); if (c) n.add(o.id); else n.delete(o.id); setSelected(n); }} /></TableCell>
@@ -228,10 +255,7 @@ const AdminOrdersPage = () => {
                   <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Configuration</h3>
                   <div className="text-sm space-y-1.5">
                     <p>Dimensions : {selectedOrder.width} × {selectedOrder.projection} cm ({area} m²)</p>
-                    <div className="flex items-center gap-2">
-                      Toile : {selectedOrder.toileColor}
-                      <span className="w-4 h-4 rounded-full border" style={{ backgroundColor: selectedOrder.toileColor === "Sauge" ? "#4A5E3A" : selectedOrder.toileColor === "Ivoire" ? "#FFFFF0" : "#8B7D6B" }} />
-                    </div>
+                    <p>Toile : {selectedOrder.toileColor}</p>
                     <p>Armature : {selectedOrder.armatureColor}</p>
                     {selectedOrder.options.length > 0 && <p>Options : {selectedOrder.options.join(", ")}</p>}
                   </div>
@@ -240,15 +264,8 @@ const AdminOrdersPage = () => {
 
                 {/* Price */}
                 <div>
-                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Détail prix</h3>
-                  <div className="text-sm space-y-1">
-                    <div className="flex justify-between"><span>Base</span><span>2 030 €</span></div>
-                    {selectedOrder.options.includes("Motorisation") && <div className="flex justify-between"><span>Motorisation</span><span>+390 €</span></div>}
-                    {selectedOrder.options.includes("LED") && <div className="flex justify-between"><span>LED</span><span>+290 €</span></div>}
-                    {selectedOrder.options.includes("Pack Connect") && <div className="flex justify-between"><span>Pack Connect</span><span>+250 €</span></div>}
-                    <Separator className="my-1" />
-                    <div className="flex justify-between font-bold"><span>Total</span><span>{selectedOrder.montant.toLocaleString("fr-FR")} €</span></div>
-                  </div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase mb-2">Montant</h3>
+                  <p className="text-sm font-bold">{selectedOrder.montant.toLocaleString("fr-FR")} €</p>
                 </div>
                 <Separator />
 
@@ -298,6 +315,12 @@ const AdminOrdersPage = () => {
                     placeholder="Ajouter une note..."
                     value={drawerNotes[selectedOrder.id] ?? selectedOrder.notes}
                     onChange={e => setDrawerNotes(prev => ({ ...prev, [selectedOrder.id]: e.target.value }))}
+                    onBlur={() => {
+                      const notes = drawerNotes[selectedOrder.id];
+                      if (notes !== undefined && notes !== selectedOrder.notes) {
+                        saveNotes(selectedOrder.id, notes);
+                      }
+                    }}
                     className="text-sm"
                   />
                 </div>

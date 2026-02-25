@@ -14,7 +14,204 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_settings: {
+        Row: {
+          data: Json
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      configurator_settings: {
+        Row: {
+          data: Json
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          message: string
+          phone: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          message: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          message?: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      leads: {
+        Row: {
+          armature_color: string | null
+          created_at: string
+          email: string
+          first_name: string
+          id: string
+          last_name: string
+          message: string | null
+          options: string[] | null
+          phone: string | null
+          postal_code: string | null
+          processed: boolean
+          projection: number | null
+          toile_color: string | null
+          width: number | null
+        }
+        Insert: {
+          armature_color?: string | null
+          created_at?: string
+          email: string
+          first_name: string
+          id?: string
+          last_name: string
+          message?: string | null
+          options?: string[] | null
+          phone?: string | null
+          postal_code?: string | null
+          processed?: boolean
+          projection?: number | null
+          toile_color?: string | null
+          width?: number | null
+        }
+        Update: {
+          armature_color?: string | null
+          created_at?: string
+          email?: string
+          first_name?: string
+          id?: string
+          last_name?: string
+          message?: string | null
+          options?: string[] | null
+          phone?: string | null
+          postal_code?: string | null
+          processed?: boolean
+          projection?: number | null
+          toile_color?: string | null
+          width?: number | null
+        }
+        Relationships: []
+      }
+      orders: {
+        Row: {
+          amount: number
+          armature_color: string | null
+          client_email: string
+          client_name: string
+          client_phone: string | null
+          client_postal_code: string | null
+          created_at: string
+          id: string
+          message: string | null
+          notes: string | null
+          options: string[] | null
+          projection: number
+          ref: string
+          status: string
+          status_history: Json | null
+          toile_color: string | null
+          width: number
+        }
+        Insert: {
+          amount: number
+          armature_color?: string | null
+          client_email: string
+          client_name: string
+          client_phone?: string | null
+          client_postal_code?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          notes?: string | null
+          options?: string[] | null
+          projection: number
+          ref: string
+          status?: string
+          status_history?: Json | null
+          toile_color?: string | null
+          width: number
+        }
+        Update: {
+          amount?: number
+          armature_color?: string | null
+          client_email?: string
+          client_name?: string
+          client_phone?: string | null
+          client_postal_code?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          notes?: string | null
+          options?: string[] | null
+          projection?: number
+          ref?: string
+          status?: string
+          status_history?: Json | null
+          toile_color?: string | null
+          width?: number
+        }
+        Relationships: []
+      }
+      site_content: {
+        Row: {
+          data: Json
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          data?: Json
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          data?: Json
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
