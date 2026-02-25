@@ -1,86 +1,85 @@
 
 
-# Build Admin Dashboard, Orders & Leads Pages
+# Configurator Settings Admin Page
 
-Rewrite 3 existing placeholder pages into fully functional admin interfaces with charts, tables, filters, and detail drawers -- all using mock data.
-
----
-
-## Files to Modify
-
-### 1. `src/pages/admin/AdminDashboardPage.tsx` -- REWRITE
-
-**Row 1 -- KPI Cards (4 columns)**
-- 4 cards: Commandes (23, +12%), CA (47 320 euros, +8%), Visiteurs (3 847, +23%), Taux conversion (2.8%, -0.2%)
-- Each card includes a recharts `LineChart` sparkline (height 40px, no axes/tooltip, just stroke line)
-- Trend badge: green `ArrowUp` or red `ArrowDown` icon + percentage text
-- Mock sparkline data arrays (7 data points each)
-
-**Row 2 -- Main Charts (2 columns, 60/40 split)**
-- Left: recharts `ComposedChart` with `Bar` (commandes, gray) + `Line` (CA, sage green #4A5E3A), dual Y axes, X axis months Jan-Dec, Tooltip, Legend
-- Right: recharts `PieChart` (donut via `innerRadius`) -- 4 segments (Sans option 38%, Motorisation 35%, LED 12%, Pack Connect 15%), colors #4A5E3A, #8FA07A, #C8B89A, #1A1A1A, legend with percentages
-
-**Row 3 -- Split Tables (2 columns)**
-- Left: "Dernieres commandes" -- Table with 5 rows (Ref, Client, Dimensions, Options, Montant, Statut badge, Date). Status badges color-coded. Link to /admin/commandes
-- Right: "Derniers leads non traites" -- 5 card-style entries (name, email, phone, config, date). "Contacter" mailto link + "Marquer traite" checkbox. Link to /admin/leads
-
-**Row 4 -- Alerts**
-- Full-width card with 3 mock alerts using colored left borders (orange warning, green success, blue info)
-
-Uses: `useAuth` for admin name, recharts components, Card, Table, Badge, Checkbox from shadcn
+Build a `ConfiguratorContext` shared between admin settings and front-end configurator, plus a full admin settings page with 5 tabs.
 
 ---
 
-### 2. `src/pages/admin/AdminOrdersPage.tsx` -- REWRITE
+## New Files
 
-**Mock Data**: 15 realistic order objects with: id, ref, client (name/email/phone/cp), width, projection, toileColor, armatureColor, options array, montant, status, date, message, statusHistory array, notes
+### 1. `src/contexts/ConfiguratorSettingsContext.tsx`
 
-**Filter Bar**: 
-- Search Input (filters by name/email/ref)
-- Select for Status (Tous, Nouveau, En fabrication, Expedie, Livre, Annule)
-- Select for Period (Ce mois, 3 mois, 6 mois, Cette annee, Personnalise)
-- DatePicker range (visible only when Personnalise selected) -- use simple date inputs
-- "Exporter CSV" button (generates and downloads a CSV blob from filtered data)
+React Context holding the full configurator configuration state:
+- **State structure**: `pricing` (baseRate, minPrice, installmentDivisor), `dimensions` (width/projection min/max/step), `toileColors[]`, `armatureColors[]`, `options[]` -- exactly as specified
+- **Persistence**: localStorage key `configurator_settings`, loaded on mount with fallback to defaults
+- **Methods exposed**: `updatePricing()`, `updateDimensions()`, `updateToileColor()`, `addToileColor()`, `removeToileColor()`, `toggleToileColor()`, `reorderToileColors()`, `updateArmatureColor()`, `addArmatureColor()`, `removeArmatureColor()`, `toggleArmatureColor()`, `reorderArmatureColors()`, `updateOption()`, `addOption()`, `removeOption()`, `resetToDefaults()`
+- Each update method saves to localStorage immediately
+- Provider wraps entire app in `App.tsx`
 
-**Orders Table**:
-- Checkbox column, Ref, Client, Configuration ("350x250 cm . Sauge . Anthracite"), Options (icon badges), Montant, Status (colored pill Badge), Date, Actions
-- Actions: Eye icon "Voir" (opens drawer), dropdown for status change, Mail icon (mailto)
-- Client-side filtering + pagination (10 per page) using useState
-- Pagination component at bottom
+### 2. `src/pages/admin/AdminConfiguratorPage.tsx` -- REWRITE
 
-**Order Detail Drawer**:
-- Sheet component sliding from right (w-[400px])
-- Displays: ref + date, client info block, full configuration details with color swatches, price breakdown table, client message, status history timeline (vertical with dots and lines), status update Select + Button, internal notes Textarea, "Envoyer email" button
-- State managed locally: selectedOrder, notes per order
+Full admin page with:
+
+**Sticky preview banner**: sage green bg, eye icon, "Les modifications s'appliquent en temps reel" + external link to /store-coffre
+
+**5 Tabs** (using shadcn Tabs):
+
+**Tab 1 -- Tarification**: 2-column layout
+- Left: baseRate, minPrice, installmentDivisor number inputs with helper text
+- Right: live price simulator card with width/projection sliders + computed surface/price/installment display
+- Save button with toast
+
+**Tab 2 -- Dimensions**: 2-column (Largeur / Avancee)
+- Min, max, step inputs per dimension
+- Validation: min < max inline error
+- Simple CSS diagram (div-based top-down awning view) showing labeled width/projection, updating live
+- Save button with toast
+
+**Tab 3 -- Couleurs de toile**: color list
+- Each row: move up/down buttons, 32px color circle, label Input, hex Input + native color picker, active Switch, delete Button (with confirm state)
+- "Ajouter un coloris" button at bottom
+- Save button with toast
+
+**Tab 4 -- Couleurs armature**: same layout as Tab 3
+- Rectangular swatch (80x32px) instead of circle
+- Same controls
+
+**Tab 5 -- Options**: card per option
+- Each card: active toggle, icon input, label input, description textarea, price number input, promo badge input (optional), highlight toggle, includesIds multi-checkbox
+- "Ajouter une option" button
+- Save button with toast
 
 ---
 
-### 3. `src/pages/admin/AdminLeadsPage.tsx` -- REWRITE
+## Modified Files
 
-**Mock Data**: 15 lead objects with: id, prenom, nom, email, telephone, width, projection, toileColor, armatureColor, options, codePostal, date, message, traite (boolean)
+### 3. `src/App.tsx`
+- Import and wrap app with `<ConfiguratorSettingsProvider>` (inside BrowserRouter, outside Routes)
 
-**Stat Banner**: Card at top showing "12 leads ce mois . 5 non traites . Taux de traitement : 58%" with computed values from mock data
+### 4. `src/hooks/useConfigurator.ts`
+- Import `useConfiguratorSettings` from the new context
+- Replace hardcoded `TOILE_COLORS`, `ARMATURE_COLORS` with active colors from context
+- Replace hardcoded `baseRate=580`, `minPrice=1890`, divisor `3` with context values
+- Replace hardcoded option prices (390, 290, 590) with context option prices
+- Export `TOILE_COLORS` and `ARMATURE_COLORS` as computed from context (active only) for backward compat
 
-**Filter Bar**:
-- Search input (name/email/phone)
-- Switch toggle "Non traites uniquement" 
-- Select for Period
-
-**Leads Table**:
-- Columns: Prenom+Nom, Email, Telephone, Configuration summary, Code Postal, Date, Traite (toggle Checkbox), Actions
-- Treated rows get `opacity-50` styling
-- Actions: Mail icon (mailto), Phone icon (tel: link), Check icon (toggle traite), Trash icon (removes from local state)
-- Pagination (10 per page)
+### 5. `src/components/product/ConfiguratorSection.tsx`
+- Import `useConfiguratorSettings` to read active colors, options, and dimension limits
+- Replace hardcoded `TOILE_COLORS`/`ARMATURE_COLORS` imports with context-driven active lists
+- Replace hardcoded option cards with dynamic rendering from `settings.options.filter(o => o.active)`
+- Replace hardcoded dimension min/max in clamp functions with context values
+- Replace hardcoded installment text divisor with context value
 
 ---
 
 ## Technical Details
 
-- **recharts** is already installed -- use LineChart, ComposedChart, Bar, Line, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer
-- **shadcn components** used: Card, Table (+ all sub-components), Badge, Button, Input, Select, Checkbox, Sheet, Switch, Textarea, Separator
-- All state is local (useState) -- no backend, all mock data
-- CSV export: create Blob with comma-separated data, trigger download via temporary anchor element
-- All pages use `font-sans` class consistently with the AdminLayout shell
-- No new files needed beyond the 3 rewrites
+- All admin form state is local (useState) per tab; "Sauvegarder" commits to context + localStorage
+- Toast notifications via existing `useToast` hook from shadcn
+- No drag-and-drop library -- use simple ArrowUp/ArrowDown buttons for reordering
+- Delete confirmation is inline (row changes to "Supprimer ? [Annuler] [Confirmer]")
+- Color picker uses native `<input type="color">` paired with hex text input
+- Price simulator in Tab 1 uses the same formula as useConfigurator but with local admin-edited values
 - No new dependencies needed
 
