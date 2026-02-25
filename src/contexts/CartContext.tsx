@@ -42,7 +42,7 @@ const STORAGE_KEY = "lunik-cart";
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [item, setItemState] = useState<CartItem | null>(() => {
     try {
-      const stored = sessionStorage.getItem(STORAGE_KEY);
+      const stored = localStorage.getItem(STORAGE_KEY);
       return stored ? JSON.parse(stored) : null;
     } catch {
       return null;
@@ -51,9 +51,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (item) {
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(item));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(item));
     } else {
-      sessionStorage.removeItem(STORAGE_KEY);
+      localStorage.removeItem(STORAGE_KEY);
     }
   }, [item]);
 

@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, ref, customerEmail, customerName, productName, description, paymentMethod, orderData } =
+    const { amount, ref, customerEmail, customerName, productName, description, paymentMethod, orderData, promoCode, promoDiscount } =
       await req.json();
 
     if (!amount || !ref || !customerEmail) {
@@ -34,6 +34,28 @@ serve(async (req) => {
 
     const origin = req.headers.get("origin") || "https://lunik.lovable.app";
 
+    // Validate promo code if provided
+    let validatedDiscount = 0;
+    if (promoCode && promoDiscount) {
+      const { data: promo } = await supabaseAdmin
+        .from("promo_codes")
+        .select("*")
+        .eq("code", promoCode)
+        .eq("active", true)
+        .single();
+
+      if (promo) {
+        validatedDiscount = promoDiscount;
+        // Increment usage
+        await supabaseAdmin
+          .from("promo_codes")
+          .update({ current_uses: (promo.current_uses || 0) + 1 })
+          .eq("id", promo.id);
+      }
+    }
+
+    const finalAmount = Math.max(0, amount - validatedDiscount);
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
@@ -46,7 +68,7 @@ serve(async (req) => {
               name: productName || "Store Coffre Sur-Mesure",
               description: description || "",
             },
-            unit_amount: amount * 100, // Convert to cents
+            unit_amount: finalAmount * 100, // Convert to cents
           },
           quantity: 1,
         },
@@ -71,6 +93,9 @@ serve(async (req) => {
 
       const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
         ...orderData,
+        amount: finalAmount,
+        promo_code: promoCode || "",
+        promo_discount: validatedDiscount,
         payment_status: "pending",
         stripe_payment_intent_id: session.id,
         status: "Nouveau",
@@ -100,6 +125,15 @@ serve(async (req) => {
         postal_code: orderData.client_postal_code || "",
         message: orderData.message || "",
       });
+
+      // Mark abandoned cart as converted if email matches
+      if (orderData?.client_email) {
+        await supabaseAdmin
+          .from("abandoned_carts")
+          .update({ converted: true, converted_order_id: insertedOrder?.id || null })
+          .eq("email", orderData.client_email)
+          .eq("converted", false);
+      }
 
       // Send confirmation + admin notification emails
       if (insertedOrder?.id) {

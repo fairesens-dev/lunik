@@ -12,9 +12,11 @@ interface Props {
   contactData: Step1Data;
   deliveryOption: string;
   onBack: () => void;
+  promoCode?: string;
+  promoDiscount?: number;
 }
 
-const CheckoutStep3 = ({ contactData, deliveryOption, onBack }: Props) => {
+const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", promoDiscount = 0 }: Props) => {
   const { item, clearCart } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -24,7 +26,7 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack }: Props) => {
 
   if (!item) return null;
 
-  const total = item.pricing.total;
+  const total = item.pricing.total - promoDiscount;
   const installment = Math.round(total / 4);
 
   const generateRef = () => "SC-" + Date.now().toString(36).toUpperCase();
@@ -54,7 +56,8 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack }: Props) => {
           productName: item.productName,
           description: `${item.configuration.width}×${item.configuration.projection}cm · Toile ${item.configuration.toileColor.label} · ${item.configuration.armatureColor.label}`,
           paymentMethod,
-          // Pass order data so edge function can insert to DB on success
+          promoCode: promoCode || undefined,
+          promoDiscount: promoDiscount || undefined,
           orderData: {
             ref,
             client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
@@ -203,7 +206,7 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack }: Props) => {
 
       <div className="hidden lg:block">
         <div className="sticky top-8">
-          <OrderSummary item={item} deliveryOption={deliveryOption} />
+          <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useCartAbandonment } from "@/hooks/useCartAbandonment";
 import { ArrowLeft, Lock } from "lucide-react";
 import CheckoutStep1, { type Step1Data } from "@/components/checkout/CheckoutStep1";
 import CheckoutStep2 from "@/components/checkout/CheckoutStep2";
@@ -11,13 +12,26 @@ const STEPS = ["Coordonnées", "Livraison", "Paiement"];
 const CheckoutPage = () => {
   const { item } = useCart();
   const navigate = useNavigate();
+  const { setStage, captureEmail } = useCartAbandonment();
   const [step, setStep] = useState(1);
   const [contactData, setContactData] = useState<Step1Data | null>(null);
   const [deliveryOption, setDeliveryOption] = useState("standard");
+  const [promoCode, setPromoCode] = useState("");
+  const [promoDiscount, setPromoDiscount] = useState(0);
 
   useEffect(() => {
     if (!item) navigate("/store-coffre", { replace: true });
   }, [item, navigate]);
+
+  // Track abandonment stage
+  useEffect(() => {
+    const stageMap: Record<number, string> = {
+      1: "checkout_step_1",
+      2: "checkout_step_2",
+      3: "checkout_step_3",
+    };
+    setStage(stageMap[step] || "checkout_step_1");
+  }, [step, setStage]);
 
   if (!item) return null;
 
@@ -78,13 +92,24 @@ const CheckoutPage = () => {
         </div>
 
         {/* Steps */}
-        {step === 1 && <CheckoutStep1 onNext={handleStep1} defaultValues={contactData ?? undefined} />}
+        {step === 1 && (
+          <CheckoutStep1
+            onNext={handleStep1}
+            defaultValues={contactData ?? undefined}
+            onEmailCapture={captureEmail}
+            onPromoApplied={(code, discount) => { setPromoCode(code); setPromoDiscount(discount); }}
+            promoCode={promoCode}
+            promoDiscount={promoDiscount}
+          />
+        )}
         {step === 2 && <CheckoutStep2 onNext={handleStep2} onBack={() => setStep(1)} />}
         {step === 3 && contactData && (
           <CheckoutStep3
             contactData={contactData}
             deliveryOption={deliveryOption}
             onBack={() => setStep(2)}
+            promoCode={promoCode}
+            promoDiscount={promoDiscount}
           />
         )}
       </div>

@@ -4,11 +4,14 @@ interface OrderSummaryProps {
   item: CartItem;
   deliveryOption?: string;
   compact?: boolean;
+  promoCode?: string;
+  promoDiscount?: number;
 }
 
-const OrderSummary = ({ item, deliveryOption = "standard", compact = false }: OrderSummaryProps) => {
+const OrderSummary = ({ item, deliveryOption = "standard", compact = false, promoCode = "", promoDiscount = 0 }: OrderSummaryProps) => {
   const { configuration: cfg, pricing } = item;
-  const tva = Math.round((pricing.total / 1.2) * 0.2 * 100) / 100;
+  const finalTotal = pricing.total - promoDiscount;
+  const tva = Math.round((finalTotal / 1.2) * 0.2 * 100) / 100;
 
   return (
     <div className={`border border-border bg-card ${compact ? "p-4" : "p-6"}`}>
@@ -63,9 +66,20 @@ const OrderSummary = ({ item, deliveryOption = "standard", compact = false }: Or
             {deliveryOption === "installation" ? "Sur devis" : "Offerte ✓"}
           </span>
         </div>
+        {promoCode && promoDiscount > 0 && (
+          <div className="flex justify-between text-primary">
+            <span className="text-sm">Code {promoCode}</span>
+            <span className="text-sm font-medium">-{promoDiscount.toLocaleString("fr-FR")} €</span>
+          </div>
+        )}
         <div className="border-t border-border pt-3 flex justify-between font-serif text-lg">
           <span>Total TTC</span>
-          <span>{pricing.total.toLocaleString("fr-FR")} €</span>
+          <span>
+            {promoDiscount > 0 && (
+              <span className="text-sm text-muted-foreground line-through mr-2">{pricing.total.toLocaleString("fr-FR")} €</span>
+            )}
+            {finalTotal.toLocaleString("fr-FR")} €
+          </span>
         </div>
         <p className="text-xs text-muted-foreground">dont TVA 20% : {tva.toLocaleString("fr-FR")} €</p>
       </div>
