@@ -1,173 +1,91 @@
 
 
-# Tunnel de Checkout Complet avec Stripe
+# Page Detail Commande — /admin/commandes/:orderId
 
-## Prerequis : Activation de Stripe
-
-Avant de coder quoi que ce soit, il faut activer l'integration Stripe sur le projet. Cela va :
-- Vous demander votre cle secrete Stripe (sk_test_xxx)
-- Configurer automatiquement les secrets Supabase
-- Debloquer les outils et patterns d'integration specifiques a Stripe (Edge Functions, webhooks, etc.)
-
-**Cette etape sera faite en premier lors de l'implementation.**
+Remplacement du drawer lateral par une page dediee complete pour la gestion des commandes.
 
 ---
 
-## Architecture Globale
+## Architecture
 
 ```text
-[Configurateur] --> "Commander" --> [/checkout]
-     |                                  |
-     v                                  v
-  CartContext                   Step 1: Coordonnees
-  (sessionStorage)              Step 2: Livraison
-                                Step 3: Paiement (Stripe Elements)
-                                        |
-                                        v
-                                Edge Function: create-checkout
-                                (cree PaymentIntent Stripe)
-                                        |
-                                        v
-                                [/merci?ref=SC-XXX]
-                                        |
-                                [/suivi] (lookup public)
+/admin/commandes          --> liste (existante, modifiee)
+/admin/commandes/:orderId --> nouvelle page detail
 ```
 
----
-
-## Schema de la base de donnees
-
-### Modifications sur la table `orders`
-
-Ajout de colonnes pour le checkout et le paiement :
-
-| Colonne | Type | Description |
-|---------|------|-------------|
-| client_address | text | Adresse ligne 1 |
-| client_address2 | text | Adresse ligne 2 (optionnel) |
-| client_city | text | Ville |
-| client_country | text | Pays (default 'France') |
-| civility | text | M. ou Mme |
-| delivery_option | text | 'standard' ou 'installation' |
-| payment_method | text | 'card' ou '4x' |
-| payment_status | text | 'pending', 'paid', 'failed' |
-| stripe_payment_intent_id | text | ID du PaymentIntent Stripe |
-| newsletter_optin | boolean | Opt-in marketing |
-
-Ajout d'une RLS policy pour permettre le SELECT public par ref + email (suivi commande).
+La page detail utilise `AdminLayout` via les routes imbriquees existantes. Le bouton "oeil" dans la liste redirigera vers `/admin/commandes/{id}` au lieu d'ouvrir le drawer.
 
 ---
 
-## Nouveaux fichiers
+## Fichiers a creer
 
-### 1. `src/contexts/CartContext.tsx`
-- Stocke la configuration du store (produit, dimensions, couleurs, options, prix detaille)
-- Persiste en `sessionStorage`
-- `setItem()` appele depuis le configurateur au clic "Commander"
-- `clearCart()` appele apres paiement reussi
+### 1. `src/pages/admin/AdminOrderDetailPage.tsx`
 
-### 2. `src/pages/CheckoutPage.tsx`
-- Layout epure (pas de Header/Footer du site)
-- Header custom : logo + "Commande securisee" + bouton Retour
-- Barre de progression 3 etapes
-- Redirection vers `/store-coffre` si panier vide
-- Gere le state de l'etape courante (1, 2, 3)
+Page principale ~600 lignes. Charge la commande par `useParams().orderId`, fait un `supabase.from("orders").select("*").eq("id", orderId).single()`.
 
-### 3. `src/components/checkout/CheckoutStep1.tsx` -- Coordonnees
-- Formulaire complet (civilite, nom, prenom, email, telephone, adresse, CP, ville, pays)
-- Autocompletion code postal -> ville (basique, dictionnaire local)
-- Section note collapsible
-- Cases a cocher CGV (obligatoire) + newsletter (optionnel)
-- Validation client-side avec zod + react-hook-form
-- Colonne droite : resume commande sticky
+**Header sticky** :
+- Breadcrumb : Commandes > SC-XXX (lien retour vers /admin/commandes)
+- Gauche : Badge statut colore + Select inline pour changer le statut + bouton "Mettre a jour"
+- Droite : boutons Email, Imprimer (window.print()), menu "Plus" (Dupliquer, Archiver, Supprimer)
 
-### 4. `src/components/checkout/CheckoutStep2.tsx` -- Livraison
-- 2 options radio card : Livraison standard (gratuite) / Livraison + Installation (sur devis)
-- Date estimee calculee dynamiquement
-- Timeline visuelle de fabrication
-- Resume commande a droite
+**Layout 2 colonnes** : `grid grid-cols-1 xl:grid-cols-[2fr_1fr] gap-6`
 
-### 5. `src/components/checkout/CheckoutStep3.tsx` -- Paiement
-- Choix CB comptant ou 4x sans frais (radio cards)
-- Stripe Elements (CardElement) pour la saisie carte
-- Simulation 4x : affichage du montant / 4 avec echeancier
-- Badges de securite
-- Bouton "Payer X euros" qui :
-  1. Appelle l'Edge Function `create-checkout` pour creer un PaymentIntent
-  2. Confirme le paiement avec `stripe.confirmCardPayment(clientSecret)`
-  3. Insere la commande dans Supabase
-  4. Redirige vers `/merci`
+**Colonne gauche** (4 cards) :
 
-### 6. `src/components/checkout/OrderSummary.tsx`
-- Composant reutilise dans les 3 etapes et la page merci
-- Affiche produit, config, options, prix detaille, TVA, badges confiance
+1. **Detail commande** — image placeholder + nom produit + tableau de configuration (largeur, avancee, surface, couleurs avec pastilles, options avec checkmarks)  + note client si presente
+2. **Recapitulatif financier** — tableau de prix detaille (base, options, livraison, sous-total HT, TVA 20%, total TTC) + infos paiement (badge statut, Stripe ID copiable, date)
+3. **Suivi fabrication & livraison** — timeline editable avec 9 etapes (checkboxes, dates, notes). Section tracking conditionnelle (transporteur select, numero de suivi, URL, bouton envoi)
+4. **Notes internes** — textarea + bouton ajouter + historique des notes en ordre inverse chronologique (pour le MVP, le champ `notes` existant sera utilise tel quel — pas de refactoring en array jsonb)
 
-### 7. `supabase/functions/create-checkout/index.ts` -- Edge Function
-- Recoit le montant et les details commande
-- Cree un PaymentIntent Stripe cote serveur
-- Retourne le `clientSecret` au frontend
-- Gere aussi le mode 4x (metadata Stripe ou simulation)
+**Colonne droite** (5 cards) :
 
-### 8. `src/pages/ThankYouPage.tsx` -- /merci
-- Animation checkmark CSS
-- Reference commande, email de confirmation
-- Resume commande (lecture seule)
-- Timeline "Et maintenant ?" (email, appel, fabrication, livraison)
-- Boutons retour accueil + suivi commande
+1. **Client** — avatar initiales, nom, email (mailto), tel (tel:), adresse complete. Section "Historique client" avec nombre de commandes et CA total (requete aggregate sur orders par email)
+2. **Historique statuts** — timeline verticale compacte depuis `status_history` jsonb
+3. **Emails envoyes** — liste statique des emails transactionnels (confirmation, fabrication, expedition, livraison, satisfaction) avec statut envoye/non envoye. Boutons "Renvoyer" et "Previsualiser" (placeholder pour le MVP)
+4. **Documents** — boutons pour generer bon de commande PDF, facture PDF, guide installation (tous placeholder `window.print()` ou alert pour le MVP)
+5. **Actions rapides** — boutons outline pleine largeur : envoyer confirmation, notifier fabrication, envoyer tracking, demander avis, remboursement partiel (rouge), annuler commande (rouge)
 
-### 9. `src/pages/OrderTrackingPage.tsx` -- /suivi
-- Formulaire lookup : reference + email
-- Requete Supabase sur `orders` filtree par ref et email
-- Timeline verticale avec statut courant
-- Barre de progression visuelle
+### 2. Print stylesheet
+
+Ajoute dans `src/index.css` un bloc `@media print` qui :
+- Masque la sidebar, topbar, boutons d'action, card notes, card actions rapides
+- Affiche le contenu en colonne unique
+- Ajoute un header entreprise et un footer "CONFIDENTIEL"
+- Page break avant le recapitulatif financier
 
 ---
 
-## Modifications de fichiers existants
+## Fichiers a modifier
 
 ### `src/App.tsx`
-- Ajout des routes `/checkout`, `/merci`, `/suivi`
-- `/checkout` hors du Layout principal (pas de Header/Footer)
-- `/merci` et `/suivi` dans le Layout ou avec layout custom
-- Wrapping avec `CartProvider`
+- Ajouter `import AdminOrderDetailPage`
+- Ajouter la route `/admin/commandes/:orderId` dans le bloc admin protege
 
-### `src/components/product/ConfiguratorSection.tsx`
-- Le bouton "Commander ce store" appelle `setItem()` du CartContext puis `navigate('/checkout')`
-- Supprime l'ouverture du OrderModal (remplace par le tunnel checkout)
+### `src/pages/admin/AdminOrdersPage.tsx`
+- Remplacer le bouton Eye qui ouvre le drawer par un `<Link to={/admin/commandes/${o.id}}>` 
+- Supprimer tout le code du `<Sheet>` drawer (lignes 230-335)
+- Supprimer les imports `Sheet`, `SheetContent`, `SheetHeader`, `SheetTitle`
+- Supprimer les states `selectedOrder`, `drawerNotes`
 
-### `src/pages/ProductPage.tsx`
-- Supprime le state `orderOpen` et le composant `OrderModal`
-- Le configurateur redirige directement vers `/checkout`
-
-### `src/integrations/supabase/types.ts`
-- Mis a jour automatiquement apres la migration SQL
+### `src/components/admin/AdminLayout.tsx`
+- Ajouter une entree dans `routeTitles` pour gerer le pattern `/admin/commandes/:id` (afficher "Detail commande" dans le breadcrumb)
 
 ---
 
-## Flux de paiement detaille
+## Donnees necessaires (pas de migration)
 
-1. Utilisateur remplit les 3 etapes du checkout
-2. Au clic "Payer", le frontend appelle l'Edge Function `create-checkout`
-3. L'Edge Function cree un `PaymentIntent` Stripe avec le montant en centimes
-4. Le frontend recoit le `clientSecret` et appelle `stripe.confirmCardPayment()`
-5. Si succes : INSERT dans `orders` avec `payment_status: 'paid'` + INSERT dans `leads`
-6. Redirection vers `/merci?ref=SC-XXX`
-7. Si echec : message d'erreur inline sous le formulaire carte
+Toutes les colonnes existent deja dans la table `orders` : `client_address`, `client_city`, `client_country`, `civility`, `delivery_option`, `payment_method`, `payment_status`, `stripe_payment_intent_id`, `status_history`, `notes`. Pas de migration SQL necessaire.
 
-### Option 4x sans frais
-- Pour le MVP : meme flow Stripe mais le montant affiche est divise par 4
-- Le paiement reel est du montant total (simulation visuelle uniquement)
-- Commentaire `// TODO: Replace with Alma API or Stripe installments` pour la production
-- En production : utiliser Stripe Payment Intents avec `payment_method_options.card.installments` ou integrer Alma
+Pour l'historique client (nombre de commandes, CA total), une requete `supabase.from("orders").select("amount").eq("client_email", email)` sera faite cote client.
 
 ---
 
-## Section technique
+## Details techniques
 
-- **Stripe Elements** : utilise `@stripe/react-stripe-js` avec `loadStripe(pk_test_xxx)`
-- **Edge Function** : utilise le secret `STRIPE_SECRET_KEY` configure via l'outil Stripe
-- **Validation** : schemas zod pour chaque etape du formulaire
-- **Persistance panier** : `sessionStorage` pour eviter la perte au refresh mais nettoyer a la fermeture du navigateur
-- **RLS suivi** : nouvelle policy SELECT sur `orders` avec condition `ref = $ref AND client_email = $email` via une fonction RPC Supabase (pour ne pas exposer toutes les commandes)
-- **TVA** : calculee a 20% (`total / 1.2 * 0.2`)
+- Le statut est mis a jour via `supabase.from("orders").update(...)` comme dans la page actuelle
+- Les notes utilisent le champ `notes` texte existant (pas de refactoring en JSONB array pour ce sprint)
+- Le Stripe ID est affiche avec un bouton copier (`navigator.clipboard.writeText`)
+- La section tracking (transporteur, numero de suivi) stocke les donnees dans `status_history` en ajoutant des metadonnees au step "Expedie"
+- Les emails et documents sont des placeholders UI — les fonctions reelles seront implementees dans un sprint ulterieur
+- `window.print()` est utilise pour l'impression avec le stylesheet print dedie
 
