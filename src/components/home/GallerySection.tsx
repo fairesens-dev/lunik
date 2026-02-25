@@ -1,12 +1,12 @@
 import AnimatedSection from "@/components/AnimatedSection";
 
 const items = [
-  { src: "/images/store-vue-ensemble.webp", alt: "Vue d'ensemble store coffre déployé", h: "h-64" },
-  { src: "/images/store-salon-apero.webp", alt: "Apéro entre amis sous le store", h: "h-80" },
-  { src: "/images/store-terrasse-work.webp", alt: "Télétravail sous le store sur la terrasse", h: "h-72" },
-  { src: "/images/store-led-toile.webp", alt: "Éclairage LED intégré au store", h: "h-80" },
-  { src: "/images/store-bras-detail.webp", alt: "Détail du bras articulé du store", h: "h-64" },
-  { src: "/images/store-coffre-ouvert.webp", alt: "Vue du coffre ouvert du store", h: "h-72" },
+  { src: "/images/real-montagne-cepe.webp", alt: "Store coffre 530×400 cm toile Cèpe avec vue montagne", h: "h-80" },
+  { src: "/images/real-vin-apero.webp", alt: "Apéro sous le store avec télécommande Somfy", h: "h-64" },
+  { src: "/images/real-bordeaux.webp", alt: "Store coffre 592×350 cm toile Bordeaux sur terrasse bois", h: "h-72" },
+  { src: "/images/real-paris-6eme.webp", alt: "Store blanc naturel posé au 6ème étage à Paris", h: "h-64" },
+  { src: "/images/real-bardage-noir.webp", alt: "Store anthracite toile Jais sur bardage moderne", h: "h-80" },
+  { src: "/images/real-lecture-piscine.webp", alt: "Détente au bord de la piscine sous le store", h: "h-72" },
 ];
 
 const GallerySection = () => (
