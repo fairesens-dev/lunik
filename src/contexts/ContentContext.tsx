@@ -3,6 +3,15 @@ import { supabase } from "@/integrations/supabase/client";
 
 // ── Types ──────────────────────────────────────────────
 
+export interface FeaturedReview {
+  trustpilotId: string;
+  title: string;
+  text: string;
+  author: string;
+  rating: number;
+  date: string;
+}
+
 export interface Testimonial {
   id: string;
   name: string;
@@ -43,6 +52,7 @@ export interface HomepageContent {
   productSectionSubtitle: string;
   testimonials: Testimonial[];
   faqItems: FAQItem[];
+  featuredReviews: FeaturedReview[];
 }
 
 export interface ProductPageContent {
@@ -107,6 +117,7 @@ const defaultContent: SiteContent = {
     productSectionSubtitle: "Un seul produit. Le meilleur de sa catégorie.",
     testimonials: [],
     faqItems: [],
+    featuredReviews: [],
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
@@ -140,11 +151,12 @@ const defaultContent: SiteContent = {
 interface ContentContextValue {
   content: SiteContent;
   updateGlobal: (data: Partial<GlobalContent>) => void;
-  updateHomepage: (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems">>) => void;
+  updateHomepage: (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews">>) => void;
   updateProductPage: (data: Partial<Omit<ProductPageContent, "faqItems">>) => void;
   updateSAV: (data: Partial<Omit<SAVContent, "faqItems">>) => void;
   updatePromoBanner: (data: Partial<PromoBannerContent>) => void;
   updateTestimonials: (testimonials: Testimonial[]) => void;
+  updateFeaturedReviews: (reviews: FeaturedReview[]) => void;
   updateHomepageFAQ: (items: FAQItem[]) => void;
   updateProductFAQ: (items: FAQItem[]) => void;
   updateSAVFAQ: (items: FAQItem[]) => void;
@@ -185,7 +197,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, []);
 
-  const updateHomepage = useCallback((data: Partial<Omit<HomepageContent, "testimonials" | "faqItems">>) => {
+  const updateHomepage = useCallback((data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews">>) => {
     setContent(prev => {
       const updated = { ...prev.homepage, ...data };
       upsertContent("homepage", updated);
@@ -225,6 +237,14 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, []);
 
+  const updateFeaturedReviews = useCallback((featuredReviews: FeaturedReview[]) => {
+    setContent(prev => {
+      const updated = { ...prev.homepage, featuredReviews };
+      upsertContent("homepage", updated);
+      return { ...prev, homepage: updated };
+    });
+  }, []);
+
   const updateHomepageFAQ = useCallback((items: FAQItem[]) => {
     setContent(prev => {
       const updated = { ...prev.homepage, faqItems: items };
@@ -252,7 +272,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   return (
     <ContentContext.Provider value={{
       content, updateGlobal, updateHomepage, updateProductPage,
-      updateSAV, updatePromoBanner, updateTestimonials,
+      updateSAV, updatePromoBanner, updateTestimonials, updateFeaturedReviews,
       updateHomepageFAQ, updateProductFAQ, updateSAVFAQ,
     }}>
       {children}
