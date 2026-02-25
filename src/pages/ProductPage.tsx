@@ -1,7 +1,8 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useConfigurator } from "@/hooks/useConfigurator";
 import { useCart } from "@/contexts/CartContext";
+import { useCartAbandonment } from "@/hooks/useCartAbandonment";
 import ProductHeroSection from "@/components/product/ProductHeroSection";
 import ProductMarqueeSection from "@/components/product/ProductMarqueeSection";
 import ProductFeaturesSection from "@/components/product/ProductFeaturesSection";
@@ -17,6 +18,25 @@ const ProductPage = () => {
   const configurator = useConfigurator();
   const { setItem } = useCart();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { setStage, restoreCart } = useCartAbandonment();
+
+  // Track abandonment stage
+  useEffect(() => { setStage("configurateur"); }, [setStage]);
+
+  // Restore cart from email link
+  useEffect(() => {
+    if (searchParams.get("restore") === "true") {
+      const saved = restoreCart();
+      if (saved) {
+        setItem(saved);
+        configurator.setWidth(saved.configuration.width);
+        configurator.setProjection(saved.configuration.projection);
+        if (saved.configuration.toileColor?.label) configurator.setToileColor(saved.configuration.toileColor.label);
+        if (saved.configuration.armatureColor?.label) configurator.setArmatureColor(saved.configuration.armatureColor.label);
+      }
+    }
+  }, []);  // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleOrder = () => {
     const motorOption = configurator.settings.options.find(o => o.id === "motorisation");

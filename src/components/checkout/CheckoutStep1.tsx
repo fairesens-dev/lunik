@@ -1,9 +1,11 @@
 import { useForm } from "react-hook-form";
+import { supabase } from "@/integrations/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -34,11 +36,19 @@ export type Step1Data = z.infer<typeof step1Schema>;
 interface Props {
   onNext: (data: Step1Data) => void;
   defaultValues?: Partial<Step1Data>;
+  onEmailCapture?: (email: string) => void;
+  onPromoApplied?: (code: string, discount: number) => void;
+  promoCode?: string;
+  promoDiscount?: number;
 }
 
-const CheckoutStep1 = ({ onNext, defaultValues }: Props) => {
+const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0 }: Props) => {
   const { item } = useCart();
   const [noteOpen, setNoteOpen] = useState(false);
+  const [promoOpen, setPromoOpen] = useState(!!promoCode);
+  const [promoInput, setPromoInput] = useState(promoCode);
+  const [promoError, setPromoError] = useState("");
+  const [promoLoading, setPromoLoading] = useState(false);
 
   const {
     register,
@@ -107,7 +117,17 @@ const CheckoutStep1 = ({ onNext, defaultValues }: Props) => {
 
             <div>
               <Label htmlFor="email" className="text-xs text-muted-foreground">Email</Label>
-              <Input id="email" type="email" {...register("email")} />
+              <Input
+                id="email"
+                type="email"
+                {...register("email")}
+                onBlur={(e) => {
+                  const val = e.target.value;
+                  if (val && val.includes("@") && onEmailCapture) {
+                    onEmailCapture(val);
+                  }
+                }}
+              />
               <p className="text-xs text-muted-foreground mt-1">Votre confirmation de commande sera envoyée à cette adresse</p>
               {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
             </div>
@@ -168,6 +188,81 @@ const CheckoutStep1 = ({ onNext, defaultValues }: Props) => {
           </CollapsibleContent>
         </Collapsible>
 
+        {/* Promo code */}
+        <Collapsible open={promoOpen} onOpenChange={setPromoOpen}>
+          <CollapsibleTrigger className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
+            <ChevronDown className={`w-4 h-4 transition-transform ${promoOpen ? "rotate-180" : ""}`} />
+            Code promo
+          </CollapsibleTrigger>
+          <CollapsibleContent className="mt-3">
+            {promoCode && promoDiscount > 0 ? (
+              <div className="flex items-center gap-2">
+                <Badge variant="default" className="bg-primary text-primary-foreground">
+                  {promoCode} appliqué — -{promoDiscount.toLocaleString("fr-FR")} €
+                </Badge>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onPromoApplied?.("", 0)}
+                >
+                  Retirer
+                </Button>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Input
+                  placeholder="REVIENS10"
+                  value={promoInput}
+                  onChange={(e) => { setPromoInput(e.target.value.toUpperCase()); setPromoError(""); }}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={promoLoading || !promoInput}
+                  onClick={async () => {
+                    setPromoLoading(true);
+                    setPromoError("");
+                    try {
+                      const now = new Date().toISOString();
+                      const { data, error } = await supabase
+                        .from("promo_codes")
+                        .select("*")
+                        .eq("code", promoInput)
+                        .eq("active", true)
+                        .lte("valid_from", now)
+                        .gte("valid_until", now)
+                        .single();
+
+                      if (error || !data) {
+                        setPromoError("Code invalide ou expiré");
+                        return;
+                      }
+                      if (data.max_uses && data.current_uses >= data.max_uses) {
+                        setPromoError("Ce code a atteint son nombre d'utilisations maximum");
+                        return;
+                      }
+
+                      const cartTotal = item!.pricing.total;
+                      const discount = data.type === "percent"
+                        ? Math.round(cartTotal * Number(data.value) / 100)
+                        : Number(data.value);
+                      onPromoApplied?.(data.code, discount);
+                    } catch {
+                      setPromoError("Erreur de validation");
+                    } finally {
+                      setPromoLoading(false);
+                    }
+                  }}
+                >
+                  Appliquer
+                </Button>
+              </div>
+            )}
+            {promoError && <p className="text-xs text-destructive mt-1">{promoError}</p>}
+          </CollapsibleContent>
+        </Collapsible>
+
         {/* Checkboxes */}
         <div className="space-y-3">
           <label className="flex items-start gap-3 cursor-pointer">
@@ -206,7 +301,7 @@ const CheckoutStep1 = ({ onNext, defaultValues }: Props) => {
       {/* RIGHT – Summary */}
       <div className="hidden lg:block">
         <div className="sticky top-8">
-          <OrderSummary item={item} />
+          <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} />
         </div>
       </div>
     </form>

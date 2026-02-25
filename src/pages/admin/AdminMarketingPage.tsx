@@ -3,15 +3,19 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useContent, type FeaturedReview } from "@/contexts/ContentContext";
 import { useTrustpilot } from "@/hooks/useTrustpilot";
 import { clearTrustpilotCache } from "@/lib/trustpilot";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Star, ExternalLink, RefreshCw, ChevronUp, ChevronDown, Trash2,
-  StarOff, Send, BarChart3,
+  StarOff, Send, BarChart3, Plus, Tag,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -56,6 +60,32 @@ const AdminMarketingPage = () => {
   const { summary, reviews, loading, error, hasMore, loadMore } = useTrustpilot(20);
   const [featured, setFeatured] = useState<FeaturedReview[]>(content.homepage.featuredReviews || []);
   const [inviteEmail, setInviteEmail] = useState("");
+
+  // Promo codes state
+  interface PromoCode {
+    id: string; code: string; type: string; value: number;
+    valid_from: string; valid_until: string; max_uses: number | null;
+    current_uses: number; first_purchase_only: boolean; active: boolean;
+    created_at: string;
+  }
+  const [promoCodes, setPromoCodes] = useState<PromoCode[]>([]);
+  const [promoLoading, setPromoLoading] = useState(false);
+  const [showPromoForm, setShowPromoForm] = useState(false);
+  const [newPromo, setNewPromo] = useState({
+    code: "", type: "percent", value: 10,
+    valid_from: new Date().toISOString().slice(0, 10),
+    valid_until: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
+    max_uses: "" as string | number, first_purchase_only: false,
+  });
+
+  const fetchPromoCodes = useCallback(async () => {
+    setPromoLoading(true);
+    const { data } = await supabase.from("promo_codes").select("*").order("created_at", { ascending: false });
+    if (data) setPromoCodes(data as PromoCode[]);
+    setPromoLoading(false);
+  }, []);
+
+  useEffect(() => { fetchPromoCodes(); }, [fetchPromoCodes]);
 
   useEffect(() => {
     setFeatured(content.homepage.featuredReviews || []);
@@ -131,6 +161,7 @@ const AdminMarketingPage = () => {
           <TabsTrigger value="trustpilot">Avis Trustpilot</TabsTrigger>
           <TabsTrigger value="featured">Avis mis en avant</TabsTrigger>
           <TabsTrigger value="invitations">Demandes d'avis</TabsTrigger>
+          <TabsTrigger value="promo">Codes promo</TabsTrigger>
         </TabsList>
 
         {/* ── Tab: Trustpilot reviews ──────────────── */}
@@ -321,6 +352,147 @@ const AdminMarketingPage = () => {
               <p className="text-xs text-muted-foreground mt-3">
                 L'envoi d'invitations Trustpilot nécessite la configuration OAuth. Cette fonctionnalité sera disponible prochainement.
               </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* ── Tab: Promo codes ────────────────────── */}
+        <TabsContent value="promo" className="space-y-4 mt-4">
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">Gérez vos codes promo pour la récupération de paniers et les campagnes.</p>
+            <Button size="sm" onClick={() => setShowPromoForm(!showPromoForm)}>
+              <Plus className="w-4 h-4 mr-2" /> Nouveau code
+            </Button>
+          </div>
+
+          {showPromoForm && (
+            <Card>
+              <CardContent className="p-4 space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs">Code</Label>
+                    <Input
+                      placeholder="REVIENS10"
+                      value={newPromo.code}
+                      onChange={e => setNewPromo({ ...newPromo, code: e.target.value.toUpperCase() })}
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Type</Label>
+                    <Select value={newPromo.type} onValueChange={v => setNewPromo({ ...newPromo, type: v })}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="percent">% remise</SelectItem>
+                        <SelectItem value="fixed">€ fixe</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs">Valeur</Label>
+                    <Input type="number" value={newPromo.value} onChange={e => setNewPromo({ ...newPromo, value: Number(e.target.value) })} />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Début</Label>
+                    <Input type="date" value={newPromo.valid_from} onChange={e => setNewPromo({ ...newPromo, valid_from: e.target.value })} />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Fin</Label>
+                    <Input type="date" value={newPromo.valid_until} onChange={e => setNewPromo({ ...newPromo, valid_until: e.target.value })} />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label className="text-xs">Max utilisations (vide = illimité)</Label>
+                    <Input type="number" placeholder="Illimité" value={newPromo.max_uses} onChange={e => setNewPromo({ ...newPromo, max_uses: e.target.value ? Number(e.target.value) : "" })} />
+                  </div>
+                  <div className="flex items-center gap-2 pt-5">
+                    <Switch checked={newPromo.first_purchase_only} onCheckedChange={v => setNewPromo({ ...newPromo, first_purchase_only: v })} />
+                    <Label className="text-xs">Premier achat uniquement</Label>
+                  </div>
+                </div>
+                <Button
+                  onClick={async () => {
+                    if (!newPromo.code) { toast.error("Code requis"); return; }
+                    const { error } = await supabase.from("promo_codes").insert({
+                      code: newPromo.code,
+                      type: newPromo.type,
+                      value: newPromo.value,
+                      valid_from: new Date(newPromo.valid_from).toISOString(),
+                      valid_until: new Date(newPromo.valid_until).toISOString(),
+                      max_uses: newPromo.max_uses ? Number(newPromo.max_uses) : null,
+                      first_purchase_only: newPromo.first_purchase_only,
+                    });
+                    if (error) { toast.error("Erreur: " + error.message); return; }
+                    toast.success("Code promo créé");
+                    setShowPromoForm(false);
+                    setNewPromo({ code: "", type: "percent", value: 10, valid_from: new Date().toISOString().slice(0, 10), valid_until: new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10), max_uses: "", first_purchase_only: false });
+                    fetchPromoCodes();
+                  }}
+                >
+                  Créer le code
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+
+          <Card>
+            <CardContent className="p-0">
+              {promoLoading ? (
+                <div className="p-8"><Skeleton className="h-10 w-full" /></div>
+              ) : promoCodes.length === 0 ? (
+                <div className="p-12 text-center text-muted-foreground">
+                  <Tag className="w-10 h-10 mx-auto mb-3 text-gray-300" />
+                  <p>Aucun code promo</p>
+                </div>
+              ) : (
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Code</TableHead>
+                      <TableHead>Réduction</TableHead>
+                      <TableHead>Validité</TableHead>
+                      <TableHead className="text-center">Utilisations</TableHead>
+                      <TableHead className="text-center">Actif</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {promoCodes.map(p => (
+                      <TableRow key={p.id}>
+                        <TableCell className="font-mono font-medium">{p.code}</TableCell>
+                        <TableCell>{p.type === "percent" ? `${p.value}%` : `${p.value} €`}</TableCell>
+                        <TableCell className="text-xs text-muted-foreground">
+                          {new Date(p.valid_from).toLocaleDateString("fr-FR")} → {new Date(p.valid_until).toLocaleDateString("fr-FR")}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          {p.current_uses}{p.max_uses ? `/${p.max_uses}` : ""}
+                        </TableCell>
+                        <TableCell className="text-center">
+                          <Switch
+                            checked={p.active}
+                            onCheckedChange={async (v) => {
+                              await supabase.from("promo_codes").update({ active: v }).eq("id", p.id);
+                              fetchPromoCodes();
+                            }}
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"
+                            onClick={async () => {
+                              await supabase.from("promo_codes").delete().eq("id", p.id);
+                              toast.success("Code supprimé");
+                              fetchPromoCodes();
+                            }}>
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              )}
             </CardContent>
           </Card>
         </TabsContent>

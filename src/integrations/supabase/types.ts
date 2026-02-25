@@ -14,6 +14,59 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_carts: {
+        Row: {
+          abandonment_stage: string
+          cart_data: Json
+          converted: boolean
+          converted_order_id: string | null
+          created_at: string
+          email: string | null
+          id: string
+          last_email_sent_at: string | null
+          promo_code_used: string | null
+          session_id: string
+          touch_count: number
+          updated_at: string
+        }
+        Insert: {
+          abandonment_stage?: string
+          cart_data?: Json
+          converted?: boolean
+          converted_order_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_email_sent_at?: string | null
+          promo_code_used?: string | null
+          session_id: string
+          touch_count?: number
+          updated_at?: string
+        }
+        Update: {
+          abandonment_stage?: string
+          cart_data?: Json
+          converted?: boolean
+          converted_order_id?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_email_sent_at?: string | null
+          promo_code_used?: string | null
+          session_id?: string
+          touch_count?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_carts_converted_order_id_fkey"
+            columns: ["converted_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       admin_settings: {
         Row: {
           data: Json
@@ -158,6 +211,8 @@ export type Database = {
           payment_method: string | null
           payment_status: string | null
           projection: number
+          promo_code: string | null
+          promo_discount: number | null
           ref: string
           status: string
           status_history: Json | null
@@ -188,6 +243,8 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string | null
           projection: number
+          promo_code?: string | null
+          promo_discount?: number | null
           ref: string
           status?: string
           status_history?: Json | null
@@ -218,12 +275,56 @@ export type Database = {
           payment_method?: string | null
           payment_status?: string | null
           projection?: number
+          promo_code?: string | null
+          promo_discount?: number | null
           ref?: string
           status?: string
           status_history?: Json | null
           stripe_payment_intent_id?: string | null
           toile_color?: string | null
           width?: number
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          current_uses: number
+          first_purchase_only: boolean
+          id: string
+          max_uses: number | null
+          type: string
+          valid_from: string
+          valid_until: string
+          value: number
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          current_uses?: number
+          first_purchase_only?: boolean
+          id?: string
+          max_uses?: number | null
+          type?: string
+          valid_from?: string
+          valid_until?: string
+          value?: number
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          current_uses?: number
+          first_purchase_only?: boolean
+          id?: string
+          max_uses?: number | null
+          type?: string
+          valid_from?: string
+          valid_until?: string
+          value?: number
         }
         Relationships: []
       }

@@ -6,6 +6,7 @@ import { Switch } from "@/components/ui/switch";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useContent } from "@/contexts/ContentContext";
 import DynamicProductVisual from "@/components/product/DynamicProductVisual";
+import SaveConfigCTA from "@/components/product/SaveConfigCTA";
 import type { useConfigurator } from "@/hooks/useConfigurator";
 
 type ConfiguratorProps = ReturnType<typeof useConfigurator> & {
@@ -303,6 +304,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                     <span>🚚 Livraison 4-5 sem</span>
                     <span>🇫🇷 Fabriqué en France</span>
                   </div>
+                  <SaveConfigCTA hasValidConfig={width > 0 && projection > 0} />
                 </div>
               </div>
             </div>

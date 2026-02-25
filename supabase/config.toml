@@ -8,3 +8,9 @@ verify_jwt = false
 
 [functions.trustpilot-proxy]
 verify_jwt = false
+
+[functions.process-abandoned-carts]
+verify_jwt = false
+
+[functions.send-config-email]
+verify_jwt = false
