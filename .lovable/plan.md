@@ -1,114 +1,150 @@
 
 
-# Visuel produit dynamique pour le configurateur
+# Integration Trustpilot — Avis en temps reel + Admin
 
-Remplacement du placeholder statique "Apercu produit" par un visuel SVG qui reagit en temps reel aux choix de l'utilisateur (couleurs, dimensions, options).
+## Probleme de securite important
+
+L'API Trustpilot necessite une cle API qui ne doit **pas** etre exposee cote client (les variables `VITE_` sont visibles dans le bundle JS). La solution passe par une **Edge Function proxy** qui fait les appels a Trustpilot cote serveur.
+
+---
+
+## Architecture
+
+```text
+Frontend                     Edge Function                  Trustpilot API
+   |                              |                              |
+   | supabase.functions.invoke()  |                              |
+   | "trustpilot-proxy"           |                              |
+   +----------------------------->| fetch(api.trustpilot.com)    |
+                                  +----------------------------->|
+                                  |<-----------------------------+
+   |<-----------------------------| JSON response                |
+   | Cache localStorage 1h       |                              |
+```
+
+---
+
+## Secrets Supabase a ajouter
+
+2 nouveaux secrets :
+- `TRUSTPILOT_API_KEY` — cle API Trustpilot
+- `TRUSTPILOT_BUSINESS_UNIT_ID` — identifiant de l'entreprise Trustpilot
 
 ---
 
 ## Fichiers a creer
 
-### 1. `src/components/product/DynamicProductVisual.tsx`
+### 1. `supabase/functions/trustpilot-proxy/index.ts`
 
-Composant React pur (pas de dependance externe) qui affiche un store banne en SVG composite avec plusieurs couches superposees dans un conteneur `position: relative` :
+Edge Function qui recoit `{ action, params }` et proxifie vers l'API Trustpilot :
+- `action: "summary"` — GET `/business-units/{BU_ID}` (score global, nombre d'avis, distribution)
+- `action: "reviews"` — GET `/business-units/{BU_ID}/reviews` avec pagination, filtre par etoiles, tri
+- Retourne le JSON tel quel au client
+- Pas de JWT requis (`verify_jwt = false`) car lecture publique
 
-**Props :**
-```text
-toileColor: { hex: string; label: string }
-armatureColor: { hex: string; label: string }
-options: { motorisation: boolean; led: boolean; packConnect: boolean }
-width: number (cm)
-projection: number (cm)
-className?: string
-```
+### 2. `src/lib/trustpilot.ts`
 
-**Couches (z-order croissant) :**
-- Couche 0 : Fond de scene — gradient ciel vers terrasse (CSS gradients)
-- Couche 1 : Structure SVG armature (coffre, bras, barre frontale, supports muraux) — couleur appliquee via `fill={armatureColor.hex}` directement (pas de CSS filter, plus fiable)
-- Couche 2 : Toile (fabric) — rectangle positionne entre le coffre et la barre frontale, colore avec `toileColor.hex`, texture via `repeating-linear-gradient` subtil, leger `perspective/rotateX` pour l'effet 3D
-- Couche 3 : Lueur LED — bande lumineuse jaune pale sous la barre frontale, visible uniquement si `options.led || options.packConnect`, avec `box-shadow` glow
-- Couche 4 : Badge "Motorise" — pastille en haut a droite, visible si `options.motorisation || options.packConnect`
-- Couche 5 : Overlay dimensions (`width x projection cm`, fond noir semi-transparent, en bas a gauche) + pastilles couleur (en bas a droite)
+Module utilitaire frontend :
+- `fetchBusinessSummary()` — appelle l'Edge Function action `summary`, cache localStorage 1h
+- `fetchReviews({ page, perPage, stars, orderBy })` — appelle action `reviews`, cache localStorage 1h
+- `clearTrustpilotCache()` — vide le cache
+- Gestion d'erreur avec fallback vers les temoignages statiques du ContentContext
 
-**Proportions dynamiques :** Le ratio `projection/width` (clampe entre 0.3 et 0.8) influence la hauteur des bras et de la toile dans le SVG, donnant un apercu proportionnel.
+### 3. `src/hooks/useTrustpilot.ts`
 
-**Transition :** Le conteneur a `transition: all 300ms ease` pour un effet fluide quand les valeurs changent.
+Hook React qui expose :
+- `summary` (score, nombre, distribution) + `loading` + `error`
+- `reviews` (liste paginee) + `loadMore()` + `filterByStars(n)`
+- Chargement initial au mount avec cache localStorage
 
-### 2. Vignettes preconfigurees
+### 4. `src/components/TrustpilotReviews.tsx`
 
-3 miniatures sous le visuel principal, chacune est un `DynamicProductVisual` en petit format :
+Composant front-end complet :
 
-1. **Config actuelle** (bordure accent, label "Votre config")
-2. **Style epure** : Toile Blanc Ecru + Armature Blanc, aucune option
-3. **Style audacieux** : Toile Noir + Armature Noir, toutes options
+**Banniere sommaire** : logo Trustpilot SVG (vert officiel) + etoiles visuelles remplies + `"{score}/5 . {count} avis verifies"` + lien externe "Voir tous les avis"
 
-Clic sur une vignette = previsualisation temporaire dans le visuel principal.
-Bouton "Appliquer cette config" pour valider et mettre a jour les vrais states du configurateur.
+**Grille d'avis** (3 colonnes desktop, 1 mobile) : chaque carte affiche les etoiles remplies, le titre en gras, le texte (3 lignes max + "Lire la suite"), avatar initiales + nom + date relative ("il y a 3 jours"), badge "Avis verifie"
+
+**Barre de filtre** par etoiles : [Tous] [5 etoiles] [4 etoiles]
+
+**Bouton "Voir plus d'avis"** pour pagination
+
+**Skeleton** pendant le chargement, **fallback** vers les temoignages ContentContext en cas d'erreur API
+
+### 5. `src/components/TrustpilotWidget.tsx`
+
+Widget TrustBox officiel Trustpilot en fallback/complement — `div` avec les attributs `data-widget` charges par le script Trustpilot externe.
 
 ---
 
 ## Fichiers a modifier
 
-### `src/components/product/ConfiguratorSection.tsx`
+### `src/pages/admin/AdminMarketingPage.tsx`
 
-**Colonne gauche (lignes 60-84) :**
-- Remplacer le `div` placeholder gris (`aspect-[4/3] bg-stone-200`) par le composant `DynamicProductVisual`
-- Passer les props depuis les valeurs du configurateur
-- Ajouter les 3 vignettes dessous
-- Ajouter un state `previewConfig` pour gerer la previsualisation temporaire d'une vignette
-- Conserver les badges textuels existants (dimensions, couleur toile, armature, options) sous les vignettes
+Remplacement du placeholder "Coming soon" par une page complete avec tabs :
 
-### `src/contexts/ConfiguratorSettingsContext.tsx`
+**Tab "Avis Trustpilot"** :
 
-**Type `ColorEntry` (ligne 24-29) :**
-- Ajouter un champ optionnel `photoUrl?: string` au type `ColorEntry`
+1. **Carte sommaire** — score global + etoiles + nombre total + graphique de distribution en barres horizontales (5 etoiles = XX%, 4 etoiles = XX%, etc.)
 
-### `src/pages/admin/AdminConfiguratorPage.tsx`
+2. **Tableau des avis** — colonnes : Note (etoiles), Titre, Auteur, Date, Actions (lien Trustpilot externe, toggle "Mettre en avant")
 
-**Composant `ColorsTab` (lignes 219-298) :**
-- Ajouter dans chaque ligne de couleur un champ d'upload image (uniquement pour le tab "toile")
-- Input `type="file"` accept `image/*`
-- Upload vers Supabase Storage bucket `product-photos`
-- Miniature 60x60px si photo existante + bouton supprimer
-- Helper text : "Photo optionnelle. Si fournie, remplace le rendu CSS."
+3. **Gestionnaire d'avis mis en avant** — liste des avis selectionnes (max 6), reordonnables par drag (fleches haut/bas), sauvegardes dans `site_content` sous la cle `featuredReviews`. Ces avis sont affiches en priorite dans les sections temoignages du front-end.
 
-### `DynamicProductVisual.tsx` — logique photo
+4. **Section invitation d'avis** — formulaire email (saisie manuelle ou selection depuis commandes "Livre"), envoie l'email `review_request` via l'Edge Function `send-order-email` existante. Historique des invitations envoyees.
 
-Si `toileColor` a un `photoUrl` non vide :
-- Afficher la photo reelle en fond a la place des couches SVG 0-2
-- Appliquer un filtre CSS leger pour adapter la teinte armature
-- Conserver les couches 3-5 (LED, badge, overlays)
+### `src/contexts/ContentContext.tsx`
+
+- Ajouter un type `FeaturedReview` (`{ trustpilotId, title, text, author, rating, date }`)
+- Ajouter `featuredReviews: FeaturedReview[]` dans `HomepageContent`
+- Ajouter `updateFeaturedReviews()` dans le contexte
+
+### `src/components/home/TestimonialsSection.tsx`
+
+- Si `featuredReviews` non vide dans le contenu **et** l'API Trustpilot echoue : afficher les avis mis en avant par l'admin
+- Si l'API Trustpilot repond : afficher les avis Trustpilot reels avec la banniere sommaire
+- Conserver le carousel existant comme fallback ultime (temoignages statiques ContentContext)
+
+### `src/components/product/ProductTestimonialsSection.tsx`
+
+- Remplacer les temoignages codes en dur par le composant `TrustpilotReviews`
+- Ajouter le widget `TrustpilotWidget` en dessous
+
+### `src/pages/Index.tsx`
+
+- Aucun changement structurel — `TestimonialsSection` gere deja l'affichage
+
+### `src/pages/ProductPage.tsx`
+
+- Aucun changement structurel — `ProductTestimonialsSection` integrera le nouveau composant
+
+### `supabase/config.toml`
+
+- Ajouter la config pour `trustpilot-proxy` avec `verify_jwt = false`
+
+### `index.html`
+
+- Ajouter le script TrustBox Trustpilot : `<script src="//widget.trustpilot.com/bootstrap/v5/tp.widget.bootstrap.min.js" async></script>`
 
 ---
 
-## Migration SQL
+## Strategie de cache
 
-Creation d'un bucket Storage public `product-photos` pour heberger les photos de store par coloris :
+Les donnees Trustpilot sont cachees dans `localStorage` avec un TTL de 1 heure :
+- Cle `tp_summary` : sommaire entreprise
+- Cle `tp_reviews_{page}_{stars}` : pages d'avis par filtre
+- A chaque appel, on verifie le timestamp ; si expire, on refetch via l'Edge Function
+- L'admin peut forcer un rafraichissement via un bouton "Actualiser" qui appelle `clearTrustpilotCache()`
 
-```sql
-INSERT INTO storage.buckets (id, name, public) VALUES ('product-photos', 'product-photos', true);
+---
 
-CREATE POLICY "Anyone can view product photos"
-  ON storage.objects FOR SELECT USING (bucket_id = 'product-photos');
+## Cascade de fallback
 
-CREATE POLICY "Authenticated users can upload product photos"
-  ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'product-photos' AND auth.role() = 'authenticated');
-
-CREATE POLICY "Authenticated users can delete product photos"
-  ON storage.objects FOR DELETE
-  USING (bucket_id = 'product-photos' AND auth.role() = 'authenticated');
+```text
+1. API Trustpilot (via Edge Function) → avis reels
+2. Avis mis en avant par l'admin (featuredReviews dans site_content)
+3. Temoignages statiques du ContentContext (carousel existant)
 ```
 
----
-
-## Resume des modifications
-
-| Fichier | Action |
-|---------|--------|
-| `src/components/product/DynamicProductVisual.tsx` | Creer — composant visuel SVG multicouche |
-| `src/components/product/ConfiguratorSection.tsx` | Modifier — integrer le visuel + vignettes |
-| `src/contexts/ConfiguratorSettingsContext.tsx` | Modifier — ajouter `photoUrl` a `ColorEntry` |
-| `src/pages/admin/AdminConfiguratorPage.tsx` | Modifier — ajouter upload photo par coloris |
-| Migration SQL | Creer bucket `product-photos` |
+Cela garantit que la section temoignages affiche toujours du contenu, meme si l'API Trustpilot est indisponible ou pas encore configuree.
 
