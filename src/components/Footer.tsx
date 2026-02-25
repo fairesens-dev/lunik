@@ -1,0 +1,89 @@
+import { Link } from "react-router-dom";
+
+const Footer = () => {
+  return (
+    <footer className="bg-foreground text-background">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+          {/* Col 1: Brand */}
+          <div>
+            <h3 className="font-serif text-2xl tracking-[0.15em] uppercase mb-4">[BRAND]</h3>
+            <p className="text-background/60 text-sm leading-relaxed mb-6 max-w-xs">
+              L'excellence du store sur mesure, fabriqué en France avec passion et savoir-faire depuis plus de 20 ans.
+            </p>
+            <div className="flex gap-4">
+              {["Instagram", "Facebook", "Pinterest"].map((social) => (
+                <a
+                  key={social}
+                  href="#"
+                  className="text-background/40 hover:text-background transition-colors text-xs uppercase tracking-widest"
+                >
+                  {social}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          {/* Col 2: Navigation */}
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-background/40 mb-6 font-sans font-medium">
+              Navigation
+            </h4>
+            <nav className="flex flex-col gap-3">
+              {[
+                { label: "Notre Store", href: "/store-coffre" },
+                { label: "Service Après-Vente", href: "/service-apres-vente" },
+                { label: "Contact", href: "/contact" },
+                { label: "CGV", href: "/conditions-generales-de-vente" },
+                { label: "Mentions Légales", href: "/mentions-legales" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-background/60 hover:text-background transition-colors text-sm"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {/* Col 3: Contact */}
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-background/40 mb-6 font-sans font-medium">
+              Contact
+            </h4>
+            <div className="space-y-3 text-sm text-background/60">
+              <p>contact@brand-store.fr</p>
+              <p>+33 (0)4 XX XX XX XX</p>
+              <p>Lundi – Vendredi : 9h – 18h</p>
+            </div>
+            <div className="mt-8 inline-flex items-center gap-2 border border-background/20 px-4 py-2 text-xs uppercase tracking-widest text-background/60">
+              <span>🇫🇷</span>
+              <span>Fabriqué en France</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="border-t border-background/10">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-background/30 text-xs">
+            © {new Date().getFullYear()} [BRAND]. Tous droits réservés.
+          </p>
+          <div className="flex gap-6">
+            <Link to="/conditions-generales-de-vente" className="text-background/30 hover:text-background/60 transition-colors text-xs">
+              CGV
+            </Link>
+            <Link to="/mentions-legales" className="text-background/30 hover:text-background/60 transition-colors text-xs">
+              Mentions Légales
+            </Link>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
