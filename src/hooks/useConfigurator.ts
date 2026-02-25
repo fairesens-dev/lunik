@@ -1,94 +1,73 @@
 import { useState, useMemo } from "react";
-
-const TOILE_COLORS = [
-  { name: "Blanc Écru", hex: "#F5F0E8" },
-  { name: "Sable", hex: "#E8DCC8" },
-  { name: "Chanvre", hex: "#C8B89A" },
-  { name: "Havane", hex: "#8B7355" },
-  { name: "Moka", hex: "#5C4A32" },
-  { name: "Sauge", hex: "#4A5E3A" },
-  { name: "Eucalyptus", hex: "#6B8C6B" },
-  { name: "Bleu Ardoise", hex: "#4A6B8A" },
-  { name: "Terracotta", hex: "#8A4A4A" },
-  { name: "Gris Clair", hex: "#C8C8C8" },
-  { name: "Gris Anthracite", hex: "#5A5A5A" },
-  { name: "Noir", hex: "#1A1A1A" },
-];
-
-const ARMATURE_COLORS = [
-  { name: "Blanc RAL 9016", hex: "#F0EDE8" },
-  { name: "Gris Anthracite RAL 7016", hex: "#5A5A5A" },
-  { name: "Noir RAL 9005", hex: "#1A1A1A" },
-  { name: "Sable RAL 1015", hex: "#C8B48A" },
-];
-
-export { TOILE_COLORS, ARMATURE_COLORS };
+import { useConfiguratorSettings } from "@/contexts/ConfiguratorSettingsContext";
 
 export function useConfigurator() {
+  const { settings } = useConfiguratorSettings();
+  const { pricing, dimensions } = settings;
+
+  const activeToileColors = useMemo(() => settings.toileColors.filter(c => c.active), [settings.toileColors]);
+  const activeArmatureColors = useMemo(() => settings.armatureColors.filter(c => c.active), [settings.armatureColors]);
+
+  // Exported for backward compat
+  const TOILE_COLORS_COMPAT = useMemo(() => activeToileColors.map(c => ({ name: c.label, hex: c.hex })), [activeToileColors]);
+  const ARMATURE_COLORS_COMPAT = useMemo(() => activeArmatureColors.map(c => ({ name: c.label, hex: c.hex })), [activeArmatureColors]);
+
   const [width, setWidth] = useState(350);
   const [projection, setProjection] = useState(250);
-  const [toileColor, setToileColor] = useState("Blanc Écru");
-  const [armatureColor, setArmatureColor] = useState("Blanc RAL 9016");
+  const [toileColor, setToileColor] = useState(activeToileColors[0]?.label || "Blanc Écru");
+  const [armatureColor, setArmatureColor] = useState(activeArmatureColors[0]?.label || "Blanc RAL 9016");
   const [motorisation, setMotorisation] = useState(false);
   const [led, setLed] = useState(false);
   const [pack, setPack] = useState(false);
 
+  const motorOption = settings.options.find(o => o.id === "motorisation");
+  const ledOption = settings.options.find(o => o.id === "led");
+  const packOption = settings.options.find(o => o.id === "pack-connect");
+
   const handlePackToggle = (checked: boolean) => {
     setPack(checked);
-    if (checked) {
-      setMotorisation(true);
-      setLed(true);
-    }
+    if (checked) { setMotorisation(true); setLed(true); }
   };
+  const handleMotorisationToggle = (checked: boolean) => { if (!pack) setMotorisation(checked); };
+  const handleLedToggle = (checked: boolean) => { if (!pack) setLed(checked); };
 
-  const handleMotorisationToggle = (checked: boolean) => {
-    if (!pack) setMotorisation(checked);
-  };
-
-  const handleLedToggle = (checked: boolean) => {
-    if (!pack) setLed(checked);
-  };
-
-  const surfaceArea = useMemo(
-    () => parseFloat(((width / 100) * (projection / 100)).toFixed(2)),
-    [width, projection]
-  );
+  const surfaceArea = useMemo(() => parseFloat(((width / 100) * (projection / 100)).toFixed(2)), [width, projection]);
 
   const price = useMemo(() => {
-    const baseRate = 580;
-    const minPrice = 1890;
-    let p = Math.max(minPrice, Math.round(surfaceArea * baseRate));
-    if (pack) p += 590;
+    let p = Math.max(pricing.minPrice, Math.round(surfaceArea * pricing.baseRate));
+    if (pack) p += (packOption?.price ?? 590);
     else {
-      if (motorisation) p += 390;
-      if (led) p += 290;
+      if (motorisation) p += (motorOption?.price ?? 390);
+      if (led) p += (ledOption?.price ?? 290);
     }
     return p;
-  }, [surfaceArea, motorisation, led, pack]);
+  }, [surfaceArea, motorisation, led, pack, pricing, motorOption, ledOption, packOption]);
 
-  const installmentPrice = useMemo(() => Math.round(price / 3), [price]);
+  const installmentPrice = useMemo(() => Math.round(price / (pricing.installmentDivisor || 3)), [price, pricing.installmentDivisor]);
 
   const optionsSummary = useMemo(() => {
     const parts: string[] = [];
-    if (pack) parts.push("Pack Connect");
+    if (pack) parts.push(packOption?.label || "Pack Connect");
     else {
-      if (motorisation) parts.push("Motorisation");
-      if (led) parts.push("LED");
+      if (motorisation) parts.push(motorOption?.label || "Motorisation");
+      if (led) parts.push(ledOption?.label || "LED");
     }
     return parts.join(" + ") || "Aucune";
-  }, [motorisation, led, pack]);
+  }, [motorisation, led, pack, motorOption, ledOption, packOption]);
 
   return {
-    width, setWidth,
-    projection, setProjection,
-    toileColor, setToileColor,
-    armatureColor, setArmatureColor,
-    motorisation, handleMotorisationToggle,
-    led, handleLedToggle,
-    pack, handlePackToggle,
-    surfaceArea,
-    price,
-    installmentPrice,
-    optionsSummary,
+    width, setWidth, projection, setProjection,
+    toileColor, setToileColor, armatureColor, setArmatureColor,
+    motorisation, handleMotorisationToggle, led, handleLedToggle, pack, handlePackToggle,
+    surfaceArea, price, installmentPrice, optionsSummary,
+    TOILE_COLORS: TOILE_COLORS_COMPAT,
+    ARMATURE_COLORS: ARMATURE_COLORS_COMPAT,
+    settings,
   };
 }
+
+// Re-export static defaults for backward compat
+import { DEFAULT_SETTINGS } from "@/contexts/ConfiguratorSettingsContext";
+export { DEFAULT_SETTINGS };
+export const TOILE_COLORS = DEFAULT_SETTINGS.toileColors.map(c => ({ name: c.label, hex: c.hex }));
+export const ARMATURE_COLORS = DEFAULT_SETTINGS.armatureColors.map(c => ({ name: c.label, hex: c.hex }));

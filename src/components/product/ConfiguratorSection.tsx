@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import AnimatedSection from "@/components/AnimatedSection";
-import { TOILE_COLORS, ARMATURE_COLORS } from "@/hooks/useConfigurator";
 import type { useConfigurator } from "@/hooks/useConfigurator";
 
 type ConfiguratorProps = ReturnType<typeof useConfigurator> & {
@@ -18,11 +17,15 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
     led, handleLedToggle,
     pack, handlePackToggle,
     surfaceArea, price, installmentPrice, optionsSummary,
+    TOILE_COLORS, ARMATURE_COLORS, settings,
     onOrder,
   } = props;
 
-  const clampWidth = (v: number) => setWidth(Math.min(600, Math.max(150, v || 150)));
-  const clampProjection = (v: number) => setProjection(Math.min(400, Math.max(100, v || 100)));
+  const { dimensions, pricing } = settings;
+  const activeOptions = settings.options.filter(o => o.active);
+
+  const clampWidth = (v: number) => setWidth(Math.min(dimensions.width.max, Math.max(dimensions.width.min, v || dimensions.width.min)));
+  const clampProjection = (v: number) => setProjection(Math.min(dimensions.projection.max, Math.max(dimensions.projection.min, v || dimensions.projection.min)));
 
   const selectedToile = TOILE_COLORS.find(c => c.name === toileColor);
   const selectedArmature = ARMATURE_COLORS.find(c => c.name === armatureColor);
@@ -88,8 +91,8 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                     <div>
                       <label className="text-xs text-muted-foreground mb-1 block">Largeur (cm)</label>
                       <Input
-                        type="number" min={150} max={600} value={width}
-                        onChange={(e) => setWidth(parseInt(e.target.value) || 150)}
+                        type="number" min={dimensions.width.min} max={dimensions.width.max} value={width}
+                        onChange={(e) => setWidth(parseInt(e.target.value) || dimensions.width.min)}
                         onBlur={() => clampWidth(width)}
                         placeholder="ex: 350"
                       />
@@ -97,15 +100,15 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                     <div>
                       <label className="text-xs text-muted-foreground mb-1 block">Avancée (cm)</label>
                       <Input
-                        type="number" min={100} max={400} value={projection}
-                        onChange={(e) => setProjection(parseInt(e.target.value) || 100)}
+                        type="number" min={dimensions.projection.min} max={dimensions.projection.max} value={projection}
+                        onChange={(e) => setProjection(parseInt(e.target.value) || dimensions.projection.min)}
                         onBlur={() => clampProjection(projection)}
                         placeholder="ex: 250"
                       />
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">Surface couverte : <strong>{surfaceArea} m²</strong></p>
-                  <p className="text-xs text-muted-foreground mt-1">Largeur max 600 cm · Avancée max 400 cm</p>
+                  <p className="text-xs text-muted-foreground mt-1">Largeur max {dimensions.width.max} cm · Avancée max {dimensions.projection.max} cm</p>
                 </div>
 
                 {/* 02 Toile */}
@@ -162,40 +165,35 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   </div>
                 </div>
 
-                {/* 04 Options */}
+                {/* 04 Options — dynamic from context */}
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">04 — Options</p>
                   <div className="space-y-3">
-                    {/* Motorisation */}
-                    <div className="border border-border p-4 flex items-center gap-4">
-                      <Switch checked={motorisation} onCheckedChange={handleMotorisationToggle} disabled={pack} />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">⚡ Motorisation Somfy io</p>
-                        <p className="text-xs text-muted-foreground">Télécommande + app smartphone TaHoma incluses. Compatible Google Home & Alexa.</p>
-                      </div>
-                      <span className="text-sm font-medium whitespace-nowrap">+390 €</span>
-                    </div>
-                    {/* LED */}
-                    <div className="border border-border p-4 flex items-center gap-4">
-                      <Switch checked={led} onCheckedChange={handleLedToggle} disabled={pack} />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">💡 Éclairage LED sous store</p>
-                        <p className="text-xs text-muted-foreground">Bandeau LED intégré, lumière 3000K, télécommandé.</p>
-                      </div>
-                      <span className="text-sm font-medium whitespace-nowrap">+290 €</span>
-                    </div>
-                    {/* Pack */}
-                    <div className="border border-border p-4 flex items-center gap-4">
-                      <Switch checked={pack} onCheckedChange={handlePackToggle} />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium">📱 Pack Connect (Motorisation + LED + TaHoma)</p>
-                        <p className="text-xs text-muted-foreground">Tout dans un seul pack connecté.</p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-sm font-medium whitespace-nowrap">+590 €</span>
-                        <span className="block text-[10px] text-primary font-medium mt-0.5">ÉCONOMISEZ 90 €</span>
-                      </div>
-                    </div>
+                    {activeOptions.map((opt) => {
+                      const isPack = (opt.includesIds && opt.includesIds.length > 0);
+                      let checked = false;
+                      let onToggle: (v: boolean) => void = () => {};
+                      let disabled = false;
+
+                      if (opt.id === "motorisation") { checked = motorisation; onToggle = handleMotorisationToggle; disabled = pack; }
+                      else if (opt.id === "led") { checked = led; onToggle = handleLedToggle; disabled = pack; }
+                      else if (opt.id === "pack-connect") { checked = pack; onToggle = handlePackToggle; }
+                      else { checked = false; onToggle = () => {}; }
+
+                      return (
+                        <div key={opt.id} className={`border border-border p-4 flex items-center gap-4 ${opt.highlight ? "ring-1 ring-primary/20" : ""}`}>
+                          <Switch checked={checked} onCheckedChange={onToggle} disabled={disabled} />
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
+                            <p className="text-xs text-muted-foreground">{opt.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className="text-sm font-medium whitespace-nowrap">+{opt.price} €</span>
+                            {opt.savingsLabel && <span className="block text-[10px] text-primary font-medium mt-0.5">{opt.savingsLabel}</span>}
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -206,7 +204,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                     {price.toLocaleString("fr-FR")} €
                   </p>
                   <p className="text-xs text-muted-foreground mt-2">
-                    Soit {installmentPrice.toLocaleString("fr-FR")} €/mois en 3× sans frais
+                    Soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {pricing.installmentDivisor}× sans frais
                   </p>
                   <Button
                     onClick={onOrder}
