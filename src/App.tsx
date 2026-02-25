@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ConfiguratorSettingsProvider } from "@/contexts/ConfiguratorSettingsContext";
 import { ContentProvider } from "@/contexts/ContentContext";
+import { CartProvider } from "@/contexts/CartContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import ProductPage from "./pages/ProductPage";
@@ -14,6 +15,9 @@ import ContactPage from "./pages/ContactPage";
 import CGVPage from "./pages/CGVPage";
 import MentionsLegalesPage from "./pages/MentionsLegalesPage";
 import NotFound from "./pages/NotFound";
+import CheckoutPage from "./pages/CheckoutPage";
+import ThankYouPage from "./pages/ThankYouPage";
+import OrderTrackingPage from "./pages/OrderTrackingPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminResetPasswordPage from "./pages/admin/AdminResetPasswordPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
@@ -36,6 +40,7 @@ const App = () => (
       <BrowserRouter>
         <ContentProvider>
         <ConfiguratorSettingsProvider>
+        <CartProvider>
         <AuthProvider>
           <Routes>
             {/* Public site */}
@@ -46,7 +51,12 @@ const App = () => (
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/conditions-generales-de-vente" element={<CGVPage />} />
               <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
+              <Route path="/suivi" element={<OrderTrackingPage />} />
             </Route>
+
+            {/* Checkout (no main layout) */}
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/merci" element={<ThankYouPage />} />
 
             {/* Admin login (public, no layout) */}
             <Route path="/admin/login" element={<AdminLoginPage />} />
@@ -69,6 +79,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
+        </CartProvider>
         </ConfiguratorSettingsProvider>
         </ContentProvider>
       </BrowserRouter>

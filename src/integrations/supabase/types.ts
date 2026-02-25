@@ -138,57 +138,87 @@ export type Database = {
         Row: {
           amount: number
           armature_color: string | null
+          civility: string | null
+          client_address: string | null
+          client_address2: string | null
+          client_city: string | null
+          client_country: string | null
           client_email: string
           client_name: string
           client_phone: string | null
           client_postal_code: string | null
           created_at: string
+          delivery_option: string | null
           id: string
           message: string | null
+          newsletter_optin: boolean | null
           notes: string | null
           options: string[] | null
+          payment_method: string | null
+          payment_status: string | null
           projection: number
           ref: string
           status: string
           status_history: Json | null
+          stripe_payment_intent_id: string | null
           toile_color: string | null
           width: number
         }
         Insert: {
           amount: number
           armature_color?: string | null
+          civility?: string | null
+          client_address?: string | null
+          client_address2?: string | null
+          client_city?: string | null
+          client_country?: string | null
           client_email: string
           client_name: string
           client_phone?: string | null
           client_postal_code?: string | null
           created_at?: string
+          delivery_option?: string | null
           id?: string
           message?: string | null
+          newsletter_optin?: boolean | null
           notes?: string | null
           options?: string[] | null
+          payment_method?: string | null
+          payment_status?: string | null
           projection: number
           ref: string
           status?: string
           status_history?: Json | null
+          stripe_payment_intent_id?: string | null
           toile_color?: string | null
           width: number
         }
         Update: {
           amount?: number
           armature_color?: string | null
+          civility?: string | null
+          client_address?: string | null
+          client_address2?: string | null
+          client_city?: string | null
+          client_country?: string | null
           client_email?: string
           client_name?: string
           client_phone?: string | null
           client_postal_code?: string | null
           created_at?: string
+          delivery_option?: string | null
           id?: string
           message?: string | null
+          newsletter_optin?: boolean | null
           notes?: string | null
           options?: string[] | null
+          payment_method?: string | null
+          payment_status?: string | null
           projection?: number
           ref?: string
           status?: string
           status_history?: Json | null
+          stripe_payment_intent_id?: string | null
           toile_color?: string | null
           width?: number
         }
@@ -217,7 +247,25 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      lookup_order: {
+        Args: { p_email: string; p_ref: string }
+        Returns: {
+          amount: number
+          armature_color: string
+          client_email: string
+          client_name: string
+          created_at: string
+          delivery_option: string
+          options: string[]
+          payment_status: string
+          projection: number
+          ref: string
+          status: string
+          status_history: Json
+          toile_color: string
+          width: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
