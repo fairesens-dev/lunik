@@ -54,9 +54,12 @@ const ProductHeroSection = () => {
         </div>
       </div>
       <div className="hidden lg:block w-[45%] relative">
-        <div className="absolute inset-0 bg-stone-200 flex items-center justify-center">
-          <span className="text-stone-400 uppercase tracking-widest text-sm font-sans">Photo hero produit</span>
-        </div>
+        <img
+          src="/images/store-salon-apero.webp"
+          alt="Amis trinquant sous un store coffre sur une terrasse"
+          className="absolute inset-0 w-full h-full object-cover"
+          loading="eager"
+        />
         <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-stone-300/60 to-transparent" />
       </div>
     </section>
