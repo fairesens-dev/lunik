@@ -1,85 +1,121 @@
 
 
-# Configurator Settings Admin Page
+# Build Content Management Page (/admin/contenu)
 
-Build a `ConfiguratorContext` shared between admin settings and front-end configurator, plus a full admin settings page with 5 tabs.
+Create a ContentContext for site-wide content management and a full admin page with 7 tabs to edit all front-end text content in real-time.
 
 ---
 
 ## New Files
 
-### 1. `src/contexts/ConfiguratorSettingsContext.tsx`
+### 1. `src/contexts/ContentContext.tsx`
 
-React Context holding the full configurator configuration state:
-- **State structure**: `pricing` (baseRate, minPrice, installmentDivisor), `dimensions` (width/projection min/max/step), `toileColors[]`, `armatureColors[]`, `options[]` -- exactly as specified
-- **Persistence**: localStorage key `configurator_settings`, loaded on mount with fallback to defaults
-- **Methods exposed**: `updatePricing()`, `updateDimensions()`, `updateToileColor()`, `addToileColor()`, `removeToileColor()`, `toggleToileColor()`, `reorderToileColors()`, `updateArmatureColor()`, `addArmatureColor()`, `removeArmatureColor()`, `toggleArmatureColor()`, `reorderArmatureColors()`, `updateOption()`, `addOption()`, `removeOption()`, `resetToDefaults()`
-- Each update method saves to localStorage immediately
-- Provider wraps entire app in `App.tsx`
+React Context with localStorage persistence (key: `site_content`).
 
-### 2. `src/pages/admin/AdminConfiguratorPage.tsx` -- REWRITE
+**State structure** matches the spec exactly:
+- `global`: brandName, tagline, phone, email, address, siret, socialInstagram, socialFacebook, socialPinterest, trustpilotUrl
+- `homepage`: heroTitle, heroSubtitle, heroOverline, heroCTA1, heroCTA2, marqueeText, productSectionTitle, productSectionSubtitle, testimonials array, faqItems array
+- `productPage`: heroTitle, heroOverline, heroSubtitle, configuratorTitle, configuratorSubtitle, stepLabels array, orderConfirmationMessage, faqItems array
+- `sav`: heroTitle, heroSubtitle, hours, responseDelay, faqItems array
+- `promoBanner`: active, text, bgColor, textColor, ctaText, ctaUrl
 
-Full admin page with:
+Default values populated from the current hardcoded strings in existing components.
 
-**Sticky preview banner**: sage green bg, eye icon, "Les modifications s'appliquent en temps reel" + external link to /store-coffre
+**Methods**: `updateGlobal()`, `updateHomepage()`, `updateProductPage()`, `updateSAV()`, `updatePromoBanner()`, `updateTestimonials()`, `updateHomepageFAQ()`, `updateProductFAQ()`, `updateSAVFAQ()`
 
-**5 Tabs** (using shadcn Tabs):
+Provider loads from localStorage on mount, persists on every state change.
 
-**Tab 1 -- Tarification**: 2-column layout
-- Left: baseRate, minPrice, installmentDivisor number inputs with helper text
-- Right: live price simulator card with width/projection sliders + computed surface/price/installment display
-- Save button with toast
+### 2. `src/components/PromoBanner.tsx`
 
-**Tab 2 -- Dimensions**: 2-column (Largeur / Avancee)
-- Min, max, step inputs per dimension
-- Validation: min < max inline error
-- Simple CSS diagram (div-based top-down awning view) showing labeled width/projection, updating live
-- Save button with toast
+Simple full-width banner component consuming ContentContext:
+- Only renders if `promoBanner.active === true`
+- Shows text, CTA button, styled with configured bgColor/textColor
+- Rendered at top of Layout.tsx (above Header)
 
-**Tab 3 -- Couleurs de toile**: color list
-- Each row: move up/down buttons, 32px color circle, label Input, hex Input + native color picker, active Switch, delete Button (with confirm state)
-- "Ajouter un coloris" button at bottom
-- Save button with toast
+---
 
-**Tab 4 -- Couleurs armature**: same layout as Tab 3
-- Rectangular swatch (80x32px) instead of circle
-- Same controls
+## Rewritten Files
 
-**Tab 5 -- Options**: card per option
-- Each card: active toggle, icon input, label input, description textarea, price number input, promo badge input (optional), highlight toggle, includesIds multi-checkbox
-- "Ajouter une option" button
-- Save button with toast
+### 3. `src/pages/admin/AdminContentPage.tsx` -- FULL REWRITE
+
+Page title: "Gestion du contenu", subtitle about real-time updates.
+
+**7 Tabs** (shadcn Tabs):
+
+**Tab 1 -- Infos globales**: Two cards ("Identite de la marque" with brandName/tagline/phone/email/address/siret/trustpilotUrl, "Reseaux sociaux" with Instagram/Facebook/Pinterest URLs). Save button + toast.
+
+**Tab 2 -- Page d'accueil**: Cards for Hero (overline, title textarea with char count, subtitle, CTA1 text, CTA2 text), Marquee (textarea + live scrolling preview below), Product highlight section (title, subtitle). Save + toast.
+
+**Tab 3 -- Page produit**: Cards for Hero (overline, title, subtitle), Configurator section (title, subtitle), Step labels (4 inputs), Order confirmation message (textarea). Save + toast.
+
+**Tab 4 -- SAV & Contact**: Cards for SAV hero (title, subtitle), Contact info (hours textarea, response delay input). Save + toast.
+
+**Tab 5 -- Temoignages**: Editable list of testimonial cards. Each row: name input, city input, rating select (1-5), text textarea, active toggle, delete button (with inline confirm). "+ Ajouter un temoignage" button. Save + toast.
+
+**Tab 6 -- FAQ**: Two sub-sections via inner tabs: "FAQ Page d'accueil" and "FAQ Page produit". Each is an editable list of question/answer pairs with active toggle, up/down reorder arrows, delete. "+ Ajouter une question" button. Save + toast.
+
+**Tab 7 -- Banniere promo**: Card with active toggle, text input, bgColor + textColor color pickers (native input + hex text), CTA text, CTA URL. Live preview bar below showing exact rendering. Save + toast.
 
 ---
 
 ## Modified Files
 
-### 3. `src/App.tsx`
-- Import and wrap app with `<ConfiguratorSettingsProvider>` (inside BrowserRouter, outside Routes)
+### 4. `src/App.tsx`
+- Import `ContentProvider` from ContentContext
+- Wrap app with `<ContentProvider>` (alongside existing ConfiguratorSettingsProvider)
 
-### 4. `src/hooks/useConfigurator.ts`
-- Import `useConfiguratorSettings` from the new context
-- Replace hardcoded `TOILE_COLORS`, `ARMATURE_COLORS` with active colors from context
-- Replace hardcoded `baseRate=580`, `minPrice=1890`, divisor `3` with context values
-- Replace hardcoded option prices (390, 290, 590) with context option prices
-- Export `TOILE_COLORS` and `ARMATURE_COLORS` as computed from context (active only) for backward compat
+### 5. `src/components/Layout.tsx`
+- Import `PromoBanner` component
+- Render `<PromoBanner />` before `<Header />` inside the layout
 
-### 5. `src/components/product/ConfiguratorSection.tsx`
-- Import `useConfiguratorSettings` to read active colors, options, and dimension limits
-- Replace hardcoded `TOILE_COLORS`/`ARMATURE_COLORS` imports with context-driven active lists
-- Replace hardcoded option cards with dynamic rendering from `settings.options.filter(o => o.active)`
-- Replace hardcoded dimension min/max in clamp functions with context values
-- Replace hardcoded installment text divisor with context value
+### 6. `src/components/home/HeroSection.tsx`
+- Import `useContent` from ContentContext
+- Replace hardcoded title/subtitle/overline/CTA texts with `content.homepage.heroTitle`, etc.
+- heroTitle supports `\n` rendered as `<br />`
+
+### 7. `src/components/home/MarqueeSection.tsx`
+- Import `useContent`, replace hardcoded `marqueeText` with `content.homepage.marqueeText`
+
+### 8. `src/components/home/TestimonialsSection.tsx`
+- Import `useContent`, replace hardcoded testimonials array with `content.homepage.testimonials.filter(t => t.active)`
+
+### 9. `src/components/home/FAQSection.tsx`
+- Import `useContent`, replace hardcoded faqs with `content.homepage.faqItems.filter(f => f.active)`
+
+### 10. `src/components/home/ProductHighlightSection.tsx`
+- Import `useContent`, replace hardcoded section title/subtitle with `content.homepage.productSectionTitle` / `productSectionSubtitle`
+
+### 11. `src/components/product/ProductHeroSection.tsx`
+- Import `useContent`, replace hardcoded overline/title/subtitle with `content.productPage.*`
+
+### 12. `src/components/product/ProductFAQSection.tsx`
+- Import `useContent`, replace hardcoded faqs array with `content.productPage.faqItems.filter(f => f.active)`
+
+### 13. `src/components/product/ConfiguratorSection.tsx`
+- Import `useContent`, replace hardcoded configurator section title/subtitle with `content.productPage.configuratorTitle` / `configuratorSubtitle`
+
+### 14. `src/pages/SAVPage.tsx`
+- Import `useContent`, replace hardcoded hero title/subtitle with `content.sav.heroTitle` / `heroSubtitle`
+- Replace hardcoded SAV FAQ array with `content.sav.faqItems.filter(f => f.active)`
+
+### 15. `src/components/Footer.tsx`
+- Import `useContent`, replace hardcoded brand name, email, phone with `content.global.*`
+- Replace hardcoded social links with `content.global.socialInstagram`, etc.
+
+### 16. `src/components/Header.tsx`
+- Import `useContent`, replace `[BRAND]` with `content.global.brandName`
 
 ---
 
 ## Technical Details
 
-- All admin form state is local (useState) per tab; "Sauvegarder" commits to context + localStorage
-- Toast notifications via existing `useToast` hook from shadcn
-- No drag-and-drop library -- use simple ArrowUp/ArrowDown buttons for reordering
-- Delete confirmation is inline (row changes to "Supprimer ? [Annuler] [Confirmer]")
-- Color picker uses native `<input type="color">` paired with hex text input
-- Price simulator in Tab 1 uses the same formula as useConfigurator but with local admin-edited values
+- All admin form state is local (useState per tab); "Sauvegarder" commits to context + localStorage
+- Toast notifications via `useToast` from shadcn
+- Testimonials/FAQ items include `active: boolean` for toggle visibility and `id: string` for stable keys
+- FAQ reordering uses ArrowUp/ArrowDown buttons (same pattern as ConfiguratorPage colors)
+- Delete confirmation is inline ("Supprimer ? [Annuler] [Confirmer]")
+- Marquee live preview in Tab 2 uses the same CSS animation class as the front-end
+- Promo banner live preview in Tab 7 renders a styled div with the configured colors/text
+- heroTitle newlines: stored as `\n` in state, rendered by splitting on `\n` and joining with `<br />`
 - No new dependencies needed
 
