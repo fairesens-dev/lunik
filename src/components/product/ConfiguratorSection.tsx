@@ -104,8 +104,8 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
         <AnimatedSection delay={0.15}>
           <div className="border border-border bg-background shadow-sm">
             <div className="grid grid-cols-1 lg:grid-cols-[45%_55%]">
-              {/* LEFT — Visual */}
-              <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border">
+              {/* LEFT — Visual (sticky on desktop) */}
+              <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border lg:self-start lg:sticky lg:top-28">
                 {/* Dynamic visual */}
                 <DynamicProductVisual
                   toileColor={displayConfig.toileColor}
@@ -314,14 +314,17 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   </div>
                 </div>
 
+                {/* Save config / devis par email */}
+                <SaveConfigCTA hasValidConfig={width > 0 && projection > 0} />
+
                 {/* Price & CTA */}
                 <div className="border-t border-border pt-8">
                   <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Votre prix estimé</p>
-                  <p className="font-serif text-4xl md:text-5xl text-foreground transition-all duration-300">
-                    {price.toLocaleString("fr-FR")} €
+                  <p className="font-serif text-3xl md:text-4xl text-primary font-medium transition-all duration-300">
+                    {installmentPrice.toLocaleString("fr-FR")} €/mois <span className="text-lg font-normal text-muted-foreground">en {pricing.installmentDivisor}× sans frais</span>
                   </p>
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {pricing.installmentDivisor}× sans frais
+                  <p className="text-sm text-muted-foreground mt-1">
+                    ou {price.toLocaleString("fr-FR")} € au comptant
                   </p>
                   <Button
                     onClick={onOrder}
@@ -334,7 +337,6 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                     <span>🚚 Livraison 4-5 sem</span>
                     <span>🇫🇷 Fabriqué en France</span>
                   </div>
-                  <SaveConfigCTA hasValidConfig={width > 0 && projection > 0} />
                 </div>
               </div>
             </div>

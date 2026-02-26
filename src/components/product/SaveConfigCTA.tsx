@@ -54,10 +54,10 @@ const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
     <form onSubmit={handleSubmit} className="mt-8 border border-border bg-secondary/30 p-5">
       <div className="flex items-center gap-2 mb-3">
         <Mail className="w-4 h-4 text-primary" />
-        <span className="text-sm font-medium">Sauvegarder ma configuration</span>
+        <span className="text-sm font-medium">M'envoyer la configuration et le devis par e-mail</span>
       </div>
       <p className="text-xs text-muted-foreground mb-3">
-        Recevez votre configuration par email pour la reprendre plus tard.
+        Recevez votre configuration détaillée et votre devis par email.
       </p>
       <div className="flex gap-2">
         <Input
