@@ -10,7 +10,7 @@ const GallerySection = () => {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-28 lg:py-36">
+    <section className="py-16 lg:py-20">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="text-center mb-16">
@@ -41,11 +41,6 @@ const GallerySection = () => {
           ))}
         </div>
 
-        <div className="text-center mt-12">
-          <a href="https://trustpilot.com" target="_blank" rel="noopener noreferrer" className="story-link text-xs uppercase tracking-[0.2em] font-medium text-primary">
-            Voir tous les avis Trustpilot →
-          </a>
-        </div>
       </div>
     </section>
   );
