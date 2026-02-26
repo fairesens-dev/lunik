@@ -1,5 +1,7 @@
-import { useMemo } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DynamicProductVisualProps {
   toileColor: { hex: string; label: string; photoUrl?: string };
@@ -9,32 +11,98 @@ interface DynamicProductVisualProps {
   projection: number;
   className?: string;
   compact?: boolean;
+  onLedToggle?: (led: boolean) => void;
+}
+
+// In-memory cache for generated images
+const imageCache = new Map<string, string>();
+
+function cacheKey(toileHex: string, armatureHex: string, led: boolean) {
+  return `${toileHex}-${armatureHex}-${led}`;
 }
 
 const DynamicProductVisual = ({
   toileColor,
   armatureColor,
   options,
-  width,
-  projection,
   className,
   compact = false,
 }: DynamicProductVisualProps) => {
-  const aspectRatio = useMemo(
-    () => Math.min(Math.max(projection / width, 0.3), 0.8),
-    [projection, width]
-  );
-
   const showLed = options.led || options.packConnect;
-  const showMotor = options.motorisation || options.packConnect;
-  const hasPhoto = !!toileColor.photoUrl;
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const abortRef = useRef<AbortController>();
 
-  // SVG dynamic values
-  const armHeight = Math.round(100 * aspectRatio);
-  const frontBarY = 108 + armHeight;
-  const toileHeight = `${28 * aspectRatio}%`;
-  const toileTop = `37%`;
-  const ledTop = `${35 + 28 * aspectRatio}%`;
+  const generateImage = useCallback(async (toileHex: string, toileLabel: string, armatureHex: string, armatureLabel: string, led: boolean) => {
+    const key = cacheKey(toileHex, armatureHex, led);
+
+    // Check cache first
+    if (imageCache.has(key)) {
+      setImageUrl(imageCache.get(key)!);
+      setLoading(false);
+      setError(false);
+      return;
+    }
+
+    // Abort previous request
+    abortRef.current?.abort();
+    abortRef.current = new AbortController();
+
+    setLoading(true);
+    setError(false);
+
+    try {
+      const { data, error: fnError } = await supabase.functions.invoke("generate-store-image", {
+        body: {
+          toileColorHex: toileHex,
+          toileColorLabel: toileLabel,
+          armatureColorHex: armatureHex,
+          armatureColorLabel: armatureLabel,
+          led,
+        },
+      });
+
+      if (fnError) throw fnError;
+      if (data?.imageUrl) {
+        imageCache.set(key, data.imageUrl);
+        setImageUrl(data.imageUrl);
+        setError(false);
+      } else {
+        throw new Error("No image returned");
+      }
+    } catch (e) {
+      console.error("Image generation failed:", e);
+      setError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (compact) return;
+
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(() => {
+      generateImage(toileColor.hex, toileColor.label, armatureColor.hex, armatureColor.label, showLed);
+    }, 800);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [toileColor.hex, toileColor.label, armatureColor.hex, armatureColor.label, showLed, compact, generateImage]);
+
+  // Compact mode: show simple color preview
+  if (compact) {
+    return (
+      <div className={cn("relative w-full overflow-hidden rounded-sm", className)} style={{ aspectRatio: "4/3" }}>
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-100 to-stone-200" />
+        <div className="absolute top-[35%] left-[15%] w-[70%] h-[30%] transition-colors duration-300" style={{ backgroundColor: toileColor.hex, opacity: 0.9 }} />
+      </div>
+    );
+  }
 
   return (
     <div
@@ -44,108 +112,64 @@ const DynamicProductVisual = ({
       )}
       style={{ aspectRatio: "4/3" }}
     >
-      {hasPhoto ? (
-        /* Real photo mode */
-        <img
-          src={toileColor.photoUrl}
-          alt={`Store avec toile ${toileColor.label}`}
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-      ) : (
-        <>
-          {/* Layer 0: Background scene */}
-          <div className="absolute inset-0 bg-gradient-to-b from-sky-100 via-sky-50 to-stone-200" />
-          {/* Terrace floor */}
-          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-stone-300 to-stone-200" />
-
-          {/* Layer 1: Armature SVG */}
-          <svg
-            viewBox="0 0 400 300"
-            className="absolute inset-0 w-full h-full"
-            preserveAspectRatio="xMidYMid meet"
-          >
-            {/* Wall mount brackets */}
-            <rect x="48" y="72" width="20" height="44" fill={armatureColor.hex} rx="2" />
-            <rect x="332" y="72" width="20" height="44" fill={armatureColor.hex} rx="2" />
-            {/* Coffre box */}
-            <rect x="55" y="80" width="290" height="28" fill={armatureColor.hex} rx="3" />
-            {/* Coffre highlight */}
-            <rect x="55" y="80" width="290" height="6" fill="white" opacity="0.15" rx="3" />
-            {/* Left arm */}
-            <rect x="72" y="108" width="10" height={armHeight} fill={armatureColor.hex} rx="1" />
-            {/* Right arm */}
-            <rect x="318" y="108" width="10" height={armHeight} fill={armatureColor.hex} rx="1" />
-            {/* Front bar */}
-            <rect x="55" y={frontBarY} width="290" height="8" fill={armatureColor.hex} rx="2" />
-            {/* Front bar highlight */}
-            <rect x="55" y={frontBarY} width="290" height="2" fill="white" opacity="0.2" rx="1" />
-          </svg>
-
-          {/* Layer 2: Toile fabric */}
-          <div
-            className="absolute transition-colors duration-300"
-            style={{
-              top: toileTop,
-              left: "15%",
-              width: "70%",
-              height: toileHeight,
-              backgroundColor: toileColor.hex,
-              opacity: 0.92,
-              backgroundImage: `repeating-linear-gradient(90deg, transparent, transparent 8px, rgba(0,0,0,0.03) 8px, rgba(0,0,0,0.03) 9px)`,
-              transform: `perspective(400px) rotateX(${8 * aspectRatio}deg)`,
-              transformOrigin: "top",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
-            }}
-          />
-        </>
+      {/* Loading skeleton */}
+      {loading && !imageUrl && (
+        <Skeleton className="absolute inset-0 w-full h-full" />
       )}
 
-      {/* Layer 3: LED glow */}
-      {showLed && (
-        <div
-          className="absolute transition-opacity duration-500"
-          style={{
-            top: ledTop,
-            left: "15%",
-            width: "70%",
-            height: "4px",
-            background:
-              "linear-gradient(90deg, transparent, #FFF3B0, #FFFDE7, #FFF3B0, transparent)",
-            boxShadow: "0 0 12px 4px rgba(255, 243, 176, 0.6)",
-            borderRadius: "2px",
-          }}
-        />
-      )}
-
-      {/* Layer 4: Motor badge */}
-      {showMotor && !compact && (
-        <div className="absolute top-3 right-3 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm">
-          <span className="text-xs">⚡</span>
-          <span className="text-xs font-medium text-foreground">Motorisé</span>
+      {/* Loading overlay when refreshing with existing image */}
+      {loading && imageUrl && (
+        <div className="absolute inset-0 z-10 bg-background/30 backdrop-blur-[2px] flex items-center justify-center transition-opacity duration-300">
+          <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+            <span className="text-xs text-muted-foreground">Génération en cours…</span>
+          </div>
         </div>
       )}
 
-      {/* Layer 5: Dimension overlay */}
-      {!compact && (
-        <>
-          <div className="absolute bottom-3 left-3 bg-foreground/40 backdrop-blur-sm rounded px-2 py-1">
-            <span className="text-background text-xs font-mono">
-              {width} × {projection} cm
-            </span>
+      {/* AI-generated image */}
+      {imageUrl && (
+        <img
+          src={imageUrl}
+          alt={`Store banne avec toile ${toileColor.label} et armature ${armatureColor.label}`}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+        />
+      )}
+
+      {/* Fallback on error */}
+      {error && !imageUrl && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted">
+          <img
+            src="/images/store-vue-ensemble.webp"
+            alt="Store banne"
+            className="absolute inset-0 w-full h-full object-cover opacity-60"
+          />
+          <div className="relative z-10 bg-background/80 backdrop-blur-sm rounded px-4 py-2">
+            <p className="text-xs text-muted-foreground">Aperçu indisponible</p>
           </div>
-          <div className="absolute bottom-3 right-3 flex gap-1">
-            <div
-              className="w-4 h-4 rounded-full border border-background/50 shadow"
-              style={{ backgroundColor: toileColor.hex }}
-              title={`Toile : ${toileColor.label}`}
-            />
-            <div
-              className="w-4 h-4 rounded-full border border-background/50 shadow"
-              style={{ backgroundColor: armatureColor.hex }}
-              title={`Armature : ${armatureColor.label}`}
-            />
-          </div>
-        </>
+        </div>
+      )}
+
+      {/* Color swatches */}
+      <div className="absolute bottom-3 right-3 flex gap-1 z-20">
+        <div
+          className="w-5 h-5 rounded-full border-2 border-background shadow"
+          style={{ backgroundColor: toileColor.hex }}
+          title={`Toile : ${toileColor.label}`}
+        />
+        <div
+          className="w-5 h-5 rounded-full border-2 border-background shadow"
+          style={{ backgroundColor: armatureColor.hex }}
+          title={`Armature : ${armatureColor.label}`}
+        />
+      </div>
+
+      {/* LED indicator */}
+      {showLed && (
+        <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm z-20">
+          <span className="text-xs">💡</span>
+          <span className="text-xs font-medium text-foreground">LED</span>
+        </div>
       )}
     </div>
   );

@@ -13,4 +13,6 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.send-config-email]
+
+[functions.generate-store-image]
 verify_jwt = false
