@@ -30,6 +30,7 @@ const DynamicProductVisual = ({
 }: DynamicProductVisualProps) => {
   const showLed = options.led || options.packConnect;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
@@ -41,6 +42,7 @@ const DynamicProductVisual = ({
     // Check cache first
     if (imageCache.has(key)) {
       setImageUrl(imageCache.get(key)!);
+      setImageLoaded(true);
       setLoading(false);
       setError(false);
       return;
@@ -51,6 +53,7 @@ const DynamicProductVisual = ({
     abortRef.current = new AbortController();
 
     setLoading(true);
+    setImageLoaded(false);
     setError(false);
 
     try {
@@ -68,6 +71,7 @@ const DynamicProductVisual = ({
       if (data?.imageUrl) {
         imageCache.set(key, data.imageUrl);
         setImageUrl(data.imageUrl);
+        // Don't set loading=false yet — wait for onLoad
         setError(false);
       } else {
         throw new Error("No image returned");
@@ -75,7 +79,6 @@ const DynamicProductVisual = ({
     } catch (e) {
       console.error("Image generation failed:", e);
       setError(true);
-    } finally {
       setLoading(false);
     }
   }, []);
@@ -104,35 +107,42 @@ const DynamicProductVisual = ({
     );
   }
 
+  const isVisible = imageUrl && imageLoaded && !loading;
+
   return (
     <div
       className={cn(
         "relative w-full overflow-hidden rounded-sm transition-all duration-300",
         className
       )}
-      style={{ aspectRatio: "4/3" }}
+      style={{ aspectRatio: "3/2" }}
     >
-      {/* Loading skeleton */}
-      {loading && !imageUrl && (
-        <Skeleton className="absolute inset-0 w-full h-full" />
-      )}
-
-      {/* Loading overlay when refreshing with existing image */}
-      {loading && imageUrl && (
-        <div className="absolute inset-0 z-10 bg-background/30 backdrop-blur-[2px] flex items-center justify-center transition-opacity duration-300">
-          <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
-            <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
-            <span className="text-xs text-muted-foreground">Génération en cours…</span>
+      {/* Loading skeleton — shown until image is fully loaded */}
+      {!isVisible && !error && (
+        <div className="absolute inset-0 z-10">
+          <Skeleton className="absolute inset-0 w-full h-full" />
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-full px-4 py-2 shadow-sm">
+              <div className="w-3 h-3 rounded-full bg-primary animate-pulse" />
+              <span className="text-xs text-muted-foreground">Génération en cours…</span>
+            </div>
           </div>
         </div>
       )}
 
-      {/* AI-generated image */}
+      {/* AI-generated image (hidden until onLoad fires) */}
       {imageUrl && (
         <img
           src={imageUrl}
           alt={`Store banne avec toile ${toileColor.label} et armature ${armatureColor.label}`}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+          className={cn(
+            "absolute inset-0 w-full h-full object-cover transition-opacity duration-500",
+            isVisible ? "opacity-100" : "opacity-0"
+          )}
+          onLoad={() => {
+            setImageLoaded(true);
+            setLoading(false);
+          }}
         />
       )}
 
@@ -150,22 +160,8 @@ const DynamicProductVisual = ({
         </div>
       )}
 
-      {/* Color swatches */}
-      <div className="absolute bottom-3 right-3 flex gap-1 z-20">
-        <div
-          className="w-5 h-5 rounded-full border-2 border-background shadow"
-          style={{ backgroundColor: toileColor.hex }}
-          title={`Toile : ${toileColor.label}`}
-        />
-        <div
-          className="w-5 h-5 rounded-full border-2 border-background shadow"
-          style={{ backgroundColor: armatureColor.hex }}
-          title={`Armature : ${armatureColor.label}`}
-        />
-      </div>
-
       {/* LED indicator */}
-      {showLed && (
+      {showLed && isVisible && (
         <div className="absolute top-3 left-3 bg-background/90 backdrop-blur-sm rounded-full px-2.5 py-1 flex items-center gap-1.5 shadow-sm z-20">
           <span className="text-xs">💡</span>
           <span className="text-xs font-medium text-foreground">LED</span>

@@ -89,20 +89,6 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   <span className="bg-secondary px-3 py-1">{armatureColor}</span>
                   {optionsSummary !== "Aucune" && <span className="bg-secondary px-3 py-1">+ {optionsSummary}</span>}
                 </div>
-                <div className="flex gap-3">
-                  {selectedToile && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full border border-border" style={{ backgroundColor: selectedToile.hex }} />
-                      <span className="text-xs text-muted-foreground">Toile</span>
-                    </div>
-                  )}
-                  {selectedArmature && (
-                    <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-full border border-border" style={{ backgroundColor: selectedArmature.hex }} />
-                      <span className="text-xs text-muted-foreground">Armature</span>
-                    </div>
-                  )}
-                </div>
               </div>
 
               {/* RIGHT — Config inputs */}
