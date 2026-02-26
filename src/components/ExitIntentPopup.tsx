@@ -43,10 +43,22 @@ const ExitIntentPopup = ({
     sessionStorage.setItem("exit_popup_shown", "1");
   }, [isProductPage, hasConfig]);
 
+  const handleBeforeUnload = useCallback((e: BeforeUnloadEvent) => {
+    if (!isProductPage || !hasConfig) return;
+    if (sessionStorage.getItem("exit_popup_shown")) return;
+    setShow(true);
+    sessionStorage.setItem("exit_popup_shown", "1");
+    e.preventDefault();
+  }, [isProductPage, hasConfig]);
+
   useEffect(() => {
     document.addEventListener("mouseleave", handleMouseLeave);
-    return () => document.removeEventListener("mouseleave", handleMouseLeave);
-  }, [handleMouseLeave]);
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => {
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [handleMouseLeave, handleBeforeUnload]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

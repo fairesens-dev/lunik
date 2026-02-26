@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/AnimatedSection";
 
 const ContactCTASection = () => (
-  <section className="py-28 lg:py-36 bg-[hsl(0,0%,10%)]">
+  <section className="py-16 lg:py-20 bg-[hsl(0,0%,10%)]">
     <div className="max-w-3xl mx-auto px-6 text-center">
       <AnimatedSection>
         <h2 className="font-serif text-4xl md:text-5xl font-light text-white mb-4">

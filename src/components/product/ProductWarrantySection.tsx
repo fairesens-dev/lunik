@@ -8,7 +8,7 @@ const cards = [
 ];
 
 const ProductWarrantySection = () => (
-  <section className="py-28 lg:py-36 bg-card">
+  <section className="py-16 lg:py-20 bg-card">
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         {cards.map((card, i) => (

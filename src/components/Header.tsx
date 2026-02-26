@@ -41,10 +41,10 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
           bannerOffset ? "top-[40px]" : "top-0",
           scrolled
             ? "bg-background/95 backdrop-blur-sm shadow-sm"
-            : "bg-transparent"
+            : "bg-background/90 backdrop-blur-sm"
         )}
       >
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 flex items-center justify-between h-20">
           {/* Logo */}
           <Link to="/">
             <img src={logoLunik} alt={content.global.brandName} className="h-8" />

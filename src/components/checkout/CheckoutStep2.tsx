@@ -50,26 +50,6 @@ const CheckoutStep2 = ({ onNext, onBack }: Props) => {
             </div>
           </button>
 
-          {/* Installation */}
-          <button
-            type="button"
-            onClick={() => setDelivery("installation")}
-            className={`w-full text-left border p-5 transition-colors ${
-              delivery === "installation" ? "border-primary bg-primary/5" : "border-border"
-            }`}
-          >
-            <div className="flex items-start gap-4">
-              <Wrench className="w-5 h-5 mt-0.5 text-primary shrink-0" />
-              <div className="flex-1">
-                <p className="text-sm font-medium">Livraison + Installation par nos poseurs</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Un de nos installateurs certifiés se déplace et installe votre store le jour de la livraison.
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">Délai : 5 à 6 semaines</p>
-              </div>
-              <span className="text-sm font-medium text-muted-foreground whitespace-nowrap">Sur devis</span>
-            </div>
-          </button>
         </div>
 
         {/* Estimated date */}

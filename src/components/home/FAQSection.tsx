@@ -7,7 +7,7 @@ const FAQSection = () => {
   const faqs = content.homepage.faqItems.filter(f => f.active);
 
   return (
-    <section className="py-28 lg:py-36">
+    <section className="py-16 lg:py-20">
       <div className="max-w-3xl mx-auto px-6">
         <AnimatedSection>
           <h2 className="font-serif text-4xl md:text-5xl font-light text-center mb-16">

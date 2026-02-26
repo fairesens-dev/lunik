@@ -6,7 +6,7 @@ const TestimonialsSection = () => {
   const { content } = useContent();
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-16 lg:py-20 bg-background">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="text-center mb-16">
