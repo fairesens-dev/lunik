@@ -115,7 +115,7 @@ const DynamicProductVisual = ({
         "relative w-full overflow-hidden rounded-sm transition-all duration-300",
         className
       )}
-      style={{ aspectRatio: "3/2" }}
+      style={{ aspectRatio: "1.5/2" }}
     >
       {/* Loading skeleton — shown until image is fully loaded */}
       {!isVisible && !error && (
