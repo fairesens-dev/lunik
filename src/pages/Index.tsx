@@ -10,10 +10,8 @@ import ProductFeaturesSection from "@/components/product/ProductFeaturesSection"
 import ValuesSection from "@/components/home/ValuesSection";
 import ConfiguratorSection from "@/components/product/ConfiguratorSection";
 import GallerySection from "@/components/home/GallerySection";
-import TrustpilotBanner from "@/components/home/TrustpilotBanner";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ProcessSection from "@/components/home/ProcessSection";
-import ProductWarrantySection from "@/components/product/ProductWarrantySection";
 import FAQSection from "@/components/home/FAQSection";
 import ContactCTASection from "@/components/home/ContactCTASection";
 import ExitIntentPopup from "@/components/ExitIntentPopup";
@@ -112,10 +110,8 @@ const Index = () => {
       <ValuesSection />
       <ConfiguratorSection {...configurator} onOrder={handleOrder} />
       <GallerySection />
-      <TrustpilotBanner />
       <TestimonialsSection />
       <ProcessSection />
-      <ProductWarrantySection />
       <FAQSection />
       <ContactCTASection />
       <ExitIntentPopup
