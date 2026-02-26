@@ -28,20 +28,13 @@ const HeroSection = () => {
             </h1>
           </AnimatedSection>
           <AnimatedSection delay={0.25}>
-            <p className="text-muted-foreground text-lg leading-relaxed mb-10 max-w-md">
-              {homepage.heroSubtitle}
-            </p>
+            <p className="text-muted-foreground text-lg leading-relaxed mb-10 max-w-md">{homepage.heroSubtitle}</p>
           </AnimatedSection>
           <AnimatedSection delay={0.35}>
             <div className="flex flex-wrap gap-4 mb-10">
               <a href="#configurator">
                 <Button className="bg-primary text-primary-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto">
                   {homepage.heroCTA1}
-                </Button>
-              </a>
-              <a href="#features">
-                <Button variant="outline" className="border-foreground text-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-foreground hover:text-background transition-colors h-auto">
-                  Découvrir le produit
                 </Button>
               </a>
             </div>

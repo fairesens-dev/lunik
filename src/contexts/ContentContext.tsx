@@ -54,7 +54,6 @@ export interface HomepageContent {
   heroSubtitle: string;
   heroOverline: string;
   heroCTA1: string;
-  heroCTA2: string;
   marqueeText: string;
   productSectionTitle: string;
   productSectionSubtitle: string;
@@ -103,12 +102,48 @@ export interface SiteContent {
 // ── Defaults ───────────────────────────────────────────
 
 const defaultGalleryItems: GalleryItem[] = [
-  { id: "g1", src: "/images/real-montagne-cepe.webp", alt: "Store coffre 530×400 cm toile Cèpe avec vue montagne", caption: "Jean-Pierre, Chamonix (74)", active: true },
-  { id: "g2", src: "/images/real-vin-apero.webp", alt: "Apéro sous le store avec télécommande Somfy", caption: "Marie, Lyon (69)", active: true },
-  { id: "g3", src: "/images/real-bordeaux.webp", alt: "Store coffre 592×350 cm toile Bordeaux sur terrasse bois", caption: "Thomas, Bordeaux (33)", active: true },
-  { id: "g4", src: "/images/real-paris-6eme.webp", alt: "Store blanc naturel posé au 6ème étage à Paris", caption: "Sophie, Paris (75)", active: true },
-  { id: "g5", src: "/images/real-bardage-noir.webp", alt: "Store anthracite toile Jais sur bardage moderne", caption: "Lucas, Strasbourg (67)", active: true },
-  { id: "g6", src: "/images/real-lecture-piscine.webp", alt: "Détente au bord de la piscine sous le store", caption: "Anne, Aix-en-Provence (13)", active: true },
+  {
+    id: "g1",
+    src: "/images/real-montagne-cepe.webp",
+    alt: "Store coffre 530×400 cm toile Cèpe avec vue montagne",
+    caption: "Jean-Pierre, Chamonix (74)",
+    active: true,
+  },
+  {
+    id: "g2",
+    src: "/images/real-vin-apero.webp",
+    alt: "Apéro sous le store avec télécommande Somfy",
+    caption: "Marie, Lyon (69)",
+    active: true,
+  },
+  {
+    id: "g3",
+    src: "/images/real-bordeaux.webp",
+    alt: "Store coffre 592×350 cm toile Bordeaux sur terrasse bois",
+    caption: "Thomas, Bordeaux (33)",
+    active: true,
+  },
+  {
+    id: "g4",
+    src: "/images/real-paris-6eme.webp",
+    alt: "Store blanc naturel posé au 6ème étage à Paris",
+    caption: "Sophie, Paris (75)",
+    active: true,
+  },
+  {
+    id: "g5",
+    src: "/images/real-bardage-noir.webp",
+    alt: "Store anthracite toile Jais sur bardage moderne",
+    caption: "Lucas, Strasbourg (67)",
+    active: true,
+  },
+  {
+    id: "g6",
+    src: "/images/real-lecture-piscine.webp",
+    alt: "Détente au bord de la piscine sous le store",
+    caption: "Anne, Aix-en-Provence (13)",
+    active: true,
+  },
 ];
 
 const defaultContent: SiteContent = {
@@ -126,11 +161,12 @@ const defaultContent: SiteContent = {
   },
   homepage: {
     heroTitle: "Vivez dehors,\nsans compromis.",
-    heroSubtitle: "Nos stores bannes et coffres sont conçus sur-mesure, fabriqués en France, et livrés chez vous en 4 à 5 semaines.",
+    heroSubtitle:
+      "Nos stores bannes et coffres sont conçus sur-mesure, fabriqués en France, et livrés chez vous en 4 à 5 semaines.",
     heroOverline: "Protection solaire sur-mesure · Fabrication française",
     heroCTA1: "Configurer mon store",
-    heroCTA2: "Voir le produit",
-    marqueeText: "FABRIQUÉ EN FRANCE · SUR-MESURE · LIVRAISON 4-5 SEMAINES · GARANTIE 5 ANS · MOTORISATION SOMFY · TOILE DICKSON · MADE IN FRANCE · ",
+    marqueeText:
+      "FABRIQUÉ EN FRANCE · SUR-MESURE · LIVRAISON 4-5 SEMAINES · GARANTIE 5 ANS · MOTORISATION SOMFY · TOILE DICKSON · MADE IN FRANCE · ",
     productSectionTitle: "Le Store Coffre\nrepensé de A à Z",
     productSectionSubtitle: "Un seul produit. Le meilleur de sa catégorie.",
     testimonials: [],
@@ -170,7 +206,9 @@ const defaultContent: SiteContent = {
 interface ContentContextValue {
   content: SiteContent;
   updateGlobal: (data: Partial<GlobalContent>) => void;
-  updateHomepage: (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => void;
+  updateHomepage: (
+    data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>,
+  ) => void;
   updateProductPage: (data: Partial<Omit<ProductPageContent, "faqItems">>) => void;
   updateSAV: (data: Partial<Omit<SAVContent, "faqItems">>) => void;
   updatePromoBanner: (data: Partial<PromoBannerContent>) => void;
@@ -194,7 +232,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Load from Supabase on mount
   useEffect(() => {
     (async () => {
-      const { data: rows } = await supabase.from("site_content" as any).select("id, data") as any;
+      const { data: rows } = (await supabase.from("site_content" as any).select("id, data")) as any;
       if (rows && rows.length > 0) {
         const map: Record<string, any> = {};
         for (const r of rows) map[r.id] = r.data;
@@ -210,23 +248,26 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateGlobal = useCallback((data: Partial<GlobalContent>) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.global, ...data };
       upsertContent("global", updated);
       return { ...prev, global: updated };
     });
   }, []);
 
-  const updateHomepage = useCallback((data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => {
-    setContent(prev => {
-      const updated = { ...prev.homepage, ...data };
-      upsertContent("homepage", updated);
-      return { ...prev, homepage: updated };
-    });
-  }, []);
+  const updateHomepage = useCallback(
+    (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => {
+      setContent((prev) => {
+        const updated = { ...prev.homepage, ...data };
+        upsertContent("homepage", updated);
+        return { ...prev, homepage: updated };
+      });
+    },
+    [],
+  );
 
   const updateProductPage = useCallback((data: Partial<Omit<ProductPageContent, "faqItems">>) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.productPage, ...data };
       upsertContent("productPage", updated);
       return { ...prev, productPage: updated };
@@ -234,7 +275,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateSAV = useCallback((data: Partial<Omit<SAVContent, "faqItems">>) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.sav, ...data };
       upsertContent("sav", updated);
       return { ...prev, sav: updated };
@@ -242,7 +283,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updatePromoBanner = useCallback((data: Partial<PromoBannerContent>) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.promoBanner, ...data };
       upsertContent("promoBanner", updated);
       return { ...prev, promoBanner: updated };
@@ -250,7 +291,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateTestimonials = useCallback((testimonials: Testimonial[]) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.homepage, testimonials };
       upsertContent("homepage", updated);
       return { ...prev, homepage: updated };
@@ -258,7 +299,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateFeaturedReviews = useCallback((featuredReviews: FeaturedReview[]) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.homepage, featuredReviews };
       upsertContent("homepage", updated);
       return { ...prev, homepage: updated };
@@ -266,7 +307,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateHomepageFAQ = useCallback((items: FAQItem[]) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.homepage, faqItems: items };
       upsertContent("homepage", updated);
       return { ...prev, homepage: updated };
@@ -274,7 +315,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateProductFAQ = useCallback((items: FAQItem[]) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.productPage, faqItems: items };
       upsertContent("productPage", updated);
       return { ...prev, productPage: updated };
@@ -282,7 +323,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateSAVFAQ = useCallback((items: FAQItem[]) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.sav, faqItems: items };
       upsertContent("sav", updated);
       return { ...prev, sav: updated };
@@ -290,7 +331,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateGalleryItems = useCallback((items: GalleryItem[]) => {
-    setContent(prev => {
+    setContent((prev) => {
       const updated = { ...prev.homepage, galleryItems: items };
       upsertContent("homepage", updated);
       return { ...prev, homepage: updated };
@@ -298,11 +339,22 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   return (
-    <ContentContext.Provider value={{
-      content, updateGlobal, updateHomepage, updateProductPage,
-      updateSAV, updatePromoBanner, updateTestimonials, updateFeaturedReviews,
-      updateHomepageFAQ, updateProductFAQ, updateSAVFAQ, updateGalleryItems,
-    }}>
+    <ContentContext.Provider
+      value={{
+        content,
+        updateGlobal,
+        updateHomepage,
+        updateProductPage,
+        updateSAV,
+        updatePromoBanner,
+        updateTestimonials,
+        updateFeaturedReviews,
+        updateHomepageFAQ,
+        updateProductFAQ,
+        updateSAVFAQ,
+        updateGalleryItems,
+      }}
+    >
       {children}
     </ContentContext.Provider>
   );
