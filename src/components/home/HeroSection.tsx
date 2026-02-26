@@ -39,9 +39,9 @@ const HeroSection = () => {
                   {homepage.heroCTA1}
                 </Button>
               </a>
-              <a href="#configurator">
+              <a href="#features">
                 <Button variant="outline" className="border-foreground text-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-foreground hover:text-background transition-colors h-auto">
-                  {homepage.heroCTA2}
+                  Découvrir le produit
                 </Button>
               </a>
             </div>
