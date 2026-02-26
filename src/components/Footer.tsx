@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useContent } from "@/contexts/ContentContext";
+import logoLunik from "@/assets/logo-lunik.png";
 
 const Footer = () => {
   const { content } = useContent();
@@ -17,7 +18,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
           {/* Col 1: Brand */}
           <div>
-            <h3 className="font-serif text-2xl tracking-[0.15em] uppercase mb-4">{g.brandName}</h3>
+            <img src={logoLunik} alt={g.brandName} className="h-8 brightness-0 invert mb-2" />
             <p className="text-background/60 text-sm leading-relaxed mb-6 max-w-xs">
               L'excellence du store sur mesure, fabriqué en France avec passion et savoir-faire depuis plus de 20 ans.
             </p>
