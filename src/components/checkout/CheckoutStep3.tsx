@@ -198,7 +198,14 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
                 Traitement en cours...
               </span>
             ) : (
-              `Payer ${total.toLocaleString("fr-FR")} € ${paymentMethod === "4x" ? "(1ère échéance : " + installment.toLocaleString("fr-FR") + " €)" : "maintenant"}`
+              <>
+                <span className="hidden sm:inline">
+                  {`Payer ${total.toLocaleString("fr-FR")} € ${paymentMethod === "4x" ? "(1ère échéance : " + installment.toLocaleString("fr-FR") + " €)" : "maintenant"}`}
+                </span>
+                <span className="sm:hidden">
+                  {`Payer ${total.toLocaleString("fr-FR")} €`}
+                </span>
+              </>
             )}
           </Button>
         </div>

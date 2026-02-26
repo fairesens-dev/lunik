@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import logoLunikWhite from "@/assets/logo-lunik-white.png";
 
 const navGroups = [
   {
@@ -69,7 +70,7 @@ const AdminLayout = () => {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="px-5 py-5">
-        <span className="text-lg font-bold text-white tracking-tight font-sans">[BRAND]</span>
+        <img src={logoLunikWhite} alt="LuniK" className="h-7" />
         <span className="ml-2 text-xs bg-gray-700 text-gray-400 px-2 py-0.5 rounded font-sans">Admin</span>
       </div>
       <div className="border-t border-gray-800 mx-4" />

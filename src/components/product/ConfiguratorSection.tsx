@@ -73,6 +73,13 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
     setPreviewConfig(null);
   };
 
+  // Marketing tips per option
+  const optionMarketingTips: Record<string, { tip: string; badge?: string }> = {
+    "motorisation": { tip: "💡 95% de nos clients choisissent la motorisation" },
+    "led": { tip: "💬 \"L'éclairage LED a transformé nos soirées d'été !\" — Marie, Lyon" },
+    "pack-connect": { tip: "🔥 Économisez par rapport aux options séparées", badge: "BEST SELLER" },
+  };
+
   return (
     <section id="configurator" className="py-28 lg:py-36 bg-card">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
@@ -202,23 +209,32 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Toile Dickson · Plus de 200 coloris</p>
-                  <div className="grid grid-cols-6 gap-3 mb-3">
+                  <div className="flex flex-wrap gap-4">
                     {TOILE_COLORS.map((c) => (
                       <button
                         key={c.name}
                         onClick={() => setToileColor(c.name)}
-                        title={c.name}
-                        className={`w-11 h-11 rounded-full border-2 transition-all ${
-                          toileColor === c.name
-                            ? "ring-2 ring-primary ring-offset-2 border-primary shadow-md"
-                            : "border-border hover:border-primary/50"
-                        }`}
-                        style={{ backgroundColor: c.hex }}
-                      />
+                        className="flex flex-col items-center gap-2 group"
+                      >
+                        <div
+                          className={`w-20 h-8 border-2 relative transition-all ${
+                            toileColor === c.name
+                              ? "border-primary shadow-md"
+                              : "border-border group-hover:border-primary/50"
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                        >
+                          {toileColor === c.name && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                      </button>
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground italic">Sélectionnée : {toileColor}</p>
-                  <a href="#" className="text-xs text-primary story-link mt-1 inline-block">Commander des échantillons gratuits →</a>
+                  <p className="text-xs text-muted-foreground italic mt-3">Sélectionnée : {toileColor}</p>
                 </div>
 
                 {/* 03 Armature */}
@@ -267,17 +283,31 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                       else if (opt.id === "pack-connect") { checked = pack; onToggle = handlePackToggle; }
                       else { checked = false; onToggle = () => {}; }
 
+                      const marketing = optionMarketingTips[opt.id];
+
                       return (
-                        <div key={opt.id} className={`border border-border p-4 flex items-center gap-4 ${opt.highlight ? "ring-1 ring-primary/20" : ""}`}>
-                          <Switch checked={checked} onCheckedChange={onToggle} disabled={disabled} />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
-                            <p className="text-xs text-muted-foreground">{opt.description}</p>
+                        <div key={opt.id} className={`border p-4 flex flex-col gap-2 relative overflow-hidden ${
+                          opt.highlight ? "border-primary ring-1 ring-primary/20 bg-primary/[0.02]" : "border-border"
+                        }`}>
+                          {marketing?.badge && (
+                            <span className="absolute -top-0.5 right-3 bg-primary text-primary-foreground text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold">
+                              {marketing.badge}
+                            </span>
+                          )}
+                          <div className="flex items-center gap-4">
+                            <Switch checked={checked} onCheckedChange={onToggle} disabled={disabled} />
+                            <div className="flex-1">
+                              <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
+                              <p className="text-xs text-muted-foreground">{opt.description}</p>
+                            </div>
+                            <div className="text-right">
+                              <span className="text-sm font-medium whitespace-nowrap">+{opt.price} €</span>
+                              {opt.savingsLabel && <span className="block text-[10px] text-primary font-medium mt-0.5">{opt.savingsLabel}</span>}
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <span className="text-sm font-medium whitespace-nowrap">+{opt.price} €</span>
-                            {opt.savingsLabel && <span className="block text-[10px] text-primary font-medium mt-0.5">{opt.savingsLabel}</span>}
-                          </div>
+                          {marketing && (
+                            <p className="text-[11px] text-primary/80 italic pl-14">{marketing.tip}</p>
+                          )}
                         </div>
                       );
                     })}

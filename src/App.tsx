@@ -9,7 +9,6 @@ import { ContentProvider } from "@/contexts/ContentContext";
 import { CartProvider } from "@/contexts/CartContext";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
-import ProductPage from "./pages/ProductPage";
 import SAVPage from "./pages/SAVPage";
 import ContactPage from "./pages/ContactPage";
 import CGVPage from "./pages/CGVPage";
@@ -17,7 +16,6 @@ import MentionsLegalesPage from "./pages/MentionsLegalesPage";
 import NotFound from "./pages/NotFound";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
-import EchantillonsPage from "./pages/EchantillonsPage";
 import CookiesPage from "./pages/CookiesPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
@@ -50,12 +48,11 @@ const App = () => (
             {/* Public site */}
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/store-coffre" element={<ProductPage />} />
+              <Route path="/store-coffre" element={<Navigate to="/#configurator" replace />} />
               <Route path="/service-apres-vente" element={<SAVPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/conditions-generales-de-vente" element={<CGVPage />} />
               <Route path="/mentions-legales" element={<MentionsLegalesPage />} />
-              <Route path="/echantillons" element={<EchantillonsPage />} />
               <Route path="/cookies" element={<CookiesPage />} />
               <Route path="/suivi" element={<OrderTrackingPage />} />
             </Route>

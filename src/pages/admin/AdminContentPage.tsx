@@ -8,9 +8,10 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useContent, type Testimonial, type FAQItem } from "@/contexts/ContentContext";
-import { ExternalLink, Trash2, ArrowUp, ArrowDown, Plus } from "lucide-react";
+import { useContent, type Testimonial, type FAQItem, type GalleryItem } from "@/contexts/ContentContext";
+import { ExternalLink, Trash2, ArrowUp, ArrowDown, Plus, Upload, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 // ── Helpers ────────────────────────────────────────────
 
@@ -54,10 +55,10 @@ const TabGlobal = () => {
   );
 };
 
-// ── Tab 2: Page d'accueil ──────────────────────────────
+// ── Tab 2: Page d'accueil + configurateur (fusionné) ───
 
 const TabHomepage = () => {
-  const { content, updateHomepage } = useContent();
+  const { content, updateHomepage, updateProductPage } = useContent();
   const { toast } = useToast();
   const [form, setForm] = useState({
     heroTitle: content.homepage.heroTitle,
@@ -68,10 +69,38 @@ const TabHomepage = () => {
     marqueeText: content.homepage.marqueeText,
     productSectionTitle: content.homepage.productSectionTitle,
     productSectionSubtitle: content.homepage.productSectionSubtitle,
+    configuratorTitle: content.productPage.configuratorTitle,
+    configuratorSubtitle: content.productPage.configuratorSubtitle,
+    stepLabels: [...content.productPage.stepLabels],
+    orderConfirmationMessage: content.productPage.orderConfirmationMessage,
   });
 
   const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
-  const save = () => { updateHomepage(form); toast({ title: "✅ Page d'accueil mise à jour" }); };
+  const setStep = (i: number, v: string) => {
+    const labels = [...form.stepLabels];
+    labels[i] = v;
+    setForm(p => ({ ...p, stepLabels: labels }));
+  };
+
+  const save = () => {
+    updateHomepage({
+      heroTitle: form.heroTitle,
+      heroSubtitle: form.heroSubtitle,
+      heroOverline: form.heroOverline,
+      heroCTA1: form.heroCTA1,
+      heroCTA2: form.heroCTA2,
+      marqueeText: form.marqueeText,
+      productSectionTitle: form.productSectionTitle,
+      productSectionSubtitle: form.productSectionSubtitle,
+    });
+    updateProductPage({
+      configuratorTitle: form.configuratorTitle,
+      configuratorSubtitle: form.configuratorSubtitle,
+      stepLabels: form.stepLabels,
+      orderConfirmationMessage: form.orderConfirmationMessage,
+    });
+    toast({ title: "✅ Page d'accueil mise à jour" });
+  };
 
   return (
     <div className="space-y-6">
@@ -95,13 +124,6 @@ const TabHomepage = () => {
         <CardHeader><CardTitle>Texte du bandeau défilant</CardTitle></CardHeader>
         <CardContent className="space-y-4">
           <Textarea value={form.marqueeText} onChange={e => set("marqueeText", e.target.value)} rows={2} />
-          <div className="bg-primary text-primary-foreground py-3 overflow-hidden rounded">
-            <div className="flex animate-marquee whitespace-nowrap">
-              {[0, 1].map(i => (
-                <span key={i} className="text-xs tracking-[0.3em] uppercase font-sans font-medium mx-0">{form.marqueeText}</span>
-              ))}
-            </div>
-          </div>
         </CardContent>
       </Card>
       <Card>
@@ -112,47 +134,6 @@ const TabHomepage = () => {
             <Textarea value={form.productSectionTitle} onChange={e => set("productSectionTitle", e.target.value)} rows={2} />
           </div>
           <Field label="Sous-titre" value={form.productSectionSubtitle} onChange={v => set("productSectionSubtitle", v)} />
-        </CardContent>
-      </Card>
-      <Button onClick={save}>Sauvegarder</Button>
-    </div>
-  );
-};
-
-// ── Tab 3: Page produit ────────────────────────────────
-
-const TabProduct = () => {
-  const { content, updateProductPage } = useContent();
-  const { toast } = useToast();
-  const [form, setForm] = useState({
-    heroTitle: content.productPage.heroTitle,
-    heroOverline: content.productPage.heroOverline,
-    heroSubtitle: content.productPage.heroSubtitle,
-    configuratorTitle: content.productPage.configuratorTitle,
-    configuratorSubtitle: content.productPage.configuratorSubtitle,
-    stepLabels: [...content.productPage.stepLabels],
-    orderConfirmationMessage: content.productPage.orderConfirmationMessage,
-  });
-
-  const set = (k: string, v: string) => setForm(p => ({ ...p, [k]: v }));
-  const setStep = (i: number, v: string) => {
-    const labels = [...form.stepLabels];
-    labels[i] = v;
-    setForm(p => ({ ...p, stepLabels: labels }));
-  };
-  const save = () => { updateProductPage(form); toast({ title: "✅ Page produit mise à jour" }); };
-
-  return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader><CardTitle>Hero produit</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
-          <Field label="Overline" value={form.heroOverline} onChange={v => set("heroOverline", v)} />
-          <div>
-            <Label className="text-sm font-medium mb-1.5 block">Titre H1</Label>
-            <Textarea value={form.heroTitle} onChange={e => set("heroTitle", e.target.value)} rows={2} />
-          </div>
-          <Field label="Sous-titre" value={form.heroSubtitle} onChange={v => set("heroSubtitle", v)} textarea />
         </CardContent>
       </Card>
       <Card>
@@ -186,7 +167,109 @@ const TabProduct = () => {
   );
 };
 
-// ── Tab 4: SAV & Contact ───────────────────────────────
+// ── Tab: Réalisations (Gallery) ────────────────────────
+
+const TabGallery = () => {
+  const { content, updateGalleryItems } = useContent();
+  const { toast } = useToast();
+  const [items, setItems] = useState<GalleryItem[]>([...(content.homepage.galleryItems || [])]);
+  const [deleting, setDeleting] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
+
+  const update = (id: string, data: Partial<GalleryItem>) =>
+    setItems(prev => prev.map(g => g.id === id ? { ...g, ...data } : g));
+
+  const move = (i: number, dir: -1 | 1) => {
+    const arr = [...items];
+    const j = i + dir;
+    if (j < 0 || j >= arr.length) return;
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+    setItems(arr);
+  };
+
+  const add = () => setItems(prev => [...prev, { id: genId(), src: "", alt: "", caption: "", active: true }]);
+
+  const remove = (id: string) => { setItems(prev => prev.filter(g => g.id !== id)); setDeleting(null); };
+
+  const handleUpload = async (id: string, file: File) => {
+    setUploading(id);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `gallery/${id}.${ext}`;
+      const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
+      update(id, { src: urlData.publicUrl });
+    } catch (e: any) {
+      console.error("Upload error:", e);
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const save = () => { updateGalleryItems(items); toast({ title: "✅ Réalisations mises à jour" }); };
+
+  return (
+    <div className="space-y-4">
+      <Card>
+        <CardHeader>
+          <CardTitle>Réalisations clients</CardTitle>
+          <CardDescription>Gérez les photos de la galerie "Ils ont sauté le pas". Ajoutez une indication comme "Patrick, Strasbourg (67)".</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          {items.map((g, i) => (
+            <div key={g.id} className="flex items-start gap-3 border border-gray-100 rounded-lg p-3 bg-white">
+              {deleting === g.id ? (
+                <div className="flex items-center gap-3 flex-1">
+                  <span className="text-sm text-red-600">Supprimer ?</span>
+                  <Button size="sm" variant="ghost" onClick={() => setDeleting(null)}>Annuler</Button>
+                  <Button size="sm" variant="destructive" onClick={() => remove(g.id)}>Confirmer</Button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-0.5">
+                    <button onClick={() => move(i, -1)} disabled={i === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowUp className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => move(i, 1)} disabled={i === items.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowDown className="w-3.5 h-3.5" /></button>
+                  </div>
+                  {g.src ? (
+                    <div className="relative w-24 h-16 shrink-0">
+                      <img src={g.src} alt={g.alt} className="w-full h-full object-cover rounded border" />
+                      <button onClick={() => update(g.id, { src: "" })} className="absolute -top-1 -right-1 bg-white rounded-full shadow p-0.5">
+                        <X className="w-3 h-3 text-red-500" />
+                      </button>
+                    </div>
+                  ) : (
+                    <label className="w-24 h-16 border-2 border-dashed border-gray-300 rounded flex items-center justify-center cursor-pointer hover:border-primary/50 shrink-0">
+                      <Upload className="w-4 h-4 text-gray-400" />
+                      <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleUpload(g.id, f);
+                      }} />
+                      {uploading === g.id && <span className="text-[10px] text-gray-400 ml-1">…</span>}
+                    </label>
+                  )}
+                  <div className="flex-1 space-y-2">
+                    <Input placeholder="Caption (ex: Patrick, Strasbourg (67))" value={g.caption} onChange={e => update(g.id, { caption: e.target.value })} className="h-8 text-sm" />
+                    <div className="flex gap-2">
+                      <Input placeholder="URL de l'image (ou upload)" value={g.src} onChange={e => update(g.id, { src: e.target.value })} className="h-8 text-sm flex-1" />
+                      <Input placeholder="Texte alt SEO" value={g.alt} onChange={e => update(g.id, { alt: e.target.value })} className="h-8 text-sm flex-1" />
+                    </div>
+                  </div>
+                  <Switch checked={g.active} onCheckedChange={v => update(g.id, { active: v })} />
+                  <button onClick={() => setDeleting(g.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                </>
+              )}
+            </div>
+          ))}
+          <Button variant="outline" onClick={add}><Plus className="w-4 h-4 mr-1" /> Ajouter une réalisation</Button>
+          <div><Button onClick={save}>Sauvegarder</Button></div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+};
+
+// ── Tab: SAV & Contact ─────────────────────────────────
 
 const TabSAV = () => {
   const { content, updateSAV } = useContent();
@@ -222,7 +305,7 @@ const TabSAV = () => {
   );
 };
 
-// ── Tab 5: Témoignages ─────────────────────────────────
+// ── Tab: Témoignages ───────────────────────────────────
 
 const TabTestimonials = () => {
   const { content, updateTestimonials } = useContent();
@@ -279,7 +362,7 @@ const TabTestimonials = () => {
   );
 };
 
-// ── Tab 6: FAQ ─────────────────────────────────────────
+// ── Tab: FAQ ───────────────────────────────────────────
 
 const FAQEditor = ({ items, onChange }: { items: FAQItem[]; onChange: (items: FAQItem[]) => void }) => {
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -352,24 +435,18 @@ const TabFAQ = () => {
 
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="home">
-        <TabsList>
-          <TabsTrigger value="home">FAQ Page d'accueil</TabsTrigger>
-          <TabsTrigger value="product">FAQ Page produit</TabsTrigger>
-        </TabsList>
-        <TabsContent value="home">
+      <Card>
+        <CardHeader><CardTitle>FAQ du site</CardTitle></CardHeader>
+        <CardContent>
           <FAQEditor items={homeFaq} onChange={setHomeFaq} />
-        </TabsContent>
-        <TabsContent value="product">
-          <FAQEditor items={productFaq} onChange={setProductFaq} />
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
       <Button onClick={save}>Sauvegarder</Button>
     </div>
   );
 };
 
-// ── Tab 7: Bannière promo ──────────────────────────────
+// ── Tab: Bannière promo ────────────────────────────────
 
 const TabPromoBanner = () => {
   const { content, updatePromoBanner } = useContent();
@@ -469,7 +546,7 @@ const AdminContentPage = () => (
       <TabsList className="flex-wrap h-auto gap-1">
         <TabsTrigger value="global">Infos globales</TabsTrigger>
         <TabsTrigger value="homepage">Page d'accueil</TabsTrigger>
-        <TabsTrigger value="product">Page produit</TabsTrigger>
+        <TabsTrigger value="gallery">Réalisations</TabsTrigger>
         <TabsTrigger value="sav">SAV & Contact</TabsTrigger>
         <TabsTrigger value="testimonials">Témoignages</TabsTrigger>
         <TabsTrigger value="faq">FAQ</TabsTrigger>
@@ -477,7 +554,7 @@ const AdminContentPage = () => (
       </TabsList>
       <TabsContent value="global"><TabGlobal /></TabsContent>
       <TabsContent value="homepage"><TabHomepage /></TabsContent>
-      <TabsContent value="product"><TabProduct /></TabsContent>
+      <TabsContent value="gallery"><TabGallery /></TabsContent>
       <TabsContent value="sav"><TabSAV /></TabsContent>
       <TabsContent value="testimonials"><TabTestimonials /></TabsContent>
       <TabsContent value="faq"><TabFAQ /></TabsContent>

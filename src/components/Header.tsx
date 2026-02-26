@@ -8,13 +8,16 @@ import logoLunik from "@/assets/logo-lunik.png";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
-  { label: "Notre Store", href: "/store-coffre" },
-  { label: "Échantillons", href: "/echantillons" },
+  { label: "Configurateur", href: "/#configurator" },
   { label: "SAV", href: "/service-apres-vente" },
   { label: "Contact", href: "/contact" },
 ];
 
-const Header = () => {
+interface HeaderProps {
+  bannerOffset?: boolean;
+}
+
+const Header = ({ bannerOffset = false }: HeaderProps) => {
   const { content } = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -34,7 +37,8 @@ const Header = () => {
     <>
       <header
         className={cn(
-          "fixed top-0 left-0 right-0 z-50 transition-all duration-500",
+          "fixed left-0 right-0 z-50 transition-all duration-500",
+          bannerOffset ? "top-[40px]" : "top-0",
           scrolled
             ? "bg-background/95 backdrop-blur-sm shadow-sm"
             : "bg-transparent"
@@ -49,9 +53,9 @@ const Header = () => {
           {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-10">
             {navLinks.map((link) => (
-              <Link
+              <a
                 key={link.href}
-                to={link.href}
+                href={link.href}
                 className={cn(
                   "story-link text-[13px] uppercase tracking-[0.15em] font-medium transition-colors",
                   location.pathname === link.href
@@ -60,16 +64,16 @@ const Header = () => {
                 )}
               >
                 {link.label}
-              </Link>
+              </a>
             ))}
           </nav>
 
           {/* Desktop CTA */}
-          <Link to="/store-coffre" className="hidden lg:block">
+          <a href="/#configurator" className="hidden lg:block">
             <Button className="bg-primary text-primary-foreground px-6 py-3 rounded-none tracking-[0.15em] uppercase text-xs font-medium hover:bg-accent-light transition-colors h-auto">
               Configurer mon store
             </Button>
-          </Link>
+          </a>
 
           {/* Mobile menu button */}
           <button
@@ -86,9 +90,10 @@ const Header = () => {
       {mobileOpen && (
         <div className="fixed inset-0 z-40 bg-background flex flex-col items-center justify-center gap-8 animate-fade-in">
           {navLinks.map((link) => (
-            <Link
+            <a
               key={link.href}
-              to={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
               className={cn(
                 "font-serif text-3xl tracking-wide transition-colors",
                 location.pathname === link.href
@@ -97,13 +102,13 @@ const Header = () => {
               )}
             >
               {link.label}
-            </Link>
+            </a>
           ))}
-          <Link to="/store-coffre">
+          <a href="/#configurator" onClick={() => setMobileOpen(false)}>
             <Button className="bg-primary text-primary-foreground px-8 py-4 rounded-none tracking-[0.15em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto mt-4">
               Configurer mon store
             </Button>
-          </Link>
+          </a>
         </div>
       )}
     </>

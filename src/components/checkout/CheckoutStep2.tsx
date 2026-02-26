@@ -79,16 +79,6 @@ const CheckoutStep2 = ({ onNext, onBack }: Props) => {
           </p>
         </div>
 
-        {/* Timeline */}
-        <div className="flex items-center justify-between gap-2">
-          {steps.map((step, i) => (
-            <div key={step} className="flex items-center gap-2 flex-1">
-              <div className={`w-3 h-3 rounded-full shrink-0 ${i === 0 ? "bg-primary" : "bg-border"}`} />
-              <span className="text-xs text-muted-foreground">{step}</span>
-              {i < steps.length - 1 && <div className="flex-1 h-px bg-border" />}
-            </div>
-          ))}
-        </div>
 
         <div className="flex gap-4">
           <Button variant="outline" onClick={onBack} className="rounded-none tracking-[0.15em] uppercase text-xs h-auto py-4 px-6">

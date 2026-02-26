@@ -30,10 +30,10 @@ const AdminConfiguratorPage = () => {
       <div className="sticky top-0 z-10 bg-green-50 border border-green-200 rounded-lg px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2 text-green-800 text-sm">
           <Eye className="w-4 h-4" />
-          <span>Aperçu en direct — Les modifications s'appliquent en temps réel sur la page produit.</span>
+          <span>Aperçu en direct — Les modifications s'appliquent en temps réel.</span>
         </div>
-        <a href="/store-coffre" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-green-700 hover:text-green-900 font-medium">
-          Voir la page produit <ExternalLink className="w-3.5 h-3.5" />
+        <a href="/#configurator" target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm text-green-700 hover:text-green-900 font-medium">
+          Voir le configurateur <ExternalLink className="w-3.5 h-3.5" />
         </a>
       </div>
 
@@ -53,7 +53,7 @@ const AdminConfiguratorPage = () => {
             title="Coloris de toile disponibles"
             subtitle="Activez ou désactivez les coloris affichés dans le configurateur"
             colors={settings.toileColors}
-            swatchType="circle"
+            swatchType="rectangle"
             showPhotoUpload
             onSave={(colors) => { reorderToileColors(colors); toast({ title: "✅ Couleurs de toile mises à jour" }); }}
             onAdd={addToileColor}
