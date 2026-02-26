@@ -33,20 +33,17 @@ const ProductHighlightSection = () => {
 
           <AnimatedSection delay={0.2}>
             <div className="space-y-6">
+              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+                <span>🇫🇷</span> Fabriqué en France
+              </div>
               <p className="text-muted-foreground leading-relaxed">
-                Notre store coffre allie performance technique et design épuré. Conçu pour s'intégrer 
-                à toutes les architectures, il protège votre terrasse du soleil tout en sublimant 
-                votre façade. Son coffre intégral préserve la toile et le mécanisme des intempéries, 
-                pour une durabilité maximale.
+                Notre store coffre allie performance technique et design épuré. Son coffre intégral 
+                protège la toile et le mécanisme des intempéries, pour une durabilité maximale.
               </p>
               <p className="text-muted-foreground leading-relaxed">
-                Toile Dickson résistante aux UV avec plus de 200 coloris, armature en aluminium 
-                thermolaqué sans entretien, motorisation Somfy pilotable depuis votre smartphone 
-                et éclairage LED intégré pour prolonger vos soirées en extérieur.
-              </p>
-              <p className="text-muted-foreground leading-relaxed">
-                Chaque store est fabriqué en France selon vos dimensions exactes, de 150 à 600 cm 
-                de largeur. Un produit sur-mesure, au juste prix, livré chez vous en 4 à 5 semaines.
+                Toile Dickson avec plus de 200 coloris, armature aluminium sans entretien, 
+                motorisation Somfy et éclairage LED intégré — le tout sur-mesure, de 150 à 600 cm, 
+                livré chez vous en 4 à 5 semaines.
               </p>
               <a href="#configurator">
                 <Button className="bg-primary text-primary-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto mt-2">
