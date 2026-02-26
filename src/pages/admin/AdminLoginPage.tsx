@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Eye, EyeOff, ArrowLeft, Loader2 } from "lucide-react";
+import logoLunik from "@/assets/logo-lunik.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -111,7 +112,7 @@ const AdminLoginPage = () => {
       <div className="w-full max-w-sm">
         <div className="bg-background rounded-lg shadow-sm border border-border p-8">
           <div className="text-center mb-6">
-            <h1 className="text-xl font-bold text-foreground">[BRAND] Admin</h1>
+            <img src={logoLunik} alt="LuniK Admin" className="h-10 mx-auto mb-2" />
             <p className="text-sm text-muted-foreground mt-1">Espace de gestion</p>
           </div>
 

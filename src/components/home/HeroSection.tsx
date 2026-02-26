@@ -34,16 +34,16 @@ const HeroSection = () => {
           </AnimatedSection>
           <AnimatedSection delay={0.35}>
             <div className="flex flex-wrap gap-4 mb-10">
-              <Link to="/store-coffre">
+              <a href="#configurator">
                 <Button className="bg-primary text-primary-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto">
                   {homepage.heroCTA1}
                 </Button>
-              </Link>
-              <Link to="/store-coffre">
+              </a>
+              <a href="#configurator">
                 <Button variant="outline" className="border-foreground text-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-foreground hover:text-background transition-colors h-auto">
                   {homepage.heroCTA2}
                 </Button>
-              </Link>
+              </a>
             </div>
           </AnimatedSection>
           <AnimatedSection delay={0.45}>

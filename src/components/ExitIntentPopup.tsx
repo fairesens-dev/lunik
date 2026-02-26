@@ -33,7 +33,7 @@ const ExitIntentPopup = ({
   const { captureEmail } = useCartAbandonment();
 
   const hasConfig = width > 0 && projection > 0;
-  const isProductPage = location.pathname === "/store-coffre";
+  const isProductPage = location.pathname === "/" || location.pathname === "/store-coffre";
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     if (e.clientY > 5) return;
@@ -106,6 +106,7 @@ const ExitIntentPopup = ({
               />
               <div className="mt-4 text-center">
                 <p className="text-2xl font-serif font-light">{price.toLocaleString("fr-FR")} €</p>
+                <p className="text-xs text-primary font-medium mt-1">ou {Math.round(price / 4).toLocaleString("fr-FR")} €/mois en 4× sans frais</p>
                 <p className="text-xs text-muted-foreground mt-1">{width} × {projection} cm</p>
               </div>
             </div>
@@ -146,13 +147,6 @@ const ExitIntentPopup = ({
                       {sending ? "Envoi..." : "Recevoir ma config →"}
                     </Button>
                   </form>
-                  <Link
-                    to="/echantillons"
-                    onClick={() => setShow(false)}
-                    className="text-xs text-primary story-link mt-4 inline-block"
-                  >
-                    Ou commander des échantillons gratuits →
-                  </Link>
                 </>
               )}
             </div>

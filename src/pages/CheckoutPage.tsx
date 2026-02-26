@@ -20,7 +20,7 @@ const CheckoutPage = () => {
   const [promoDiscount, setPromoDiscount] = useState(0);
 
   useEffect(() => {
-    if (!item) navigate("/store-coffre", { replace: true });
+    if (!item) navigate("/", { replace: true });
   }, [item, navigate]);
 
   // Track abandonment stage

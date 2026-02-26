@@ -28,6 +28,14 @@ export interface FAQItem {
   active: boolean;
 }
 
+export interface GalleryItem {
+  id: string;
+  src: string;
+  alt: string;
+  caption: string; // e.g. "Patrick, Strasbourg (67)"
+  active: boolean;
+}
+
 export interface GlobalContent {
   brandName: string;
   tagline: string;
@@ -53,6 +61,7 @@ export interface HomepageContent {
   testimonials: Testimonial[];
   faqItems: FAQItem[];
   featuredReviews: FeaturedReview[];
+  galleryItems: GalleryItem[];
 }
 
 export interface ProductPageContent {
@@ -93,9 +102,18 @@ export interface SiteContent {
 
 // ── Defaults ───────────────────────────────────────────
 
+const defaultGalleryItems: GalleryItem[] = [
+  { id: "g1", src: "/images/real-montagne-cepe.webp", alt: "Store coffre 530×400 cm toile Cèpe avec vue montagne", caption: "Jean-Pierre, Chamonix (74)", active: true },
+  { id: "g2", src: "/images/real-vin-apero.webp", alt: "Apéro sous le store avec télécommande Somfy", caption: "Marie, Lyon (69)", active: true },
+  { id: "g3", src: "/images/real-bordeaux.webp", alt: "Store coffre 592×350 cm toile Bordeaux sur terrasse bois", caption: "Thomas, Bordeaux (33)", active: true },
+  { id: "g4", src: "/images/real-paris-6eme.webp", alt: "Store blanc naturel posé au 6ème étage à Paris", caption: "Sophie, Paris (75)", active: true },
+  { id: "g5", src: "/images/real-bardage-noir.webp", alt: "Store anthracite toile Jais sur bardage moderne", caption: "Lucas, Strasbourg (67)", active: true },
+  { id: "g6", src: "/images/real-lecture-piscine.webp", alt: "Détente au bord de la piscine sous le store", caption: "Anne, Aix-en-Provence (13)", active: true },
+];
+
 const defaultContent: SiteContent = {
   global: {
-    brandName: "Mon Store",
+    brandName: "LuniK",
     tagline: "Protection solaire sur-mesure · Fabrication française",
     phone: "03 68 38 10 30",
     email: "contact@monstore.fr",
@@ -118,6 +136,7 @@ const defaultContent: SiteContent = {
     testimonials: [],
     faqItems: [],
     featuredReviews: [],
+    galleryItems: defaultGalleryItems,
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
@@ -142,7 +161,7 @@ const defaultContent: SiteContent = {
     bgColor: "#4A5E3A",
     textColor: "#FFFFFF",
     ctaText: "En profiter",
-    ctaUrl: "/store-coffre",
+    ctaUrl: "/#configurator",
   },
 };
 
@@ -151,7 +170,7 @@ const defaultContent: SiteContent = {
 interface ContentContextValue {
   content: SiteContent;
   updateGlobal: (data: Partial<GlobalContent>) => void;
-  updateHomepage: (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews">>) => void;
+  updateHomepage: (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => void;
   updateProductPage: (data: Partial<Omit<ProductPageContent, "faqItems">>) => void;
   updateSAV: (data: Partial<Omit<SAVContent, "faqItems">>) => void;
   updatePromoBanner: (data: Partial<PromoBannerContent>) => void;
@@ -160,6 +179,7 @@ interface ContentContextValue {
   updateHomepageFAQ: (items: FAQItem[]) => void;
   updateProductFAQ: (items: FAQItem[]) => void;
   updateSAVFAQ: (items: FAQItem[]) => void;
+  updateGalleryItems: (items: GalleryItem[]) => void;
 }
 
 const ContentContext = createContext<ContentContextValue | undefined>(undefined);
@@ -197,7 +217,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, []);
 
-  const updateHomepage = useCallback((data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews">>) => {
+  const updateHomepage = useCallback((data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => {
     setContent(prev => {
       const updated = { ...prev.homepage, ...data };
       upsertContent("homepage", updated);
@@ -269,11 +289,19 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   }, []);
 
+  const updateGalleryItems = useCallback((items: GalleryItem[]) => {
+    setContent(prev => {
+      const updated = { ...prev.homepage, galleryItems: items };
+      upsertContent("homepage", updated);
+      return { ...prev, homepage: updated };
+    });
+  }, []);
+
   return (
     <ContentContext.Provider value={{
       content, updateGlobal, updateHomepage, updateProductPage,
       updateSAV, updatePromoBanner, updateTestimonials, updateFeaturedReviews,
-      updateHomepageFAQ, updateProductFAQ, updateSAVFAQ,
+      updateHomepageFAQ, updateProductFAQ, updateSAVFAQ, updateGalleryItems,
     }}>
       {children}
     </ContentContext.Provider>

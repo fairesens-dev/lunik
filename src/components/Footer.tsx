@@ -44,8 +44,7 @@ const Footer = () => {
             </h4>
             <nav className="flex flex-col gap-3">
               {[
-                { label: "Notre Store", href: "/store-coffre" },
-                { label: "Échantillons gratuits", href: "/echantillons" },
+                { label: "Configurateur", href: "/#configurator" },
                 { label: "Service Après-Vente", href: "/service-apres-vente" },
                 { label: "Contact", href: "/contact" },
                 { label: "CGV", href: "/conditions-generales-de-vente" },
