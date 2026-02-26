@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
+import logoLunik from "@/assets/logo-lunik.png";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
@@ -41,8 +42,8 @@ const Header = () => {
       >
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 flex items-center justify-between h-20">
           {/* Logo */}
-          <Link to="/" className="font-serif text-2xl tracking-[0.2em] uppercase font-semibold text-foreground">
-            {content.global.brandName}
+          <Link to="/">
+            <img src={logoLunik} alt={content.global.brandName} className="h-8" />
           </Link>
 
           {/* Desktop Nav */}
