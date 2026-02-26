@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,42 +35,9 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
   const selectedToile = TOILE_COLORS.find(c => c.name === toileColor);
   const selectedArmature = ARMATURE_COLORS.find(c => c.name === armatureColor);
 
-  // Preview state for thumbnails
-  const [previewConfig, setPreviewConfig] = useState<{
-    toileColor: { hex: string; label: string; photoUrl?: string };
-    armatureColor: { hex: string; label: string };
-    options: { motorisation: boolean; led: boolean; packConnect: boolean };
-  } | null>(null);
-
   const currentToile = { hex: selectedToile?.hex || "#fff", label: toileColor };
   const currentArmature = { hex: selectedArmature?.hex || "#333", label: armatureColor };
   const currentOptions = { motorisation, led, packConnect: pack };
-
-  const displayConfig = previewConfig || {
-    toileColor: currentToile,
-    armatureColor: currentArmature,
-    options: currentOptions,
-  };
-
-  const presets = [
-    { label: "Votre config", toileColor: currentToile, armatureColor: currentArmature, options: currentOptions, active: true },
-    { label: "Style épuré", toileColor: { hex: "#F5F0E0", label: "Blanc Écru" }, armatureColor: { hex: "#F0EDE8", label: "Blanc" }, options: { motorisation: false, led: false, packConnect: false }, active: false },
-    { label: "Style audacieux", toileColor: { hex: "#1A1A1A", label: "Noir" }, armatureColor: { hex: "#1A1A1A", label: "Noir" }, options: { motorisation: true, led: true, packConnect: true }, active: false },
-  ];
-
-  const applyPreset = (preset: typeof presets[0]) => {
-    const toileMatch = TOILE_COLORS.find(c => c.hex === preset.toileColor.hex);
-    const armatureMatch = ARMATURE_COLORS.find(c => c.hex === preset.armatureColor.hex);
-    if (toileMatch) setToileColor(toileMatch.name);
-    if (armatureMatch) setArmatureColor(armatureMatch.name);
-    if (preset.options.packConnect) { handlePackToggle(true); }
-    else {
-      handlePackToggle(false);
-      handleMotorisationToggle(preset.options.motorisation);
-      handleLedToggle(preset.options.led);
-    }
-    setPreviewConfig(null);
-  };
 
   // Marketing tips per option
   const optionMarketingTips: Record<string, { tip: string; badge?: string }> = {
@@ -108,49 +74,13 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
               <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border lg:self-start lg:sticky lg:top-28">
                 {/* Dynamic visual */}
                 <DynamicProductVisual
-                  toileColor={displayConfig.toileColor}
-                  armatureColor={displayConfig.armatureColor}
-                  options={displayConfig.options}
+                  toileColor={currentToile}
+                  armatureColor={currentArmature}
+                  options={currentOptions}
                   width={width}
                   projection={projection}
                   className="mb-4"
                 />
-
-                {/* Preset thumbnails */}
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  {presets.map((preset, i) => (
-                    <button
-                      key={i}
-                      className={`relative rounded-sm overflow-hidden border-2 transition-all ${
-                        i === 0 && !previewConfig
-                          ? "border-primary"
-                          : previewConfig?.toileColor.hex === preset.toileColor.hex &&
-                            previewConfig?.armatureColor.hex === preset.armatureColor.hex
-                          ? "border-primary"
-                          : "border-border hover:border-primary/50"
-                      }`}
-                      onMouseEnter={() => i > 0 && setPreviewConfig({
-                        toileColor: preset.toileColor,
-                        armatureColor: preset.armatureColor,
-                        options: preset.options,
-                      })}
-                      onMouseLeave={() => setPreviewConfig(null)}
-                      onClick={() => i > 0 && applyPreset(preset)}
-                    >
-                      <DynamicProductVisual
-                        toileColor={preset.toileColor}
-                        armatureColor={preset.armatureColor}
-                        options={preset.options}
-                        width={width}
-                        projection={projection}
-                        compact
-                      />
-                      <span className="absolute bottom-1 left-1 right-1 text-[9px] text-background bg-foreground/60 rounded px-1 py-0.5 text-center truncate">
-                        {preset.label}
-                      </span>
-                    </button>
-                  ))}
-                </div>
 
                 {/* Config badges */}
                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
