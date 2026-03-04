@@ -124,31 +124,37 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 {/* 02 Toile */}
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
-                  <p className="text-xs text-muted-foreground mb-4">Toile Dickson · Plus de 200 coloris</p>
+                  <p className="text-xs text-muted-foreground mb-4">Toile Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
                   <div className="flex flex-wrap gap-4">
-                    {TOILE_COLORS.map((c) => (
-                      <button
-                        key={c.name}
-                        onClick={() => setToileColor(c.name)}
-                        className="flex flex-col items-center gap-2 group"
-                      >
-                        <div
-                          className={`w-20 h-8 border-2 relative transition-all ${
-                            toileColor === c.name
-                              ? "border-primary shadow-md"
-                              : "border-border group-hover:border-primary/50"
-                          }`}
-                          style={{ backgroundColor: c.hex }}
+                    {TOILE_COLORS.map((c) => {
+                      const swatchStyle = c.type === "striped" && c.colors && c.colors.length >= 2
+                        ? { background: `repeating-linear-gradient(45deg, ${c.colors[0]}, ${c.colors[0]} 10px, ${c.colors[1]} 10px, ${c.colors[1]} 20px)` }
+                        : { backgroundColor: c.hex };
+
+                      return (
+                        <button
+                          key={c.name}
+                          onClick={() => setToileColor(c.name)}
+                          className="flex flex-col items-center gap-2 group"
                         >
-                          {toileColor === c.name && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
-                            </div>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
-                      </button>
-                    ))}
+                          <div
+                            className={`w-20 h-8 border-2 relative transition-all ${
+                              toileColor === c.name
+                                ? "border-primary shadow-md"
+                                : "border-border group-hover:border-primary/50"
+                            }`}
+                            style={swatchStyle}
+                          >
+                            {toileColor === c.name && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                   <p className="text-xs text-muted-foreground italic mt-3">Sélectionnée : {toileColor}</p>
                 </div>
