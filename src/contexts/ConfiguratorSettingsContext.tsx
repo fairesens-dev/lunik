@@ -117,12 +117,30 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       const map: Record<string, any> = {};
       if (rows) for (const r of rows) map[r.id] = r.data;
 
-      // 2. Load toile colors from the storage bucket
+      // 2. Load ALL toile colors from the storage bucket (paginate)
+      let allFiles: { name: string }[] = [];
+      const PAGE_SIZE = 100;
+      let offset = 0;
+      let hasMore = true;
+      while (hasMore) {
+        const { data: files } = await supabase.storage.from("toile-colors").list("", {
+          limit: PAGE_SIZE,
+          offset,
+          sortBy: { column: "name", order: "asc" },
+        });
+        if (files && files.length > 0) {
+          allFiles = allFiles.concat(files);
+          offset += files.length;
+          hasMore = files.length === PAGE_SIZE;
+        } else {
+          hasMore = false;
+        }
+      }
+
       let bucketColors: ColorEntry[] = [];
-      const { data: files } = await supabase.storage.from("toile-colors").list("", { limit: 500, sortBy: { column: "name", order: "asc" } });
-      if (files && files.length > 0) {
+      if (allFiles.length > 0) {
         const SUPABASE_URL = "https://gejgtkgqyzdfbsbxujgl.supabase.co";
-        bucketColors = files
+        bucketColors = allFiles
           .filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f.name))
           .map(f => {
             const id = f.name.replace(/\.[^.]+$/, "");
@@ -133,16 +151,13 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       }
 
       // 3. Merge: if DB has toileColors entries, use those (admin may have toggled active).
-      // Otherwise use bucket colors.
       let toileColors = bucketColors;
       if (map.toileColors && Array.isArray(map.toileColors) && map.toileColors.length > 0) {
-        // Merge: keep DB state but enrich with photoUrl from bucket
         const bucketMap = new Map(bucketColors.map(c => [c.id, c]));
         toileColors = (map.toileColors as ColorEntry[]).map(dbColor => ({
           ...dbColor,
           photoUrl: dbColor.photoUrl || bucketMap.get(dbColor.id)?.photoUrl,
         }));
-        // Also add any new bucket colors not yet in DB
         for (const bc of bucketColors) {
           if (!toileColors.find(tc => tc.id === bc.id)) {
             toileColors.push(bc);
