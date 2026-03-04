@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { ExternalLink, Eye, ArrowUp, ArrowDown, Trash2, Plus, Save, Upload, X } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { ExternalLink, Eye, ArrowUp, ArrowDown, Trash2, Plus, Save, Upload, X, Search } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -225,6 +225,26 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
   const [local, setLocal] = useState<ColorEntry[]>(initialColors);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [uploading, setUploading] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+
+  // Sync local state when initialColors changes (e.g. after bucket loading)
+  useEffect(() => {
+    if (initialColors.length > 0 && local.length === 0) {
+      setLocal(initialColors);
+    } else if (initialColors.length > 0 && initialColors.length !== local.length) {
+      setLocal(initialColors);
+    }
+  }, [initialColors]);
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return local.map((c, i) => ({ color: c, originalIndex: i }));
+    const q = search.toLowerCase();
+    return local
+      .map((c, i) => ({ color: c, originalIndex: i }))
+      .filter(({ color }) => color.label.toLowerCase().includes(q) || color.id.toLowerCase().includes(q));
+  }, [local, search]);
+
+  const activeCount = local.filter(c => c.active).length;
 
   const move = (idx: number, dir: -1 | 1) => {
     const next = [...local];
@@ -249,6 +269,10 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
   const confirmDelete = (id: string) => {
     setLocal(local.filter(c => c.id !== id));
     setDeleting(null);
+  };
+
+  const toggleAll = (active: boolean) => {
+    setLocal(local.map(c => ({ ...c, active })));
   };
 
   const handlePhotoUpload = async (idx: number, file: File) => {
@@ -283,72 +307,72 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
     onSave(local);
   };
 
+  const getSwatchStyle = (c: ColorEntry): React.CSSProperties => {
+    if (c.photoUrl) {
+      return { backgroundImage: `url(${c.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" };
+    }
+    return { backgroundColor: c.hex };
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">{title}</CardTitle>
-        <CardDescription>{subtitle}</CardDescription>
+        <CardDescription>{subtitle} — {activeCount} actifs sur {local.length} total</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2">
-        {local.map((c, i) => (
-          <div key={c.id} className="flex items-center gap-3 border border-gray-100 rounded-lg p-3 bg-white">
-            {deleting === c.id ? (
-              <div className="flex items-center gap-3 flex-1">
-                <span className="text-sm text-red-600">Supprimer ce coloris ?</span>
-                <Button size="sm" variant="ghost" onClick={() => setDeleting(null)}>Annuler</Button>
-                <Button size="sm" variant="destructive" onClick={() => confirmDelete(c.id)}>Confirmer</Button>
-              </div>
-            ) : (
-              <>
-                <div className="flex flex-col gap-0.5">
-                  <button onClick={() => move(i, -1)} disabled={i === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowUp className="w-3.5 h-3.5" /></button>
-                  <button onClick={() => move(i, 1)} disabled={i === local.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowDown className="w-3.5 h-3.5" /></button>
-                </div>
-                {swatchType === "circle" ? (
-                  <div className="w-8 h-8 rounded-full border border-gray-200 shrink-0" style={{ backgroundColor: c.hex }} />
-                ) : (
-                  <div className="w-20 h-8 rounded border border-gray-200 shrink-0" style={{ backgroundColor: c.hex }} />
-                )}
-                <Input value={c.label} onChange={e => updateField(i, "label", e.target.value)} className="max-w-[180px] h-8 text-sm" />
-                <div className="flex items-center gap-1">
-                  <Input value={c.hex} onChange={e => updateField(i, "hex", e.target.value)} className="w-24 h-8 text-sm font-mono" />
-                  <input type="color" value={c.hex} onChange={e => updateField(i, "hex", e.target.value)} className="w-8 h-8 rounded cursor-pointer border-0 p-0" />
-                </div>
-                {showPhotoUpload && (
-                  <div className="flex items-center gap-2">
-                    {c.photoUrl ? (
-                      <>
-                        <img src={c.photoUrl} alt="" className="w-10 h-10 object-cover rounded border" />
-                        <button onClick={() => handlePhotoRemove(i)} className="text-gray-400 hover:text-red-500" title="Supprimer la photo">
-                          <X className="w-4 h-4" />
-                        </button>
-                      </>
-                    ) : (
-                      <label className="cursor-pointer flex items-center gap-1 text-xs text-gray-500 hover:text-gray-700">
-                        <Upload className="w-3.5 h-3.5" />
-                        <span>{uploading === c.id ? "…" : "Photo"}</span>
-                        <input
-                          type="file"
-                          accept="image/*"
-                          className="hidden"
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) handlePhotoUpload(i, f);
-                          }}
-                        />
-                      </label>
-                    )}
-                  </div>
-                )}
-                <Switch checked={c.active} onCheckedChange={v => updateField(i, "active", v)} />
-                <button onClick={() => setDeleting(c.id)} className="text-gray-400 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-              </>
-            )}
+      <CardContent className="space-y-3">
+        {/* Search + bulk actions */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+            <Input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Rechercher un coloris…"
+              className="pl-9 h-9"
+            />
           </div>
-        ))}
+          <Button variant="outline" size="sm" onClick={() => toggleAll(true)}>Tout activer</Button>
+          <Button variant="outline" size="sm" onClick={() => toggleAll(false)}>Tout désactiver</Button>
+        </div>
+
+        {/* Color grid */}
+        <div className="max-h-[600px] overflow-y-auto space-y-1.5 pr-1">
+          {filtered.map(({ color: c, originalIndex: i }) => (
+            <div key={c.id} className={`flex items-center gap-3 border rounded-lg p-2.5 ${c.active ? "bg-white border-gray-100" : "bg-gray-50 border-gray-100 opacity-60"}`}>
+              {deleting === c.id ? (
+                <div className="flex items-center gap-3 flex-1">
+                  <span className="text-sm text-red-600">Supprimer ?</span>
+                  <Button size="sm" variant="ghost" onClick={() => setDeleting(null)}>Annuler</Button>
+                  <Button size="sm" variant="destructive" onClick={() => confirmDelete(c.id)}>Confirmer</Button>
+                </div>
+              ) : (
+                <>
+                  <div className="flex flex-col gap-0.5">
+                    <button onClick={() => move(i, -1)} disabled={i === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowUp className="w-3 h-3" /></button>
+                    <button onClick={() => move(i, 1)} disabled={i === local.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowDown className="w-3 h-3" /></button>
+                  </div>
+                  {/* Swatch with photo support */}
+                  <div
+                    className="w-12 h-12 rounded border border-gray-200 shrink-0"
+                    style={getSwatchStyle(c)}
+                  />
+                  <Input value={c.label} onChange={e => updateField(i, "label", e.target.value)} className="max-w-[160px] h-8 text-sm" />
+                  <Switch checked={c.active} onCheckedChange={v => updateField(i, "active", v)} />
+                  <button onClick={() => setDeleting(c.id)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 className="w-4 h-4" /></button>
+                </>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {filtered.length === 0 && search && (
+          <p className="text-sm text-gray-400 text-center py-4">Aucun coloris trouvant « {search} »</p>
+        )}
+
         <Button variant="outline" onClick={addNew} className="mt-2"><Plus className="w-4 h-4 mr-2" /> Ajouter un coloris</Button>
         <div className="pt-4">
-          <Button onClick={save}><Save className="w-4 h-4 mr-2" /> Sauvegarder l'ordre et les modifications</Button>
+          <Button onClick={save}><Save className="w-4 h-4 mr-2" /> Sauvegarder ({activeCount} actifs)</Button>
         </div>
       </CardContent>
     </Card>
