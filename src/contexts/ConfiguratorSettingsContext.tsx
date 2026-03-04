@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { parseToileColorLabel } from "@/lib/parseToileColorLabel";
 
 /* ─── Types ──────────────────────────────────────────── */
 
@@ -59,36 +60,7 @@ export const DEFAULT_SETTINGS: ConfiguratorSettings = {
     width: { min: 150, max: 600, step: 1, unit: "cm" },
     projection: { min: 100, max: 400, step: 1, unit: "cm" },
   },
-  toileColors: [
-    { id: "c_blanc", hex: "#F8F8F8", label: "Blanc", active: true, type: "solid" },
-    { id: "c_vert_sapin", hex: "#1A4B3C", label: "Vert Sapin", active: true, type: "solid" },
-    { id: "c_bleu_roi", hex: "#183E7A", label: "Bleu Roi", active: true, type: "solid" },
-    { id: "c_orange_vif", hex: "#E55B13", label: "Orange Vif", active: true, type: "solid" },
-    { id: "c_rouge_carmin", hex: "#A32020", label: "Rouge Carmin", active: true, type: "solid" },
-    { id: "c_terre_cuite", hex: "#C67140", label: "Terre Cuite", active: true, type: "solid" },
-    { id: "c_chocolat", hex: "#5C3A21", label: "Chocolat", active: true, type: "solid" },
-    { id: "c_sable", hex: "#D2BCA2", label: "Sable", active: true, type: "solid" },
-    { id: "c_bordeaux", hex: "#6E1E24", label: "Bordeaux", active: true, type: "solid" },
-    { id: "c_noir", hex: "#111111", label: "Noir", active: true, type: "solid" },
-    { id: "c_gris_souris", hex: "#8A8A8A", label: "Gris Souris", active: true, type: "solid" },
-    { id: "c_taupe", hex: "#8B7D73", label: "Taupe", active: true, type: "solid" },
-    { id: "c_bleu_ciel", hex: "#7B9ECE", label: "Bleu Ciel", active: true, type: "solid" },
-    { id: "c_vert_olive", hex: "#6B7D3A", label: "Vert Olive", active: true, type: "solid" },
-    { id: "c_turquoise", hex: "#4A9BA3", label: "Turquoise", active: true, type: "solid" },
-    { id: "c_bleu_marine", hex: "#2A3654", label: "Bleu Marine", active: true, type: "solid" },
-    { id: "t_gris_chine", hex: "#A9A9A9", label: "Gris Chiné", active: true, type: "textured" },
-    { id: "t_anthracite", hex: "#3D3D3D", label: "Anthracite Texturé", active: true, type: "textured" },
-    { id: "t_bleu_jean", hex: "#4C6A8D", label: "Bleu Jean", active: true, type: "textured" },
-    { id: "r_jaune_blanc", hex: "#FFC300", label: "Rayé Jaune & Blanc", active: true, type: "striped", colors: ["#FFC300", "#F8F8F8"] },
-    { id: "r_vert_blanc", hex: "#2E4F40", label: "Rayé Vert & Blanc", active: true, type: "striped", colors: ["#2E4F40", "#F8F8F8"] },
-    { id: "r_bleu_blanc", hex: "#183E7A", label: "Rayé Bleu & Blanc", active: true, type: "striped", colors: ["#183E7A", "#F8F8F8"] },
-    { id: "r_rouge_blanc", hex: "#A32020", label: "Rayé Rouge & Blanc", active: true, type: "striped", colors: ["#A32020", "#F8F8F8"] },
-    { id: "r_gris_blanc", hex: "#8A8A8A", label: "Rayé Gris & Blanc", active: true, type: "striped", colors: ["#8A8A8A", "#F8F8F8"] },
-    { id: "r_taupe_blanc", hex: "#8B7D73", label: "Rayé Taupe & Blanc", active: true, type: "striped", colors: ["#8B7D73", "#F8F8F8"] },
-    { id: "r_bleu_gris", hex: "#4C6A8D", label: "Rayé Bleu & Gris", active: true, type: "striped", colors: ["#4C6A8D", "#8A8A8A"] },
-    { id: "r_vert_gris", hex: "#5D7A68", label: "Rayé Vert & Gris", active: true, type: "striped", colors: ["#5D7A68", "#A9A9A9"] },
-    { id: "r_multicolore_chaud", hex: "#E55B13", label: "Rayé Multicolore Chaud", active: true, type: "striped", colors: ["#E55B13", "#C67140"] },
-  ],
+  toileColors: [], // Loaded dynamically from the toile-colors bucket
   armatureColors: [],
   options: [],
 };
@@ -137,21 +109,54 @@ const ConfiguratorSettingsContext = createContext<ConfiguratorSettingsContextTyp
 export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [settings, setSettings] = useState<ConfiguratorSettings>(DEFAULT_SETTINGS);
 
-  // Load from Supabase on mount
+  // Load from Supabase on mount + load toile colors from bucket
   useEffect(() => {
     (async () => {
+      // 1. Load admin settings from DB
       const { data: rows } = await supabase.from("configurator_settings" as any).select("id, data") as any;
-      if (rows && rows.length > 0) {
-        const map: Record<string, any> = {};
-        for (const r of rows) map[r.id] = r.data;
-        setSettings({
-          pricing: map.pricing ?? DEFAULT_SETTINGS.pricing,
-          dimensions: map.dimensions ?? DEFAULT_SETTINGS.dimensions,
-          toileColors: map.toileColors ?? DEFAULT_SETTINGS.toileColors,
-          armatureColors: map.armatureColors ?? DEFAULT_SETTINGS.armatureColors,
-          options: map.options ?? DEFAULT_SETTINGS.options,
-        });
+      const map: Record<string, any> = {};
+      if (rows) for (const r of rows) map[r.id] = r.data;
+
+      // 2. Load toile colors from the storage bucket
+      let bucketColors: ColorEntry[] = [];
+      const { data: files } = await supabase.storage.from("toile-colors").list("", { limit: 500, sortBy: { column: "name", order: "asc" } });
+      if (files && files.length > 0) {
+        const SUPABASE_URL = "https://gejgtkgqyzdfbsbxujgl.supabase.co";
+        bucketColors = files
+          .filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f.name))
+          .map(f => {
+            const id = f.name.replace(/\.[^.]+$/, "");
+            const label = parseToileColorLabel(f.name);
+            const photoUrl = `${SUPABASE_URL}/storage/v1/object/public/toile-colors/${encodeURIComponent(f.name)}`;
+            return { id, hex: "#888", label, active: true, type: "solid" as const, photoUrl };
+          });
       }
+
+      // 3. Merge: if DB has toileColors entries, use those (admin may have toggled active).
+      // Otherwise use bucket colors.
+      let toileColors = bucketColors;
+      if (map.toileColors && Array.isArray(map.toileColors) && map.toileColors.length > 0) {
+        // Merge: keep DB state but enrich with photoUrl from bucket
+        const bucketMap = new Map(bucketColors.map(c => [c.id, c]));
+        toileColors = (map.toileColors as ColorEntry[]).map(dbColor => ({
+          ...dbColor,
+          photoUrl: dbColor.photoUrl || bucketMap.get(dbColor.id)?.photoUrl,
+        }));
+        // Also add any new bucket colors not yet in DB
+        for (const bc of bucketColors) {
+          if (!toileColors.find(tc => tc.id === bc.id)) {
+            toileColors.push(bc);
+          }
+        }
+      }
+
+      setSettings({
+        pricing: map.pricing ?? DEFAULT_SETTINGS.pricing,
+        dimensions: map.dimensions ?? DEFAULT_SETTINGS.dimensions,
+        toileColors,
+        armatureColors: map.armatureColors ?? DEFAULT_SETTINGS.armatureColors,
+        options: map.options ?? DEFAULT_SETTINGS.options,
+      });
     })();
   }, []);
 

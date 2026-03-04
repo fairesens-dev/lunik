@@ -125,33 +125,36 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Toile Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-3">
                     {TOILE_COLORS.map((c) => {
-                      const swatchStyle = c.type === "striped" && c.colors && c.colors.length >= 2
-                        ? { background: `repeating-linear-gradient(45deg, ${c.colors[0]}, ${c.colors[0]} 10px, ${c.colors[1]} 10px, ${c.colors[1]} 20px)` }
-                        : { backgroundColor: c.hex };
+                      const swatchStyle: React.CSSProperties = (c as any).photoUrl
+                        ? { backgroundImage: `url(${(c as any).photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+                        : c.type === "striped" && c.colors && c.colors.length >= 2
+                          ? { background: `repeating-linear-gradient(45deg, ${c.colors[0]}, ${c.colors[0]} 10px, ${c.colors[1]} 10px, ${c.colors[1]} 20px)` }
+                          : { backgroundColor: c.hex };
 
                       return (
                         <button
                           key={c.name}
                           onClick={() => setToileColor(c.name)}
-                          className="flex flex-col items-center gap-2 group"
+                          className="flex flex-col items-center gap-1.5 group"
+                          title={c.name}
                         >
                           <div
-                            className={`w-20 h-8 border-2 relative transition-all ${
+                            className={`w-16 h-16 border-2 relative transition-all rounded-sm ${
                               toileColor === c.name
-                                ? "border-primary shadow-md"
+                                ? "border-primary shadow-md ring-2 ring-primary/30"
                                 : "border-border group-hover:border-primary/50"
                             }`}
                             style={swatchStyle}
                           >
                             {toileColor === c.name && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-sm">
+                                <Check className="w-5 h-5 text-white drop-shadow" />
                               </div>
                             )}
                           </div>
-                          <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                          <span className="text-[9px] text-muted-foreground text-center leading-tight max-w-[64px] truncate">{c.name}</span>
                         </button>
                       );
                     })}
