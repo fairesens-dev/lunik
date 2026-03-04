@@ -1,42 +1,52 @@
 
 
-## Plan : Ajouter les 28 coloris Orchestra avec support des motifs rayés
+## Plan : Remplacer les coloris hardcodés par les images du bucket Supabase
 
-### Contexte
+### Constat
 
-Le `ColorEntry` actuel ne supporte que `id`, `hex`, `label`, `active`, `photoUrl`. Il faut étendre le modèle pour gérer les types `solid`, `textured` et `striped` (avec tableau de couleurs pour les rayures). L'affichage des pastilles dans le configurateur utilise uniquement `backgroundColor` — il faudra supporter le `repeating-linear-gradient` pour les rayés.
+Le bucket `toile-colors` contient environ **160 images** de textures Orchestra (unis, chinés, tweed, piqué, rayures, bloc-color...). Le code actuel n'en affiche que 28 avec des pastilles CSS. Il faut utiliser les vraies photos comme pastilles.
 
 ### Modifications
 
-**1. Étendre le type `ColorEntry`** (`src/contexts/ConfiguratorSettingsContext.tsx`)
+**1. Rendre le bucket `toile-colors` public** (migration SQL)
 
-Ajouter des champs optionnels au type :
-- `type?: "solid" | "textured" | "striped"` (défaut `"solid"`)
-- `colors?: string[]` (pour les rayures, tableau de 2+ couleurs)
+Le bucket est actuellement privé. Sans cela, les images ne sont pas accessibles publiquement via URL.
 
-**2. Remplacer les couleurs de toile par défaut** (`src/contexts/ConfiguratorSettingsContext.tsx`)
+**2. Charger dynamiquement les coloris depuis le bucket** (`ConfiguratorSettingsContext.tsx`)
 
-Peupler `DEFAULT_SETTINGS.toileColors` avec les 28 coloris fournis, tous `active: true`.
+Au lieu de hardcoder 160 entrées, le contexte va lister les fichiers du bucket `toile-colors` au chargement et construire automatiquement la liste des coloris :
+- `id` : nom du fichier sans extension (ex: `hi_orc_0001_120_ecru_RVBjpgLR`)
+- `label` : nom humain extrait du fichier (ex: `Écru`, `Charcoal Tweed`, `Manosque Beige`, `Littoral Argent`...)
+- `photoUrl` : URL publique Supabase Storage
+- `hex` : `#888` par défaut (fallback)
+- `type` : `"solid"` (le type visuel n'a plus d'importance puisqu'on affiche la photo)
 
-**3. Mettre à jour le rendu des pastilles** (`src/components/product/ConfiguratorSection.tsx`)
+Les coloris du bucket remplacent les defaults hardcodés. La gestion admin (activer/désactiver) reste fonctionnelle via la table `configurator_settings` : si des entrées existent en base, elles priment ; sinon, les coloris du bucket sont utilisés.
 
-Dans la boucle d'affichage des couleurs de toile, calculer le `style` dynamiquement :
-- `solid` / `textured` → `backgroundColor: c.hex`
-- `striped` → `background: repeating-linear-gradient(45deg, color1, color1 10px, color2 10px, color2 20px)`
+**3. Mettre à jour le rendu des pastilles** (`ConfiguratorSection.tsx`)
 
-Extraire une fonction utilitaire `getColorSwatchStyle(color)` pour réutilisabilité.
+Si un coloris a un `photoUrl`, la pastille utilise `background-image: url(...)` avec `background-size: cover` au lieu du `backgroundColor` ou `linear-gradient`. La pastille conserve ses dimensions (rectangulaire) et son comportement de sélection (bordure + check).
 
-**4. Adapter le hook et les compat maps** (`src/hooks/useConfigurator.ts`)
+**4. Fonction utilitaire d'extraction du label** 
 
-Enrichir `TOILE_COLORS_COMPAT` pour propager `type` et `colors` en plus de `name` et `hex`, afin que le configurateur puisse les exploiter.
+Parser le nom de fichier pour en extraire un label lisible :
+- `hi_orc_0001_120_ecru_RVBjpgLR.jpg` → `Écru`
+- `hi_orc_7330_120_charcoal_tweed_RVBjpgLR.jpg` → `Charcoal Tweed`
+- `hi_ORC_D532_120_LITTORAL_Argent_sur_laize.jpg` → `Littoral Argent`
+- `hi_orc_8553_120_BS_jaune_RVBjpgLR.jpg` → `BS Jaune` (bicolore store)
 
-**5. Mettre à jour le sous-titre**
+**5. Mettre à jour le sous-titre du configurateur**
 
-Changer "Plus de 200 coloris" → "Toile Orchestra by Dickson · 28 coloris" dans la section 02 du configurateur.
+"Toile Orchestra by Dickson · 28 coloris" sera remplacé dynamiquement par le nombre réel de coloris chargés.
+
+**6. Adapter le hook `useConfigurator`**
+
+Propager `photoUrl` dans `TOILE_COLORS_COMPAT` pour que tous les composants en aval puissent l'utiliser.
 
 ### Fichiers impactés
 
-- `src/contexts/ConfiguratorSettingsContext.tsx` — type + defaults
-- `src/hooks/useConfigurator.ts` — compat map enrichie
-- `src/components/product/ConfiguratorSection.tsx` — rendu pastilles avec gradient
+- Migration SQL : bucket public
+- `src/contexts/ConfiguratorSettingsContext.tsx` : chargement dynamique depuis le bucket
+- `src/components/product/ConfiguratorSection.tsx` : rendu pastilles avec images
+- `src/hooks/useConfigurator.ts` : propagation `photoUrl`
 
