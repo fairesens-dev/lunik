@@ -1,63 +1,42 @@
 
 
-# Remplacement du visuel schematique par une photo IA realiste
+## Plan : Ajouter les 28 coloris Orchestra avec support des motifs rayés
 
-## Changements prevus
+### Contexte
 
-### 1. Supprimer les boutons presets (lignes 56-74, 119-153 de ConfiguratorSection.tsx)
+Le `ColorEntry` actuel ne supporte que `id`, `hex`, `label`, `active`, `photoUrl`. Il faut étendre le modèle pour gérer les types `solid`, `textured` et `striped` (avec tableau de couleurs pour les rayures). L'affichage des pastilles dans le configurateur utilise uniquement `backgroundColor` — il faudra supporter le `repeating-linear-gradient` pour les rayés.
 
-Retrait complet des 3 boutons "Votre config / Style epure / Style audacieux", des thumbnails DynamicProductVisual en miniature, et de tout le state `previewConfig` associe.
+### Modifications
 
-### 2. Ajouter un toggle LED sur le visuel
+**1. Étendre le type `ColorEntry`** (`src/contexts/ConfiguratorSettingsContext.tsx`)
 
-Un petit bouton superpose sur l'image permettra d'activer/desactiver le rendu LED directement sur le visuel (toggle "Voir avec eclairage LED"), synchronise avec l'option LED du configurateur.
+Ajouter des champs optionnels au type :
+- `type?: "solid" | "textured" | "striped"` (défaut `"solid"`)
+- `colors?: string[]` (pour les rayures, tableau de 2+ couleurs)
 
-### 3. Remplacer le visuel SVG par une image generee par IA
+**2. Remplacer les couleurs de toile par défaut** (`src/contexts/ConfiguratorSettingsContext.tsx`)
 
-**Architecture :**
+Peupler `DEFAULT_SETTINGS.toileColors` avec les 28 coloris fournis, tous `active: true`.
 
-```text
-[ConfiguratorSection]
-   |
-   v
-[DynamicProductVisual] -- appelle --> [Edge Function: generate-store-image]
-                                            |
-                                            v
-                                    [Gemini 2.5 Flash Image API]
-                                            |
-                                            v
-                                    [Image base64 renvoyee au client]
-```
+**3. Mettre à jour le rendu des pastilles** (`src/components/product/ConfiguratorSection.tsx`)
 
-**Edge function `generate-store-image` :**
-- Recoit en POST : `toileColorHex`, `toileColorLabel`, `armatureColorHex`, `armatureColorLabel`, `led` (boolean)
-- Construit un prompt du type : *"A realistic professional product photo of a modern retractable cassette awning (store banne coffre) deployed on a sunny terrace. The fabric is [color label] ([hex]). The aluminum frame is [color label] ([hex]). [With warm LED strip lighting under the fabric / No LED]. Clean background, lifestyle setting, high quality."*
-- Appelle `ai.gateway.lovable.dev` avec le modele `google/gemini-2.5-flash-image`
-- Renvoie l'image base64
+Dans la boucle d'affichage des couleurs de toile, calculer le `style` dynamiquement :
+- `solid` / `textured` → `backgroundColor: c.hex`
+- `striped` → `background: repeating-linear-gradient(45deg, color1, color1 10px, color2 10px, color2 20px)`
 
-**Composant `DynamicProductVisual` refactorise :**
-- Suppression de tout le rendu SVG schematique
-- Appel a l'edge function quand `toileColor`, `armatureColor` ou `led` changent (avec debounce de 800ms)
-- Cache en memoire (Map cle = `${toileHex}-${armatureHex}-${led}`) pour eviter de regenerer les memes combinaisons
-- Affichage d'un skeleton/placeholder anime pendant le chargement
-- Les dimensions (`width`, `projection`) n'influencent plus le visuel
-- Fallback : si l'API echoue, afficher une image statique par defaut
+Extraire une fonction utilitaire `getColorSwatchStyle(color)` pour réutilisabilité.
 
-**Gestion de la prop `compact` :**
-- En mode compact (thumbnails), ne pas appeler l'IA - ces thumbnails sont supprimees de toute facon
+**4. Adapter le hook et les compat maps** (`src/hooks/useConfigurator.ts`)
 
-### 4. Fichiers modifies
+Enrichir `TOILE_COLORS_COMPAT` pour propager `type` et `colors` en plus de `name` et `hex`, afin que le configurateur puisse les exploiter.
 
-| Fichier | Modification |
-|---|---|
-| `src/components/product/ConfiguratorSection.tsx` | Retirer presets, previewConfig, thumbnails. Simplifier le passage de props au visuel. |
-| `src/components/product/DynamicProductVisual.tsx` | Refonte complete : remplacer SVG par appel edge function + cache + loading state |
-| `supabase/functions/generate-store-image/index.ts` | Nouvelle edge function pour generer l'image via Gemini |
+**5. Mettre à jour le sous-titre**
 
-### 5. Experience utilisateur
+Changer "Plus de 200 coloris" → "Toile Orchestra by Dickson · 28 coloris" dans la section 02 du configurateur.
 
-- Au chargement initial : generation de l'image avec les couleurs par defaut (~2-3s), skeleton anime affiche
-- Au changement de couleur : debounce 800ms puis generation, l'image precedente reste affichee avec un overlay de chargement subtil
-- Toggle LED : regeneration de l'image avec/sans LED
-- Cache : les combinaisons deja generees s'affichent instantanement
+### Fichiers impactés
+
+- `src/contexts/ConfiguratorSettingsContext.tsx` — type + defaults
+- `src/hooks/useConfigurator.ts` — compat map enrichie
+- `src/components/product/ConfiguratorSection.tsx` — rendu pastilles avec gradient
 
