@@ -1,52 +1,50 @@
 
 
-## Plan : Utiliser l'image du coloris comme référence pour la génération IA
+## Plan : Tri par catégories, classement par nuance, accordéons et lightbox
 
-### Problème
+### Approche
 
-Actuellement, le prompt de génération ne décrit la toile que par son nom et sa couleur hex (`"BS Rouge"`, `#888`). Pour les motifs rayés, chinés ou texturés, Gemini ne peut pas deviner le pattern exact. L'image du coloris dans le bucket contient cette information.
+**1. Classification automatique des coloris** (nouveau fichier `src/lib/classifyToileColor.ts`)
 
-### Modifications
+Fonction qui analyse le nom de fichier pour déterminer la catégorie :
+- **Unis** : noms simples sans indicateurs de motif (ex: `ecru`, `charcoal`, `gris`)
+- **Rayés** : contiennent `BS` (bloc-store), `rayure`, `stripe`, ou plusieurs couleurs séparées
+- **Motifs / Texturés** : contiennent `tweed`, `chine`, `pique`, `fantaisie`, `jacquard`, `manosque`, `littoral`, `dickson` pattern names
 
-**1. Propager `photoUrl` vers `DynamicProductVisual`** (`ConfiguratorSection.tsx`)
+Heuristique : si le label contient des mots-clés connus → catégorie correspondante, sinon → Uni par défaut.
 
-La ligne 38 construit `currentToile` sans `photoUrl`. Il faut l'ajouter :
-```ts
-const currentToile = { hex: selectedToile?.hex || "#fff", label: toileColor, photoUrl: (selectedToile as any)?.photoUrl };
+**2. Tri par nuance au sein de chaque catégorie**
+
+Extraire une nuance dominante depuis le label (mots-clés : rouge, bleu, beige, gris, vert, jaune, marron, blanc, noir, orange...) et grouper/trier par nuance. Les coloris sans nuance identifiable vont à la fin.
+
+**3. Refonte de la section 02 du configurateur** (`ConfiguratorSection.tsx`)
+
+Remplacer le `flex-wrap` plat par des accordéons Radix (déjà installé) :
+
+```
+02 — COULEUR DE TOILE
+Toile Orchestra by Dickson · 156 coloris
+
+▼ Unis (82 coloris)
+  [pastilles en grille, triées par nuance]
+
+▶ Rayés (45 coloris)
+  [pastilles en grille, triées par nuance]
+
+▶ Motifs & Texturés (29 coloris)
+  [pastilles en grille, triées par nuance]
 ```
 
-**2. Passer `photoUrl` à la edge function** (`DynamicProductVisual.tsx`)
+Premier accordéon ouvert par défaut. Le coloris sélectionné est toujours visible (son accordéon s'ouvre automatiquement).
 
-- Ajouter `photoUrl` dans la signature de `generateImage` et dans le body envoyé à `generate-store-image`
-- Inclure `photoUrl` dans la `cacheKey` (car le même label peut avoir des motifs différents)
-- Mettre à jour l'appel dans le `useEffect`
+**4. Icône loupe + lightbox**
 
-**3. Envoyer l'image du coloris comme référence visuelle à Gemini** (`generate-store-image/index.ts`)
-
-Si `toilePhotoUrl` est fourni, utiliser l'API multimodale de Gemini : envoyer un message `content` composé de texte + image_url. Le prompt demande explicitement à Gemini de reproduire le motif exact visible dans l'image de référence sur la toile du store banne.
-
-```ts
-// Si on a une photo de référence, on l'envoie comme image jointe
-const content = toilePhotoUrl
-  ? [
-      { type: "text", text: prompt },
-      { type: "image_url", image_url: { url: toilePhotoUrl } }
-    ]
-  : prompt;
-
-messages: [{ role: "user", content }],
-```
-
-Le prompt sera enrichi d'une instruction :
-> "IMPORTANT: An image of the exact fabric pattern/texture is attached. The awning fabric MUST reproduce this exact pattern, colors, and texture faithfully."
-
-**4. Redéployer la edge function**
+Sur chaque pastille, au hover, afficher une petite icône `Search` (lucide) en bas à droite. Au clic sur la loupe (pas sur la pastille), ouvrir un `Dialog` Radix affichant l'image en grand format avec le nom du coloris. Le clic sur la pastille elle-même continue de sélectionner le coloris.
 
 ### Fichiers impactés
 
 | Fichier | Changement |
 |---|---|
-| `src/components/product/ConfiguratorSection.tsx` | Propager `photoUrl` dans `currentToile` |
-| `src/components/product/DynamicProductVisual.tsx` | Passer `photoUrl` au body de l'appel, inclure dans cache key |
-| `supabase/functions/generate-store-image/index.ts` | Accepter `toilePhotoUrl`, construire un message multimodal texte+image |
+| `src/lib/classifyToileColor.ts` | Nouveau — classification + tri par nuance |
+| `src/components/product/ConfiguratorSection.tsx` | Accordéons par catégorie, loupe, lightbox Dialog |
 
