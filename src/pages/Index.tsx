@@ -7,6 +7,7 @@ import HeroSection from "@/components/home/HeroSection";
 import MarqueeSection from "@/components/home/MarqueeSection";
 import ProductHighlightSection from "@/components/home/ProductHighlightSection";
 import ProductFeaturesSection from "@/components/product/ProductFeaturesSection";
+import FabricSection from "@/components/home/FabricSection";
 import ValuesSection from "@/components/home/ValuesSection";
 import ConfiguratorSection from "@/components/product/ConfiguratorSection";
 import GallerySection from "@/components/home/GallerySection";
@@ -107,6 +108,7 @@ const Index = () => {
       <MarqueeSection />
       <ProductHighlightSection />
       <ProductFeaturesSection />
+      <FabricSection />
       <ValuesSection />
       <ConfiguratorSection {...configurator} onOrder={handleOrder} />
       <GallerySection />

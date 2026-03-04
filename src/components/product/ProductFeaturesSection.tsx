@@ -4,8 +4,8 @@ import { ArrowRight } from "lucide-react";
 const rows = [
   {
     label: "TOILE",
-    title: "Toile Dickson — Le meilleur de la protection solaire",
-    body: "Plus de 200 coloris disponibles. Résistante aux UV, à la pluie et aux décolorations. La toile Dickson est la référence mondiale du secteur, utilisée par les plus grands fabricants.",
+    title: "Toile Orchestra by Dickson — La référence mondiale",
+    body: "173 coloris en acrylique teint masse avec traitement Cleanguard. Certifiée OEKO-TEX classe II, garantie 10 ans. La référence mondiale de la protection solaire.",
     specs: [
       "Traitement anti-taches et anti-moisissures",
       "Résistance UV classement 5/5",
