@@ -2,12 +2,14 @@ import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useContent } from "@/contexts/ContentContext";
 import DynamicProductVisual from "@/components/product/DynamicProductVisual";
 import SaveConfigCTA from "@/components/product/SaveConfigCTA";
 import ToileColorSelector from "@/components/product/ToileColorSelector";
 import type { useConfigurator } from "@/hooks/useConfigurator";
+import { MIN_WIDTH_CM, MAX_WIDTH_CM } from "@/lib/pricingTable";
 
 type ConfiguratorProps = ReturnType<typeof useConfigurator> & {
   onOrder: () => void;
@@ -15,23 +17,20 @@ type ConfiguratorProps = ReturnType<typeof useConfigurator> & {
 
 const ConfiguratorSection = (props: ConfiguratorProps) => {
   const {
-    width, setWidth, projection, setProjection,
+    width, setWidth, widthValid, widthRangeLabel,
+    projection, setProjection, validProjections,
     toileColor, setToileColor, armatureColor, setArmatureColor,
-    motorisation, handleMotorisationToggle,
-    led, handleLedToggle,
-    pack, handlePackToggle,
-    surfaceArea, price, installmentPrice, optionsSummary,
-    TOILE_COLORS, ARMATURE_COLORS, settings,
+    motorisation, led, pack,
+    selectedOptions, toggleOption,
+    surfaceArea, price, basePrice, installmentPrice, optionsSummary,
+    TOILE_COLORS, ARMATURE_COLORS, PRICING_OPTIONS, settings,
     onOrder,
   } = props;
 
   const { content } = useContent();
   const { productPage } = content;
-  const { dimensions, pricing } = settings;
-  const activeOptions = settings.options.filter(o => o.active);
 
-  const clampWidth = (v: number) => setWidth(Math.min(dimensions.width.max, Math.max(dimensions.width.min, v || dimensions.width.min)));
-  const clampProjection = (v: number) => setProjection(Math.min(dimensions.projection.max, Math.max(dimensions.projection.min, v || dimensions.projection.min)));
+  const clampWidth = (v: number) => setWidth(Math.min(MAX_WIDTH_CM, Math.max(MIN_WIDTH_CM, v || MIN_WIDTH_CM)));
 
   const selectedToile = TOILE_COLORS.find(c => c.name === toileColor);
   const selectedArmature = ARMATURE_COLORS.find(c => c.name === armatureColor);
@@ -39,13 +38,6 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
   const currentToile = { hex: selectedToile?.hex || "#fff", label: toileColor, photoUrl: selectedToile?.photoUrl };
   const currentArmature = { hex: selectedArmature?.hex || "#333", label: armatureColor };
   const currentOptions = { motorisation, led, packConnect: pack };
-
-  // Marketing tips per option
-  const optionMarketingTips: Record<string, { tip: string; badge?: string }> = {
-    "motorisation": { tip: "💡 95% de nos clients choisissent la motorisation" },
-    "led": { tip: "💬 \"L'éclairage LED a transformé nos soirées d'été !\" — Marie, Lyon" },
-    "pack-connect": { tip: "🔥 Économisez par rapport aux options séparées", badge: "BEST SELLER" },
-  };
 
   return (
     <section id="configurator" className="py-16 lg:py-20 bg-background">
@@ -73,19 +65,17 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
             <div className="grid grid-cols-1 lg:grid-cols-[45%_55%]">
               {/* LEFT — Visual (sticky on desktop) */}
               <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border lg:self-start lg:sticky lg:top-28">
-                {/* Dynamic visual */}
                 <DynamicProductVisual
                   toileColor={currentToile}
                   armatureColor={currentArmature}
                   options={currentOptions}
-                  width={width}
+                  width={width * 10}
                   projection={projection}
                   className="mb-4"
                 />
-
-                {/* Config badges */}
                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-                  <span className="bg-secondary px-3 py-1">{width} × {projection} cm</span>
+                  <span className="bg-secondary px-3 py-1">{width} cm × {projection / 10} cm</span>
+                  {widthRangeLabel && <span className="bg-secondary px-3 py-1">Plage {widthRangeLabel}</span>}
                   <span className="bg-secondary px-3 py-1">Toile {toileColor}</span>
                   <span className="bg-secondary px-3 py-1">{armatureColor}</span>
                   {optionsSummary !== "Aucune" && <span className="bg-secondary px-3 py-1">+ {optionsSummary}</span>}
@@ -97,29 +87,49 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 {/* 01 Dimensions */}
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">01 — {productPage.stepLabels[0] || "VOS DIMENSIONS"}</p>
-                  <p className="text-xs text-muted-foreground mb-4">Le prix s'adapte en temps réel selon votre surface</p>
+                  <p className="text-xs text-muted-foreground mb-4">Le prix s'adapte en temps réel selon vos dimensions · Motorisation SOMFY incluse</p>
                   <div className="grid grid-cols-2 gap-4 mb-3">
                     <div>
                       <label className="text-xs text-muted-foreground mb-1 block">Largeur (cm)</label>
                       <Input
-                        type="number" min={dimensions.width.min} max={dimensions.width.max} value={width}
-                        onChange={(e) => setWidth(parseInt(e.target.value) || dimensions.width.min)}
+                        type="number"
+                        min={MIN_WIDTH_CM}
+                        max={MAX_WIDTH_CM}
+                        value={width}
+                        onChange={(e) => setWidth(parseInt(e.target.value) || MIN_WIDTH_CM)}
                         onBlur={() => clampWidth(width)}
-                        placeholder="ex: 350"
+                        placeholder={`ex: 350`}
                       />
+                      {!widthValid && width > 0 && (
+                        <p className="text-[11px] text-destructive mt-1">Largeur hors plage ({MIN_WIDTH_CM}–{MAX_WIDTH_CM} cm)</p>
+                      )}
+                      {widthRangeLabel && (
+                        <p className="text-[11px] text-muted-foreground mt-1">Plage tarifaire : {widthRangeLabel}</p>
+                      )}
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground mb-1 block">Avancée (cm)</label>
-                      <Input
-                        type="number" min={dimensions.projection.min} max={dimensions.projection.max} value={projection}
-                        onChange={(e) => setProjection(parseInt(e.target.value) || dimensions.projection.min)}
-                        onBlur={() => clampProjection(projection)}
-                        placeholder="ex: 250"
-                      />
+                      <Select
+                        value={String(projection)}
+                        onValueChange={(v) => setProjection(Number(v))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Avancée" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {validProjections.map((p) => (
+                            <SelectItem key={p} value={String(p)}>
+                              {p / 10} cm
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </div>
                   </div>
                   <p className="text-xs text-muted-foreground">Surface couverte : <strong>{surfaceArea} m²</strong></p>
-                  <p className="text-xs text-muted-foreground mt-1">Largeur max {dimensions.width.max} cm · Avancée max {dimensions.projection.max} cm</p>
+                  {basePrice !== null && (
+                    <p className="text-xs text-primary font-medium mt-1">Prix de base : {basePrice.toLocaleString("fr-FR")} € TTC</p>
+                  )}
                 </div>
 
                 {/* 02 Toile */}
@@ -143,7 +153,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                       <button
                         key={c.name}
                         onClick={() => setArmatureColor(c.name)}
-                        className={`flex flex-col items-center gap-2 group`}
+                        className="flex flex-col items-center gap-2 group"
                       >
                         <div
                           className={`w-20 h-8 border-2 relative transition-all ${
@@ -165,45 +175,56 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   </div>
                 </div>
 
-                {/* 04 Options — dynamic from context */}
+                {/* 04 Options */}
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-4">04 — {productPage.stepLabels[3] || "OPTIONS"}</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">04 — {productPage.stepLabels[3] || "OPTIONS"}</p>
+                  <p className="text-xs text-muted-foreground mb-4">Motorisation SOMFY incluse de série · Personnalisez votre store</p>
                   <div className="space-y-3">
-                    {activeOptions.map((opt) => {
-                      const isPack = (opt.includesIds && opt.includesIds.length > 0);
-                      let checked = false;
-                      let onToggle: (v: boolean) => void = () => {};
-                      let disabled = false;
-
-                      if (opt.id === "motorisation") { checked = motorisation; onToggle = handleMotorisationToggle; disabled = pack; }
-                      else if (opt.id === "led") { checked = led; onToggle = handleLedToggle; disabled = pack; }
-                      else if (opt.id === "pack-connect") { checked = pack; onToggle = handlePackToggle; }
-                      else { checked = false; onToggle = () => {}; }
-
-                      const marketing = optionMarketingTips[opt.id];
+                    {PRICING_OPTIONS.map((opt) => {
+                      const checked = selectedOptions.has(opt.id);
+                      const isReduction = opt.price < 0;
 
                       return (
-                        <div key={opt.id} className={`border p-4 flex flex-col gap-2 relative overflow-hidden ${
-                          opt.highlight ? "border-primary ring-1 ring-primary/20 bg-primary/[0.02]" : "border-border"
-                        }`}>
-                          {marketing?.badge && (
-                            <span className="absolute -top-0.5 right-3 bg-primary text-primary-foreground text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold">
-                              {marketing.badge}
+                        <div
+                          key={opt.id}
+                          className={`border p-4 flex flex-col gap-2 relative overflow-hidden transition-colors ${
+                            checked
+                              ? isReduction
+                                ? "border-destructive/50 ring-1 ring-destructive/20 bg-destructive/[0.02]"
+                                : "border-primary ring-1 ring-primary/20 bg-primary/[0.02]"
+                              : opt.highlight
+                                ? "border-primary/50 bg-primary/[0.01]"
+                                : "border-border"
+                          }`}
+                        >
+                          {opt.badge && (
+                            <span className={`absolute -top-0.5 right-3 text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold ${
+                              isReduction
+                                ? "bg-destructive text-destructive-foreground"
+                                : "bg-primary text-primary-foreground"
+                            }`}>
+                              {opt.badge}
                             </span>
                           )}
                           <div className="flex items-center gap-4">
-                            <Switch checked={checked} onCheckedChange={onToggle} disabled={disabled} />
+                            <Switch
+                              checked={checked}
+                              onCheckedChange={() => toggleOption(opt.id)}
+                            />
                             <div className="flex-1">
                               <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
                               <p className="text-xs text-muted-foreground">{opt.description}</p>
                             </div>
                             <div className="text-right">
-                              <span className="text-sm font-medium whitespace-nowrap">+{opt.price} €</span>
-                              {opt.savingsLabel && <span className="block text-[10px] text-primary font-medium mt-0.5">{opt.savingsLabel}</span>}
+                              <span className={`text-sm font-medium whitespace-nowrap ${
+                                isReduction ? "text-green-600" : ""
+                              }`}>
+                                {isReduction ? "" : "+"}{opt.price.toLocaleString("fr-FR")} €
+                              </span>
                             </div>
                           </div>
-                          {marketing && (
-                            <p className="text-[11px] text-primary/80 italic pl-14">{marketing.tip}</p>
+                          {opt.tip && (
+                            <p className="text-[11px] text-primary/80 italic pl-14">{opt.tip}</p>
                           )}
                         </div>
                       );
@@ -212,28 +233,34 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 </div>
 
                 {/* Save config / devis par email */}
-                <SaveConfigCTA hasValidConfig={width > 0 && projection > 0} />
+                <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
 
                 {/* Price & CTA */}
                 <div className="border-t border-border pt-8">
-                  <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Votre prix estimé</p>
-                  <p className="font-serif text-3xl md:text-4xl text-primary font-medium transition-all duration-300">
-                    {installmentPrice.toLocaleString("fr-FR")} €/mois <span className="text-lg font-normal text-muted-foreground">en {pricing.installmentDivisor}× sans frais</span>
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    ou {price.toLocaleString("fr-FR")} € au comptant
-                  </p>
-                  <Button
-                    onClick={onOrder}
-                    className="w-full mt-6 bg-primary text-primary-foreground py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto"
-                  >
-                    Commander ce store
-                  </Button>
-                  <div className="flex flex-wrap justify-center gap-4 mt-4 text-xs text-muted-foreground">
-                    <span>🔒 Paiement sécurisé</span>
-                    <span>🚚 Livraison 4-5 sem</span>
-                    <span>🇫🇷 Fabriqué en France</span>
-                  </div>
+                  {basePrice === null ? (
+                    <p className="text-sm text-destructive">Veuillez sélectionner des dimensions valides pour voir le prix.</p>
+                  ) : (
+                    <>
+                      <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Votre prix TTC</p>
+                      <p className="font-serif text-3xl md:text-4xl text-primary font-medium transition-all duration-300">
+                        {price.toLocaleString("fr-FR")} € <span className="text-lg font-normal text-muted-foreground">TTC</span>
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {settings.pricing.installmentDivisor}× sans frais
+                      </p>
+                      <Button
+                        onClick={onOrder}
+                        className="w-full mt-6 bg-primary text-primary-foreground py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto"
+                      >
+                        Commander ce store
+                      </Button>
+                      <div className="flex flex-wrap justify-center gap-4 mt-4 text-xs text-muted-foreground">
+                        <span>🔒 Paiement sécurisé</span>
+                        <span>🚚 Livraison 4-5 sem</span>
+                        <span>🇫🇷 Fabriqué en France</span>
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
