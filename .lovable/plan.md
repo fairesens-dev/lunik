@@ -1,50 +1,61 @@
 
 
-## Plan : Tri par catégories, classement par nuance, accordéons et lightbox
+## Plan : Grille tarifaire réelle + nouvelles options
 
-### Approche
+### Données extraites de la capture d'écran
 
-**1. Classification automatique des coloris** (nouveau fichier `src/lib/classifyToileColor.ts`)
+**Grille de prix TTC** (largeur en mm × avancée en mm) :
 
-Fonction qui analyse le nom de fichier pour déterminer la catégorie :
-- **Unis** : noms simples sans indicateurs de motif (ex: `ecru`, `charcoal`, `gris`)
-- **Rayés** : contiennent `BS` (bloc-store), `rayure`, `stripe`, ou plusieurs couleurs séparées
-- **Motifs / Texturés** : contiennent `tweed`, `chine`, `pique`, `fantaisie`, `jacquard`, `manosque`, `littoral`, `dickson` pattern names
-
-Heuristique : si le label contient des mots-clés connus → catégorie correspondante, sinon → Uni par défaut.
-
-**2. Tri par nuance au sein de chaque catégorie**
-
-Extraire une nuance dominante depuis le label (mots-clés : rouge, bleu, beige, gris, vert, jaune, marron, blanc, noir, orange...) et grouper/trier par nuance. Les coloris sans nuance identifiable vont à la fin.
-
-**3. Refonte de la section 02 du configurateur** (`ConfiguratorSection.tsx`)
-
-Remplacer le `flex-wrap` plat par des accordéons Radix (déjà installé) :
-
-```
-02 — COULEUR DE TOILE
-Toile Orchestra by Dickson · 156 coloris
-
-▼ Unis (82 coloris)
-  [pastilles en grille, triées par nuance]
-
-▶ Rayés (45 coloris)
-  [pastilles en grille, triées par nuance]
-
-▶ Motifs & Texturés (29 coloris)
-  [pastilles en grille, triées par nuance]
+```text
+                 1900-2399  2400-2899  2900-3399  3400-3600  3601-3899  3900-4399  4400-4800  4801-5920
+Avancée 1500     2 849      3 159      3 159      3 159      3 569      3 569      3 569      3 789
+Avancée 2000     —          3 239      3 239      3 239      3 669      3 669      3 669      3 919
+Avancée 2500     —          —          3 359      3 359      3 809      3 809      3 809      4 079
+Avancée 3000     —          —          —          3 499      3 969      3 969      3 969      4 269
+Avancée 3500     —          —          —          —          —          4 089      4 089      —
 ```
 
-Premier accordéon ouvert par défaut. Le coloris sélectionné est toujours visible (son accordéon s'ouvre automatiquement).
-
-**4. Icône loupe + lightbox**
-
-Sur chaque pastille, au hover, afficher une petite icône `Search` (lucide) en bas à droite. Au clic sur la loupe (pas sur la pastille), ouvrir un `Dialog` Radix affichant l'image en grand format avec le nom du coloris. Le clic sur la pastille elle-même continue de sélectionner le coloris.
-
-### Fichiers impactés
-
-| Fichier | Changement |
+**Options TTC** :
+| Option | Prix TTC |
 |---|---|
-| `src/lib/classifyToileColor.ts` | Nouveau — classification + tri par nuance |
-| `src/components/product/ConfiguratorSection.tsx` | Accordéons par catégorie, loupe, lightbox Dialog |
+| Éclairage LED sous coffre SOMFY | +859 € |
+| Éclairage LED sous les bras SOMFY | +959 € |
+| Automatisme Vent SOMFY 3D IO | +199 € |
+| Pose plafond avec équerre | +289 € |
+| Manœuvre manuelle treuil + manivelle | −619 € (remplace la motorisation par défaut) |
+| Manœuvre SOMFY RADIO CSI | +199 € |
+
+**Observation importante** : Le prix de base inclut déjà la motorisation SOMFY. L'option "Manœuvre manuelle" est une **réduction** de -619 € car elle retire la motorisation.
+
+---
+
+### Ce qui va changer
+
+#### 1. Nouvelle table de prix statique (`src/lib/pricingTable.ts`)
+- Créer un fichier contenant la grille complète (plages de largeur × avancées autorisées → prix TTC).
+- Fonction `lookupPrice(widthMm: number, projectionMm: number): number | null` qui retourne le prix ou `null` si la combinaison est invalide.
+- Fonction `getValidProjections(widthMm: number): number[]` pour savoir quelles avancées sont disponibles pour une largeur donnée.
+- Fonction `getWidthRanges(): {min, max, label}[]` listant les plages de largeur.
+
+#### 2. Nouvelles options statiques
+- Remplacer les 3 options actuelles (motorisation/LED/pack) par les 6 options du tarif.
+- "Manœuvre manuelle" sera une option qui **soustrait** 619 € (motorisation incluse par défaut).
+- Les options seront indépendantes (pas de pack, pas de logique d'inclusion mutuelle).
+
+#### 3. Refonte du hook `useConfigurator.ts`
+- Largeur : sélection par **plage** (dropdown ou slider snappé aux plages : 190-239, 240-289, etc.) avec saisie libre en cm, arrondie à la plage.
+- Avancée : **dropdown** limité aux valeurs autorisées (150, 200, 250, 300, 350 cm) filtrées selon la largeur choisie.
+- Prix = `lookupPrice(largeur, avancée)` + somme des options cochées.
+- Plus de calcul `surfaceArea × baseRate`.
+
+#### 4. Mise à jour de `ConfiguratorSection.tsx`
+- Largeur : champ numérique libre (en cm, min 190, max 592) — le système identifie automatiquement la plage tarifaire.
+- Avancée : **select dropdown** avec uniquement les avancées valides pour la largeur choisie (ex: largeur 200cm → seule avancée 150 disponible).
+- Section options : 6 options avec switches, l'option "Manœuvre manuelle" affiche "−619 €" en vert.
+- Le prix affiché est le prix TTC exact de la grille + options.
+
+#### 5. Fichiers modifiés
+- **Nouveau** : `src/lib/pricingTable.ts` — grille + lookup
+- **Modifié** : `src/hooks/useConfigurator.ts` — nouveau calcul de prix, nouvelles options, contraintes de dimensions
+- **Modifié** : `src/components/product/ConfiguratorSection.tsx` — UI dropdown avancée, 6 options, affichage prix
 
