@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from "react";
 import { ExternalLink, Eye, ArrowUp, ArrowDown, Trash2, Plus, Save, Upload, X, Search } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -358,6 +359,18 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
                     style={getSwatchStyle(c)}
                   />
                   <Input value={c.label} onChange={e => updateField(i, "label", e.target.value)} className="max-w-[160px] h-8 text-sm" />
+                  {showPhotoUpload && (
+                    <Select value={c.type || "solid"} onValueChange={v => updateField(i, "type", v)}>
+                      <SelectTrigger className="w-[100px] h-8 text-xs">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="solid">Uni</SelectItem>
+                        <SelectItem value="striped">Rayé</SelectItem>
+                        <SelectItem value="textured">Motif</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
                   <Switch checked={c.active} onCheckedChange={v => updateField(i, "active", v)} />
                   <button onClick={() => setDeleting(c.id)} className="text-gray-400 hover:text-red-500 shrink-0"><Trash2 className="w-4 h-4" /></button>
                 </>
