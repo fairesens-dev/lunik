@@ -67,50 +67,43 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
               </span>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="pt-1 pb-2 space-y-3">
-                {groupByHue(group.colors).map((hueGroup, hIdx) => (
-                  <Fragment key={hIdx}>
-                    {hIdx > 0 && <div className="border-t border-border/40 my-2" />}
-                    <div className="flex flex-wrap gap-3">
-                      {hueGroup.colors.map((c) => (
-                        <button
-                          key={c.name}
-                          onClick={() => onSelect(c.name)}
-                          className="flex flex-col items-center gap-1.5 group"
-                          title={c.name}
+              <div className="flex flex-wrap gap-3 pt-1 pb-2">
+                {group.colors.map((c) => (
+                  <button
+                    key={c.name}
+                    onClick={() => onSelect(c.name)}
+                    className="flex flex-col items-center gap-1.5 group"
+                    title={c.name}
+                  >
+                    <div
+                      className={`w-16 h-16 border-2 relative transition-all rounded-sm ${
+                        selected === c.name
+                          ? "border-primary shadow-md ring-2 ring-primary/30"
+                          : "border-border group-hover:border-primary/50"
+                      }`}
+                      style={getSwatchStyle(c)}
+                    >
+                      {selected === c.name && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-sm">
+                          <Check className="w-5 h-5 text-white drop-shadow" />
+                        </div>
+                      )}
+                      {c.photoUrl && (
+                        <div
+                          className="absolute bottom-0 right-0 w-5 h-5 bg-black/50 flex items-center justify-center rounded-tl-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-zoom-in"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setLightboxColor(c);
+                          }}
                         >
-                          <div
-                            className={`w-16 h-16 border-2 relative transition-all rounded-sm ${
-                              selected === c.name
-                                ? "border-primary shadow-md ring-2 ring-primary/30"
-                                : "border-border group-hover:border-primary/50"
-                            }`}
-                            style={getSwatchStyle(c)}
-                          >
-                            {selected === c.name && (
-                              <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-sm">
-                                <Check className="w-5 h-5 text-white drop-shadow" />
-                              </div>
-                            )}
-                            {c.photoUrl && (
-                              <div
-                                className="absolute bottom-0 right-0 w-5 h-5 bg-black/50 flex items-center justify-center rounded-tl-sm opacity-0 group-hover:opacity-100 transition-opacity cursor-zoom-in"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  setLightboxColor(c);
-                                }}
-                              >
-                                <Search className="w-3 h-3 text-white" />
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-[9px] text-muted-foreground text-center leading-tight max-w-[64px] truncate">
-                            {c.name}
-                          </span>
-                        </button>
-                      ))}
+                          <Search className="w-3 h-3 text-white" />
+                        </div>
+                      )}
                     </div>
-                  </Fragment>
+                    <span className="text-[9px] text-muted-foreground text-center leading-tight max-w-[64px] truncate">
+                      {c.name}
+                    </span>
+                  </button>
                 ))}
               </div>
             </AccordionContent>
