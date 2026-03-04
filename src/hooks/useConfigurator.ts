@@ -48,14 +48,20 @@ export function useConfigurator() {
   // Base price from grid
   const basePrice = useMemo(() => lookupPrice(widthMm, projectionMm), [widthMm, projectionMm]);
 
+  // Ensure selectedOptions is always a Set (guards against HMR/state restoration issues)
+  const safeSelectedOptions = useMemo(
+    () => (selectedOptions instanceof Set ? selectedOptions : new Set<string>()),
+    [selectedOptions]
+  );
+
   // Options total
   const optionsTotal = useMemo(() => {
     let total = 0;
     for (const opt of PRICING_OPTIONS) {
-      if (selectedOptions.has(opt.id)) total += opt.price;
+      if (safeSelectedOptions.has(opt.id)) total += opt.price;
     }
     return total;
-  }, [selectedOptions]);
+  }, [safeSelectedOptions]);
 
   // Final price
   const price = useMemo(() => (basePrice ?? 0) + optionsTotal, [basePrice, optionsTotal]);
@@ -77,13 +83,13 @@ export function useConfigurator() {
 
   // Options summary string
   const optionsSummary = useMemo(() => {
-    const parts = PRICING_OPTIONS.filter(o => selectedOptions.has(o.id)).map(o => o.label);
+    const parts = PRICING_OPTIONS.filter(o => safeSelectedOptions.has(o.id)).map(o => o.label);
     return parts.join(" + ") || "Aucune";
-  }, [selectedOptions]);
+  }, [safeSelectedOptions]);
 
   // Compat: motorisation/led/pack booleans for DynamicProductVisual
-  const motorisation = !selectedOptions.has("manoeuvre-manuelle");
-  const led = selectedOptions.has("led-coffre") || selectedOptions.has("led-bras");
+  const motorisation = !safeSelectedOptions.has("manoeuvre-manuelle");
+  const led = safeSelectedOptions.has("led-coffre") || safeSelectedOptions.has("led-bras");
   const pack = false;
 
   return {
@@ -100,7 +106,7 @@ export function useConfigurator() {
     toileColor, setToileColor,
     armatureColor, setArmatureColor,
     // Options
-    selectedOptions,
+    selectedOptions: safeSelectedOptions,
     toggleOption,
     // Compat flags for visual
     motorisation, led, pack,
