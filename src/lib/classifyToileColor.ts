@@ -95,3 +95,21 @@ export function categorizeAndSortColors<T extends { name: string; type?: string 
     .filter((cat) => groups[cat].length > 0)
     .map((cat) => ({ category: cat, colors: groups[cat] }));
 }
+
+/**
+ * Group sorted colors into hue sub-groups for visual separation.
+ */
+export function groupByHue<T extends { name: string }>(colors: T[]): { hueOrder: number; colors: T[] }[] {
+  const groups: { hueOrder: number; colors: T[] }[] = [];
+  let currentHue = -1;
+  for (const c of colors) {
+    const hue = getHueOrder(c.name);
+    if (hue !== currentHue) {
+      groups.push({ hueOrder: hue, colors: [c] });
+      currentHue = hue;
+    } else {
+      groups[groups.length - 1].colors.push(c);
+    }
+  }
+  return groups;
+}
