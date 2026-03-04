@@ -9,7 +9,7 @@ export function useConfigurator() {
   const activeArmatureColors = useMemo(() => settings.armatureColors.filter(c => c.active), [settings.armatureColors]);
 
   // Exported for backward compat
-  const TOILE_COLORS_COMPAT = useMemo(() => activeToileColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors })), [activeToileColors]);
+  const TOILE_COLORS_COMPAT = useMemo(() => activeToileColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors, photoUrl: c.photoUrl })), [activeToileColors]);
   const ARMATURE_COLORS_COMPAT = useMemo(() => activeArmatureColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors })), [activeArmatureColors]);
 
   const [width, setWidth] = useState(350);
