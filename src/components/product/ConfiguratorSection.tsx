@@ -35,7 +35,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
   const selectedToile = TOILE_COLORS.find(c => c.name === toileColor);
   const selectedArmature = ARMATURE_COLORS.find(c => c.name === armatureColor);
 
-  const currentToile = { hex: selectedToile?.hex || "#fff", label: toileColor };
+  const currentToile = { hex: selectedToile?.hex || "#fff", label: toileColor, photoUrl: selectedToile?.photoUrl };
   const currentArmature = { hex: selectedArmature?.hex || "#333", label: armatureColor };
   const currentOptions = { motorisation, led, packConnect: pack };
 

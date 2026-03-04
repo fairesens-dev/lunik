@@ -17,8 +17,8 @@ interface DynamicProductVisualProps {
 // In-memory cache for generated images
 const imageCache = new Map<string, string>();
 
-function cacheKey(toileHex: string, armatureHex: string, led: boolean) {
-  return `${toileHex}-${armatureHex}-${led}`;
+function cacheKey(toileHex: string, armatureHex: string, led: boolean, photoUrl?: string) {
+  return `${toileHex}-${armatureHex}-${led}-${photoUrl || ""}`;
 }
 
 const DynamicProductVisual = ({
@@ -36,8 +36,8 @@ const DynamicProductVisual = ({
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
   const abortRef = useRef<AbortController>();
 
-  const generateImage = useCallback(async (toileHex: string, toileLabel: string, armatureHex: string, armatureLabel: string, led: boolean) => {
-    const key = cacheKey(toileHex, armatureHex, led);
+  const generateImage = useCallback(async (toileHex: string, toileLabel: string, armatureHex: string, armatureLabel: string, led: boolean, photoUrl?: string) => {
+    const key = cacheKey(toileHex, armatureHex, led, photoUrl);
 
     // Check cache first
     if (imageCache.has(key)) {
@@ -64,6 +64,7 @@ const DynamicProductVisual = ({
           armatureColorHex: armatureHex,
           armatureColorLabel: armatureLabel,
           led,
+          toilePhotoUrl: photoUrl,
         },
       });
 
@@ -89,13 +90,13 @@ const DynamicProductVisual = ({
     if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(() => {
-      generateImage(toileColor.hex, toileColor.label, armatureColor.hex, armatureColor.label, showLed);
+      generateImage(toileColor.hex, toileColor.label, armatureColor.hex, armatureColor.label, showLed, toileColor.photoUrl);
     }, 800);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
-  }, [toileColor.hex, toileColor.label, armatureColor.hex, armatureColor.label, showLed, compact, generateImage]);
+  }, [toileColor.hex, toileColor.label, toileColor.photoUrl, armatureColor.hex, armatureColor.label, showLed, compact, generateImage]);
 
   // Compact mode: show simple color preview
   if (compact) {

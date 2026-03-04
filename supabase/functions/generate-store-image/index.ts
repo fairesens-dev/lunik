@@ -12,7 +12,7 @@ serve(async (req) => {
   }
 
   try {
-    const { toileColorHex, toileColorLabel, armatureColorHex, armatureColorLabel, led } = await req.json();
+    const { toileColorHex, toileColorLabel, armatureColorHex, armatureColorLabel, led, toilePhotoUrl } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
@@ -20,6 +20,10 @@ serve(async (req) => {
     const ledInstruction = led
       ? "The awning has a warm white LED strip light running along the underside of the front bar, casting a soft ambient glow on the fabric from below. Evening/dusk atmosphere."
       : "Daytime, bright natural sunlight. No LED lighting.";
+
+    const fabricReference = toilePhotoUrl
+      ? `\nIMPORTANT: An image of the exact fabric pattern/texture is attached. The awning fabric MUST reproduce this exact pattern, colors, and texture faithfully on the deployed awning canvas.`
+      : "";
 
     const prompt = `Generate a realistic professional product photograph of a modern retractable full-cassette awning (store banne coffre intégral) fully deployed on a beautiful sunny terrace of a contemporary house.
 
@@ -32,7 +36,15 @@ Key details:
 - Background: modern terrace with garden furniture, plants, lifestyle setting.
 - Professional product photography style, high quality, photorealistic, slight depth of field.
 - Camera angle: slightly below, looking up at the awning from the terrace.
-- Do NOT include any text, watermark, or logo in the image.`;
+- Do NOT include any text, watermark, or logo in the image.${fabricReference}`;
+
+    // Build multimodal content if we have a photo reference
+    const content = toilePhotoUrl
+      ? [
+          { type: "text", text: prompt },
+          { type: "image_url", image_url: { url: toilePhotoUrl } },
+        ]
+      : prompt;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -42,7 +54,7 @@ Key details:
       },
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-image",
-        messages: [{ role: "user", content: prompt }],
+        messages: [{ role: "user", content }],
         modalities: ["image", "text"],
       }),
     });
