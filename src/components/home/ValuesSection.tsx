@@ -1,5 +1,5 @@
 import AnimatedSection from "@/components/AnimatedSection";
-import { Banknote, ShieldCheck, Truck } from "lucide-react";
+import { Banknote, ShieldCheck, Truck, Sun, Droplets, Palette } from "lucide-react";
 
 const values = [
   {
@@ -17,6 +17,21 @@ const values = [
     title: "5 ans de garantie",
     desc: "Tous nos stores sont garantis 5 ans pièces et main d'œuvre. Nos produits sont 100% réparables.",
   },
+  {
+    icon: Sun,
+    title: "Protection UV 5/5",
+    desc: "Toile Dickson acrylique teint masse avec traitement Cleanguard anti-salissures. Résistance UV classement 5/5.",
+  },
+  {
+    icon: Droplets,
+    title: "Résistance intempéries",
+    desc: "Toile certifiée OEKO-TEX classe II, résistante aux intempéries et aux déchirures. Entretien simple à l'eau savonneuse.",
+  },
+  {
+    icon: Palette,
+    title: "173 coloris",
+    desc: "Toile Orchestra by Dickson disponible en 173 coloris pour s'adapter à tous les styles d'extérieur.",
+  },
 ];
 
 const ValuesSection = () => (
@@ -27,9 +42,9 @@ const ValuesSection = () => (
           Pourquoi choisir <span className="italic">notre store</span> ?
         </h2>
       </AnimatedSection>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-10">
         {values.map((v, i) => (
-          <AnimatedSection key={v.title} delay={i * 0.15}>
+          <AnimatedSection key={v.title} delay={i * 0.1}>
             <div className="flex flex-col items-start group hover:-translate-y-1 transition-transform duration-300">
               <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-accent-light/20 flex items-center justify-center mb-5">
                 <v.icon className="w-6 h-6 text-primary" />
