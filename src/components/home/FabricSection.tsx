@@ -23,7 +23,7 @@ const FabricSection = () => (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         <AnimatedSection>
-          <div className="aspect-[4/3] overflow-hidden">
+          <div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-lg">
             <img
               src="/images/store-toile-detail.webp"
               alt="Détail de la toile Orchestra Dickson sur store coffre"
@@ -38,7 +38,7 @@ const FabricSection = () => (
             <p className="text-xs uppercase tracking-[0.3em] text-primary font-sans font-medium">
               Toile Orchestra by Dickson
             </p>
-            <h2 className="font-serif text-3xl md:text-4xl font-light leading-tight">
+            <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
               LA référence en matière
               <br />
               <span className="italic">de protection solaire</span>
@@ -62,7 +62,7 @@ const FabricSection = () => (
             <div className="border-t border-border pt-6 mt-6">
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                 {specs.map((s) => (
-                  <div key={s.label}>
+                  <div key={s.label} className="bg-secondary/50 rounded-lg px-3 py-2">
                     <p className="text-xs text-muted-foreground uppercase tracking-wider">{s.label}</p>
                     <p className="text-sm font-medium text-foreground mt-1">{s.value}</p>
                   </div>

@@ -29,19 +29,14 @@ const FilledStars = ({ count }: { count: number }) => (
 
 const TestimonialsSection = () => {
   const { content } = useContent();
-  const { reviews, loading, error } = useTrustpilot(9);
+  const { reviews, loading } = useTrustpilot(9);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
 
-  // Fallback reviews from CMS
   const fallbackItems = content.homepage.testimonials.filter(t => t.active).map(t => ({
-    id: t.name,
-    stars: t.rating ?? 5,
-    title: "",
-    text: t.text,
-    consumer: { displayName: t.name },
-    createdAt: "",
+    id: t.name, stars: t.rating ?? 5, title: "", text: t.text,
+    consumer: { displayName: t.name }, createdAt: "",
   }));
 
   const items = reviews.length > 0 ? reviews : fallbackItems;
@@ -75,21 +70,21 @@ const TestimonialsSection = () => {
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="flex items-end justify-between mb-10">
-            <h2 className="font-serif text-4xl md:text-5xl font-light">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold">
               Ce que nos clients <span className="italic">en pensent</span>
             </h2>
             <div className="hidden md:flex gap-2">
               <button
                 onClick={() => scroll("left")}
                 disabled={!canScrollLeft}
-                className="w-10 h-10 border border-border flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-30"
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-colors disabled:opacity-30"
               >
                 <ChevronLeft className="w-5 h-5" />
               </button>
               <button
                 onClick={() => scroll("right")}
                 disabled={!canScrollRight}
-                className="w-10 h-10 border border-border flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-30"
+                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-colors disabled:opacity-30"
               >
                 <ChevronRight className="w-5 h-5" />
               </button>
@@ -105,7 +100,7 @@ const TestimonialsSection = () => {
           {items.map((review, i) => (
             <div
               key={review.id || i}
-              className="min-w-[300px] max-w-[340px] flex-shrink-0 snap-start bg-background p-6 shadow-sm flex flex-col"
+              className="min-w-[300px] max-w-[340px] flex-shrink-0 snap-start bg-background rounded-xl p-6 shadow-md flex flex-col"
             >
               <FilledStars count={review.stars} />
               {review.title && (
@@ -115,7 +110,7 @@ const TestimonialsSection = () => {
                 "{review.text}"
               </p>
               <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border">
-                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent-light/20 flex items-center justify-center text-xs font-medium text-primary">
                   {initials(review.consumer.displayName)}
                 </div>
                 <div className="flex-1 min-w-0">

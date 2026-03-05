@@ -40,17 +40,15 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
           "fixed left-0 right-0 z-50 transition-all duration-500",
           bannerOffset ? "top-[40px]" : "top-0",
           scrolled
-            ? "bg-background/95 backdrop-blur-sm shadow-sm"
-            : "bg-background/90 backdrop-blur-sm"
+            ? "bg-background/80 backdrop-blur-xl shadow-sm"
+            : "bg-background/60 backdrop-blur-lg"
         )}
       >
         <div className="max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 flex items-center justify-between h-20">
-          {/* Logo */}
           <Link to="/">
             <img src={logoLunik} alt={content.global.brandName} className="h-8" />
           </Link>
 
-          {/* Desktop Nav */}
           <nav className="hidden lg:flex items-center gap-10">
             {navLinks.map((link) => (
               <a
@@ -68,14 +66,12 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
             ))}
           </nav>
 
-          {/* Desktop CTA */}
           <a href="/#configurator" className="hidden lg:block">
-            <Button className="bg-primary text-primary-foreground px-6 py-3 rounded-none tracking-[0.15em] uppercase text-xs font-medium hover:bg-accent-light transition-colors h-auto">
+            <Button variant="gradient" className="px-6 py-3 rounded-full tracking-[0.15em] uppercase text-xs font-medium h-auto">
               Configurer mon store
             </Button>
           </a>
 
-          {/* Mobile menu button */}
           <button
             className="lg:hidden p-2"
             onClick={() => setMobileOpen(!mobileOpen)}
@@ -86,9 +82,8 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
         </div>
       </header>
 
-      {/* Mobile overlay */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-background flex flex-col items-center justify-center gap-8 animate-fade-in">
+        <div className="fixed inset-0 z-40 bg-gradient-to-b from-background to-card flex flex-col items-center justify-center gap-8 animate-fade-in">
           {navLinks.map((link) => (
             <a
               key={link.href}
@@ -105,7 +100,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
             </a>
           ))}
           <a href="/#configurator" onClick={() => setMobileOpen(false)}>
-            <Button className="bg-primary text-primary-foreground px-8 py-4 rounded-none tracking-[0.15em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto mt-4">
+            <Button variant="gradient" className="px-8 py-4 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto mt-4">
               Configurer mon store
             </Button>
           </a>

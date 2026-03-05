@@ -6,11 +6,7 @@ const rows = [
     label: "TOILE",
     title: "Toile Orchestra by Dickson — La référence mondiale",
     body: "173 coloris en acrylique teint masse avec traitement Cleanguard. Certifiée OEKO-TEX classe II, garantie 10 ans. La référence mondiale de la protection solaire.",
-    specs: [
-      "Traitement anti-taches et anti-moisissures",
-      "Résistance UV classement 5/5",
-      "Garantie 5 ans",
-    ],
+    specs: ["Traitement anti-taches et anti-moisissures", "Résistance UV classement 5/5", "Garantie 5 ans"],
     image: "/images/store-toile-detail.webp",
     imageAlt: "Détail de la toile Dickson du store coffre",
     reverse: false,
@@ -19,11 +15,7 @@ const rows = [
     label: "STRUCTURE",
     title: "Armature aluminium — Robustesse et élégance",
     body: "Profilés aluminium extrudé thermolaqué, traitement anti-corrosion. Notre coffre intégral protège la toile des intempéries quand le store est replié. Aucun entretien nécessaire.",
-    specs: [
-      "Aluminium extrudé haute résistance",
-      "Coffre intégral étanche",
-      "Sans entretien",
-    ],
+    specs: ["Aluminium extrudé haute résistance", "Coffre intégral étanche", "Sans entretien"],
     image: "/images/store-bras-fixations.webp",
     imageAlt: "Détail des fixations aluminium du store coffre",
     reverse: true,
@@ -32,11 +24,7 @@ const rows = [
     label: "MOTORISATION",
     title: "Motorisation Somfy io — Confort absolu",
     body: "Pilotez votre store depuis une télécommande, un interrupteur mural ou votre smartphone via l'application TaHoma de Somfy. Compatible avec les assistants vocaux Google et Alexa.",
-    specs: [
-      "Application TaHoma iOS & Android",
-      "Compatible Google Home & Alexa",
-      "Détecteur de vent en option",
-    ],
+    specs: ["Application TaHoma iOS & Android", "Compatible Google Home & Alexa", "Détecteur de vent en option"],
     image: "/images/store-led-nuit.webp",
     imageAlt: "Store coffre avec éclairage LED intégré de nuit",
     reverse: false,
@@ -48,7 +36,7 @@ const ProductFeaturesSection = () => (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <AnimatedSection>
         <div className="text-center mb-20">
-          <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-4">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-4">
             Conçu pour durer.
             <br />
             <span className="italic">Pensé pour vous.</span>
@@ -62,18 +50,13 @@ const ProductFeaturesSection = () => (
           <AnimatedSection key={row.label} delay={i * 0.1}>
             <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${row.reverse ? "lg:direction-rtl" : ""}`}>
               <div className={`${row.reverse ? "lg:order-2" : ""}`}>
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={row.image}
-                    alt={row.imageAlt}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
+                <div className="aspect-[4/3] overflow-hidden rounded-xl shadow-md">
+                  <img src={row.image} alt={row.imageAlt} className="w-full h-full object-cover" loading="lazy" />
                 </div>
               </div>
               <div className={`${row.reverse ? "lg:order-1" : ""}`}>
                 <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4 font-sans font-medium">{row.label}</p>
-                <h3 className="font-serif text-2xl md:text-3xl font-light mb-4">{row.title}</h3>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold mb-4">{row.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6">{row.body}</p>
                 <div className="space-y-2">
                   {row.specs.map((spec) => (

@@ -45,10 +45,10 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
         {/* Intro */}
         <AnimatedSection>
           <div className="text-center mb-16">
-            <span className="inline-block bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs tracking-[0.2em] uppercase font-medium mb-6">
+            <span className="inline-block bg-gradient-to-r from-primary to-accent-light text-white px-5 py-1.5 rounded-full text-xs tracking-[0.2em] uppercase font-medium mb-6">
               Configurateur en ligne
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-4">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-4">
               {productPage.configuratorTitle.split("\n").map((line, i) => (
                 <span key={i}>{i > 0 && <br />}{i > 0 ? <span className="italic">{line}</span> : line}</span>
               ))}
@@ -61,9 +61,9 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
 
         {/* Configurator card */}
         <AnimatedSection delay={0.15}>
-          <div className="border border-border bg-background shadow-sm">
+          <div className="border border-border bg-background rounded-2xl shadow-lg overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[45%_55%]">
-              {/* LEFT — Visual (sticky on desktop) */}
+              {/* LEFT — Visual */}
               <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border lg:self-start lg:sticky lg:top-28">
                 <DynamicProductVisual
                   toileColor={currentToile}
@@ -74,11 +74,11 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   className="mb-4"
                 />
                 <div className="flex flex-wrap gap-2 text-xs text-muted-foreground mb-4">
-                  <span className="bg-secondary px-3 py-1">{width} cm × {projection / 10} cm</span>
-                  {widthRangeLabel && <span className="bg-secondary px-3 py-1">Plage {widthRangeLabel}</span>}
-                  <span className="bg-secondary px-3 py-1">Toile {toileColor}</span>
-                  <span className="bg-secondary px-3 py-1">{armatureColor}</span>
-                  {optionsSummary !== "Aucune" && <span className="bg-secondary px-3 py-1">+ {optionsSummary}</span>}
+                  <span className="bg-secondary px-3 py-1 rounded-full">{width} cm × {projection / 10} cm</span>
+                  {widthRangeLabel && <span className="bg-secondary px-3 py-1 rounded-full">Plage {widthRangeLabel}</span>}
+                  <span className="bg-secondary px-3 py-1 rounded-full">Toile {toileColor}</span>
+                  <span className="bg-secondary px-3 py-1 rounded-full">{armatureColor}</span>
+                  {optionsSummary !== "Aucune" && <span className="bg-secondary px-3 py-1 rounded-full">+ {optionsSummary}</span>}
                 </div>
               </div>
 
@@ -99,6 +99,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                         onChange={(e) => setWidth(parseInt(e.target.value) || MIN_WIDTH_CM)}
                         onBlur={() => clampWidth(width)}
                         placeholder={`ex: 350`}
+                        className="rounded-lg"
                       />
                       {!widthValid && width > 0 && (
                         <p className="text-[11px] text-destructive mt-1">Largeur hors plage ({MIN_WIDTH_CM}–{MAX_WIDTH_CM} cm)</p>
@@ -109,18 +110,13 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                     </div>
                     <div>
                       <label className="text-xs text-muted-foreground mb-1 block">Avancée (cm)</label>
-                      <Select
-                        value={String(projection)}
-                        onValueChange={(v) => setProjection(Number(v))}
-                      >
-                        <SelectTrigger>
+                      <Select value={String(projection)} onValueChange={(v) => setProjection(Number(v))}>
+                        <SelectTrigger className="rounded-lg">
                           <SelectValue placeholder="Avancée" />
                         </SelectTrigger>
                         <SelectContent>
                           {validProjections.map((p) => (
-                            <SelectItem key={p} value={String(p)}>
-                              {p / 10} cm
-                            </SelectItem>
+                            <SelectItem key={p} value={String(p)}>{p / 10} cm</SelectItem>
                           ))}
                         </SelectContent>
                       </Select>
@@ -136,11 +132,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 <div>
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Toile Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
-                  <ToileColorSelector
-                    colors={TOILE_COLORS}
-                    selected={toileColor}
-                    onSelect={setToileColor}
-                  />
+                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
                   <p className="text-xs text-muted-foreground italic mt-3">Sélectionnée : {toileColor}</p>
                 </div>
 
@@ -150,16 +142,10 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
                   <div className="flex flex-wrap gap-4">
                     {ARMATURE_COLORS.map((c) => (
-                      <button
-                        key={c.name}
-                        onClick={() => setArmatureColor(c.name)}
-                        className="flex flex-col items-center gap-2 group"
-                      >
+                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
                         <div
-                          className={`w-20 h-8 border-2 relative transition-all ${
-                            armatureColor === c.name
-                              ? "border-primary shadow-md"
-                              : "border-border group-hover:border-primary/50"
+                          className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
+                            armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
                           }`}
                           style={{ backgroundColor: c.hex }}
                         >
@@ -187,7 +173,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                       return (
                         <div
                           key={opt.id}
-                          className={`border p-4 flex flex-col gap-2 relative overflow-hidden transition-colors ${
+                          className={`border rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden transition-all ${
                             checked
                               ? isReduction
                                 ? "border-destructive/50 ring-1 ring-destructive/20 bg-destructive/[0.02]"
@@ -198,27 +184,20 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                           }`}
                         >
                           {opt.badge && (
-                            <span className={`absolute -top-0.5 right-3 text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold ${
-                              isReduction
-                                ? "bg-destructive text-destructive-foreground"
-                                : "bg-primary text-primary-foreground"
+                            <span className={`absolute -top-0.5 right-3 text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-b-lg ${
+                              isReduction ? "bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"
                             }`}>
                               {opt.badge}
                             </span>
                           )}
                           <div className="flex items-center gap-4">
-                            <Switch
-                              checked={checked}
-                              onCheckedChange={() => toggleOption(opt.id)}
-                            />
+                            <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
                             <div className="flex-1">
                               <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
                               <p className="text-xs text-muted-foreground">{opt.description}</p>
                             </div>
                             <div className="text-right">
-                              <span className={`text-sm font-medium whitespace-nowrap ${
-                                isReduction ? "text-green-600" : ""
-                              }`}>
+                              <span className={`text-sm font-medium whitespace-nowrap ${isReduction ? "text-green-600" : ""}`}>
                                 {isReduction ? "" : "+"}{opt.price.toLocaleString("fr-FR")} €
                               </span>
                             </div>
@@ -232,7 +211,6 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   </div>
                 </div>
 
-                {/* Save config / devis par email */}
                 <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
 
                 {/* Price & CTA */}
@@ -242,7 +220,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   ) : (
                     <>
                       <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Votre prix TTC</p>
-                      <p className="font-serif text-3xl md:text-4xl text-primary font-medium transition-all duration-300">
+                      <p className="font-serif text-3xl md:text-4xl text-primary font-bold transition-all duration-300">
                         {price.toLocaleString("fr-FR")} € <span className="text-lg font-normal text-muted-foreground">TTC</span>
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
@@ -250,14 +228,15 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                       </p>
                       <Button
                         onClick={onOrder}
-                        className="w-full mt-6 bg-primary text-primary-foreground py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto"
+                        variant="gradient"
+                        className="w-full mt-6 py-5 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto shadow-lg hover:shadow-xl"
                       >
                         Commander ce store
                       </Button>
                       <div className="flex flex-wrap justify-center gap-4 mt-4 text-xs text-muted-foreground">
-                        <span>🔒 Paiement sécurisé</span>
-                        <span>🚚 Livraison 4-5 sem</span>
-                        <span>🇫🇷 Fabriqué en France</span>
+                        <span className="bg-secondary px-3 py-1.5 rounded-full">🔒 Paiement sécurisé</span>
+                        <span className="bg-secondary px-3 py-1.5 rounded-full">🚚 Livraison 4-5 sem</span>
+                        <span className="bg-secondary px-3 py-1.5 rounded-full">🇫🇷 Fabriqué en France</span>
                       </div>
                     </>
                   )}
