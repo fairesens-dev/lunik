@@ -14,8 +14,8 @@ const GallerySection = () => {
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl font-bold mb-4">
-              Ils ont sauté <span className="italic">le pas</span>
+            <h2 className="font-display text-4xl md:text-5xl font-extrabold mb-4">
+              Ils ont sauté <span className="text-primary">le pas</span>
             </h2>
             <p className="text-muted-foreground text-sm">Quelques réalisations parmi nos clients satisfaits</p>
           </div>

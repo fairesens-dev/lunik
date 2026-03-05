@@ -48,9 +48,9 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
             <span className="inline-block bg-gradient-to-r from-primary to-accent-light text-white px-5 py-1.5 rounded-full text-xs tracking-[0.2em] uppercase font-medium mb-6">
               Configurateur en ligne
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-4">
+            <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight mb-4">
               {productPage.configuratorTitle.split("\n").map((line, i) => (
-                <span key={i}>{i > 0 && <br />}{i > 0 ? <span className="italic">{line}</span> : line}</span>
+                <span key={i}>{i > 0 && <br />}{i > 0 ? <span className="text-primary">{line}</span> : line}</span>
               ))}
             </h2>
             <p className="text-muted-foreground text-sm max-w-lg mx-auto">
@@ -64,7 +64,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
           <div className="border border-border bg-background rounded-2xl shadow-lg overflow-hidden">
             <div className="grid grid-cols-1 lg:grid-cols-[45%_55%]">
               {/* LEFT — Visual */}
-              <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border lg:self-start lg:sticky lg:top-28">
+              <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-border lg:sticky lg:top-28 lg:self-start lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
                 <DynamicProductVisual
                   toileColor={currentToile}
                   armatureColor={currentArmature}
@@ -243,7 +243,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   ) : (
                     <>
                       <p className="text-xs uppercase tracking-widest text-muted-foreground mb-2">Votre prix TTC</p>
-                      <p className="font-serif text-3xl md:text-4xl text-primary font-bold transition-all duration-300">
+                      <p className="font-display text-3xl md:text-4xl text-primary font-extrabold transition-all duration-300">
                         {price.toLocaleString("fr-FR")} € <span className="text-lg font-normal text-muted-foreground">TTC</span>
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">

@@ -83,7 +83,7 @@ const ExitIntentPopup = ({
             <div className="p-6 bg-secondary rounded-l-2xl">
               <DynamicProductVisual toileColor={{ hex: toileHex, label: toileColor }} armatureColor={{ hex: armatureHex, label: armatureColor }} options={{ motorisation, led, packConnect: pack }} width={width} projection={projection} />
               <div className="mt-4 text-center">
-                <p className="text-2xl font-serif font-bold">{price.toLocaleString("fr-FR")} €</p>
+                <p className="text-2xl font-display font-bold">{price.toLocaleString("fr-FR")} €</p>
                 <p className="text-xs text-primary font-medium mt-1">ou {Math.round(price / 4).toLocaleString("fr-FR")} €/mois en 4× sans frais</p>
                 <p className="text-xs text-muted-foreground mt-1">{width} × {projection} cm</p>
               </div>
@@ -95,13 +95,13 @@ const ExitIntentPopup = ({
                   <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
                     <Mail className="w-6 h-6 text-primary" />
                   </div>
-                  <h3 className="font-serif text-xl">Configuration envoyée !</h3>
+                  <h3 className="font-display text-xl font-bold">Configuration envoyée !</h3>
                   <p className="text-sm text-muted-foreground">Retrouvez-la dans votre boîte mail.</p>
                 </div>
               ) : (
                 <>
-                  <h2 className="font-serif text-2xl md:text-3xl font-bold mb-3 leading-tight">
-                    Attendez ! Votre store est presque <span className="italic">prêt</span>.
+                  <h2 className="font-display text-2xl md:text-3xl font-extrabold mb-3 leading-tight">
+                    Attendez ! Votre store est presque <span className="text-primary">prêt</span>.
                   </h2>
                   <p className="text-sm text-muted-foreground mb-6">
                     Vous partez avec votre configuration de {width}×{projection} cm.

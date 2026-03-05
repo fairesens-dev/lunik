@@ -70,8 +70,8 @@ const TestimonialsSection = () => {
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="flex items-end justify-between mb-10">
-            <h2 className="font-serif text-4xl md:text-5xl font-bold">
-              Ce que nos clients <span className="italic">en pensent</span>
+            <h2 className="font-display text-4xl md:text-5xl font-extrabold">
+              Ce que nos clients <span className="text-primary">en pensent</span>
             </h2>
             <div className="hidden md:flex gap-2">
               <button

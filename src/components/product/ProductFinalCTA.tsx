@@ -5,10 +5,10 @@ const ProductFinalCTA = () => (
   <section className="py-28 lg:py-36 bg-gradient-to-br from-[#4A5E3A] to-[#2C3A22] text-white">
     <div className="max-w-3xl mx-auto px-6 lg:px-12 text-center">
       <AnimatedSection>
-        <h2 className="font-serif text-4xl md:text-5xl font-light mb-6">
+        <h2 className="font-display text-4xl md:text-5xl font-extrabold mb-6">
           Prêt à transformer
           <br />
-          <span className="italic">votre extérieur ?</span>
+          <span className="text-primary">votre extérieur ?</span>
         </h2>
         <p className="text-white/80 text-sm mb-10 max-w-md mx-auto">
           Configurez votre store en 2 minutes. Prix immédiat, sans engagement.

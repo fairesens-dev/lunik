@@ -13,10 +13,10 @@ const ProcessSection = () => (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <AnimatedSection>
         <div className="text-center mb-20">
-          <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight">
             De votre canapé à votre terrasse
             <br />
-            <span className="italic">en 5 étapes</span>
+            <span className="text-primary">en 5 étapes</span>
           </h2>
         </div>
       </AnimatedSection>
@@ -29,7 +29,7 @@ const ProcessSection = () => (
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent-light text-white flex items-center justify-center text-lg font-bold mx-auto mb-4">
                 {i + 1}
               </div>
-              <h3 className="font-serif text-lg mb-2">{step.title}</h3>
+              <h3 className="font-display text-lg font-semibold mb-2">{step.title}</h3>
               <p className="text-muted-foreground text-xs leading-relaxed">{step.desc}</p>
               {i < steps.length - 1 && (
                 <div className="absolute top-6 left-[60%] w-[80%] h-px bg-gradient-to-r from-primary/30 to-accent-light/30" />
@@ -51,7 +51,7 @@ const ProcessSection = () => (
                 {i < steps.length - 1 && <div className="w-px flex-1 bg-gradient-to-b from-primary/30 to-accent-light/30 mt-2" />}
               </div>
               <div>
-                <h3 className="font-serif text-lg mb-1">{step.title}</h3>
+                <h3 className="font-display text-lg font-semibold mb-1">{step.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
               </div>
             </div>

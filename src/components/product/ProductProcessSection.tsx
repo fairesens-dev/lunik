@@ -13,10 +13,10 @@ const ProductProcessSection = () => (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <AnimatedSection>
         <div className="text-center mb-20">
-          <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight">
+          <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight">
             De votre terrasse à votre store
             <br />
-            <span className="italic">en 5 étapes</span>
+            <span className="text-primary">en 5 étapes</span>
           </h2>
         </div>
       </AnimatedSection>
@@ -26,7 +26,7 @@ const ProductProcessSection = () => (
           <AnimatedSection key={step.title} delay={i * 0.1}>
             <div className="flex-1 text-center relative">
               <div className="text-3xl mb-4">{step.emoji}</div>
-              <h3 className="font-serif text-lg mb-2">{step.title}</h3>
+              <h3 className="font-display text-lg font-semibold mb-2">{step.title}</h3>
               <p className="text-white/60 text-xs leading-relaxed">{step.desc}</p>
               {i < steps.length - 1 && <div className="absolute top-5 left-[60%] w-[80%] h-px bg-white/20" />}
             </div>
@@ -43,7 +43,7 @@ const ProductProcessSection = () => (
                 {i < steps.length - 1 && <div className="w-px flex-1 bg-white/20 mt-2" />}
               </div>
               <div>
-                <h3 className="font-serif text-lg mb-1">{step.title}</h3>
+                <h3 className="font-display text-lg font-semibold mb-1">{step.title}</h3>
                 <p className="text-white/60 text-sm leading-relaxed">{step.desc}</p>
               </div>
             </div>
