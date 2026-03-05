@@ -10,7 +10,7 @@ const ProductHighlightSection = () => {
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-4">
+            <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-4">
               {content.homepage.productSectionTitle.split("\n").map((line, i) => (
                 <span key={i}>{i > 0 && <br />}{i > 0 ? <span className="italic">{line}</span> : line}</span>
               ))}
@@ -21,7 +21,7 @@ const ProductHighlightSection = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <AnimatedSection>
-            <div className="aspect-[4/3] overflow-hidden">
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-lg">
               <img
                 src="/images/store-salon-vide.webp"
                 alt="Store coffre déployé au-dessus d'un salon de jardin"
@@ -33,7 +33,7 @@ const ProductHighlightSection = () => {
 
           <AnimatedSection delay={0.2}>
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 bg-primary/10 px-4 py-2 text-sm font-medium text-primary">
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/15 to-accent-light/15 px-4 py-2 rounded-full text-sm font-medium text-primary">
                 <span>🇫🇷</span> Fabriqué en France
               </div>
               <p className="text-muted-foreground leading-relaxed">
@@ -46,7 +46,7 @@ const ProductHighlightSection = () => {
                 livré chez vous en 4 à 5 semaines.
               </p>
               <a href="#configurator">
-                <Button className="bg-primary text-primary-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto mt-2">
+                <Button variant="gradient" className="px-8 py-5 rounded-full tracking-[0.2em] uppercase text-sm font-medium h-auto mt-2">
                   Configurer mon store →
                 </Button>
               </a>

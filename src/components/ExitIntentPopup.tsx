@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -9,16 +9,9 @@ import { useCartAbandonment } from "@/hooks/useCartAbandonment";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ExitIntentPopupProps {
-  width: number;
-  projection: number;
-  toileColor: string;
-  toileHex: string;
-  armatureColor: string;
-  armatureHex: string;
-  price: number;
-  motorisation: boolean;
-  led: boolean;
-  pack: boolean;
+  width: number; projection: number; toileColor: string; toileHex: string;
+  armatureColor: string; armatureHex: string; price: number;
+  motorisation: boolean; led: boolean; pack: boolean;
 }
 
 const ExitIntentPopup = ({
@@ -67,63 +60,35 @@ const ExitIntentPopup = ({
     try {
       captureEmail(email);
       await supabase.functions.invoke("send-config-email", {
-        body: {
-          email,
-          config: { width, projection, toileColor, armatureColor, price, motorisation, led, pack },
-        },
+        body: { email, config: { width, projection, toileColor, armatureColor, price, motorisation, led, pack } },
       });
       setSent(true);
-    } catch {
-      // silent
-    } finally {
-      setSending(false);
-    }
+    } catch { /* silent */ } finally { setSending(false); }
   };
 
   return (
     <AnimatePresence>
       {show && (
-        <motion.div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-        >
-          {/* Overlay */}
+        <motion.div className="fixed inset-0 z-[60] flex items-center justify-center p-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <div className="absolute inset-0 bg-foreground/60 backdrop-blur-sm" onClick={() => setShow(false)} />
-
-          {/* Modal */}
           <motion.div
-            className="relative bg-background border border-border shadow-2xl max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            className="relative bg-background border border-border shadow-2xl rounded-2xl max-w-2xl w-full grid grid-cols-1 md:grid-cols-2 overflow-hidden"
+            initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.9, opacity: 0 }}
             transition={{ type: "spring", damping: 25 }}
           >
-            <button
-              onClick={() => setShow(false)}
-              className="absolute top-3 right-3 z-10 p-1 text-muted-foreground hover:text-foreground transition-colors"
-            >
+            <button onClick={() => setShow(false)} className="absolute top-3 right-3 z-10 p-1 text-muted-foreground hover:text-foreground transition-colors">
               <X className="w-5 h-5" />
             </button>
 
-            {/* Left — Visual */}
-            <div className="p-6 bg-secondary">
-              <DynamicProductVisual
-                toileColor={{ hex: toileHex, label: toileColor }}
-                armatureColor={{ hex: armatureHex, label: armatureColor }}
-                options={{ motorisation, led, packConnect: pack }}
-                width={width}
-                projection={projection}
-              />
+            <div className="p-6 bg-secondary rounded-l-2xl">
+              <DynamicProductVisual toileColor={{ hex: toileHex, label: toileColor }} armatureColor={{ hex: armatureHex, label: armatureColor }} options={{ motorisation, led, packConnect: pack }} width={width} projection={projection} />
               <div className="mt-4 text-center">
-                <p className="text-2xl font-serif font-light">{price.toLocaleString("fr-FR")} €</p>
+                <p className="text-2xl font-serif font-bold">{price.toLocaleString("fr-FR")} €</p>
                 <p className="text-xs text-primary font-medium mt-1">ou {Math.round(price / 4).toLocaleString("fr-FR")} €/mois en 4× sans frais</p>
                 <p className="text-xs text-muted-foreground mt-1">{width} × {projection} cm</p>
               </div>
             </div>
 
-            {/* Right — Content */}
             <div className="p-8 flex flex-col justify-center">
               {sent ? (
                 <div className="text-center space-y-3">
@@ -135,7 +100,7 @@ const ExitIntentPopup = ({
                 </div>
               ) : (
                 <>
-                  <h2 className="font-serif text-2xl md:text-3xl font-light mb-3 leading-tight">
+                  <h2 className="font-serif text-2xl md:text-3xl font-bold mb-3 leading-tight">
                     Attendez ! Votre store est presque <span className="italic">prêt</span>.
                   </h2>
                   <p className="text-sm text-muted-foreground mb-6">
@@ -143,19 +108,8 @@ const ExitIntentPopup = ({
                     Sauvegardez-la gratuitement par email.
                   </p>
                   <form onSubmit={handleSubmit} className="space-y-3">
-                    <Input
-                      type="email"
-                      placeholder="votre@email.fr"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      className="rounded-none border-border h-11 text-sm"
-                    />
-                    <Button
-                      type="submit"
-                      disabled={sending}
-                      className="w-full bg-primary text-primary-foreground rounded-none h-11 tracking-[0.1em] uppercase text-xs font-medium"
-                    >
+                    <Input type="email" placeholder="votre@email.fr" value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-lg border-border h-11 text-sm" />
+                    <Button type="submit" disabled={sending} variant="gradient" className="w-full rounded-full h-11 tracking-[0.1em] uppercase text-xs font-medium">
                       {sending ? "Envoi..." : "Recevoir ma config →"}
                     </Button>
                   </form>

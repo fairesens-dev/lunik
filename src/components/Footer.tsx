@@ -13,13 +13,12 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-foreground text-background">
+    <footer className="bg-[hsl(20,15%,12%)] text-[hsl(40,40%,93%)]">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-20">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
-          {/* Col 1: Brand */}
           <div>
             <img src={logoLunik} alt={g.brandName} className="h-8 brightness-0 invert mb-2" />
-            <p className="text-background/60 text-sm leading-relaxed mb-6 max-w-xs">
+            <p className="text-[hsl(40,40%,93%)]/60 text-sm leading-relaxed mb-6 max-w-xs">
               L'excellence du store sur mesure, fabriqué en France avec passion et savoir-faire depuis plus de 20 ans.
             </p>
             <div className="flex gap-4">
@@ -29,7 +28,7 @@ const Footer = () => {
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-background/40 hover:text-background transition-colors text-xs uppercase tracking-widest"
+                  className="opacity-40 hover:opacity-100 hover:text-primary transition-all text-xs uppercase tracking-widest"
                 >
                   {social.label}
                 </a>
@@ -37,9 +36,8 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Col 2: Navigation */}
           <div>
-            <h4 className="text-xs uppercase tracking-[0.2em] text-background/40 mb-6 font-sans font-medium">
+            <h4 className="text-xs uppercase tracking-[0.2em] opacity-40 mb-6 font-sans font-medium">
               Navigation
             </h4>
             <nav className="flex flex-col gap-3">
@@ -54,7 +52,7 @@ const Footer = () => {
                 <Link
                   key={link.href}
                   to={link.href}
-                  className="text-background/60 hover:text-background transition-colors text-sm"
+                  className="opacity-60 hover:opacity-100 hover:text-primary transition-all text-sm"
                 >
                   {link.label}
                 </Link>
@@ -62,17 +60,16 @@ const Footer = () => {
             </nav>
           </div>
 
-          {/* Col 3: Contact */}
           <div>
-            <h4 className="text-xs uppercase tracking-[0.2em] text-background/40 mb-6 font-sans font-medium">
+            <h4 className="text-xs uppercase tracking-[0.2em] opacity-40 mb-6 font-sans font-medium">
               Contact
             </h4>
-            <div className="space-y-3 text-sm text-background/60">
+            <div className="space-y-3 text-sm opacity-60">
               <p>{g.email}</p>
               <p>{g.phone}</p>
               <p>Lundi – Vendredi : 9h – 18h</p>
             </div>
-            <div className="mt-8 inline-flex items-center gap-2 border border-background/20 px-4 py-2 text-xs uppercase tracking-widest text-background/60">
+            <div className="mt-8 inline-flex items-center gap-2 border border-primary/30 rounded-full px-4 py-2 text-xs uppercase tracking-widest text-primary">
               <span>🇫🇷</span>
               <span>Fabriqué en France</span>
             </div>
@@ -80,22 +77,15 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-background/10">
+      <div className="border-t border-white/10">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-background/30 text-xs">
+          <p className="opacity-30 text-xs">
             © {new Date().getFullYear()} {g.brandName}. Tous droits réservés.
           </p>
           <div className="flex gap-6">
-            <Link to="/conditions-generales-de-vente" className="text-background/30 hover:text-background/60 transition-colors text-xs">
-              CGV
-            </Link>
-            <Link to="/mentions-legales" className="text-background/30 hover:text-background/60 transition-colors text-xs">
-              Mentions Légales
-            </Link>
-            <Link to="/cookies" className="text-background/30 hover:text-background/60 transition-colors text-xs">
-              Cookies
-            </Link>
+            <Link to="/conditions-generales-de-vente" className="opacity-30 hover:opacity-60 transition-opacity text-xs">CGV</Link>
+            <Link to="/mentions-legales" className="opacity-30 hover:opacity-60 transition-opacity text-xs">Mentions Légales</Link>
+            <Link to="/cookies" className="opacity-30 hover:opacity-60 transition-opacity text-xs">Cookies</Link>
           </div>
         </div>
       </div>

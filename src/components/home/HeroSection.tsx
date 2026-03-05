@@ -1,4 +1,3 @@
-import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useContent } from "@/contexts/ContentContext";
@@ -10,15 +9,17 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-screen flex -mt-20">
       {/* Left content — 55% */}
-      <div className="w-full lg:w-[55%] flex items-center px-6 lg:px-16 xl:px-24 pt-32 pb-20">
-        <div className="max-w-xl">
+      <div className="w-full lg:w-[55%] flex items-center px-6 lg:px-16 xl:px-24 pt-32 pb-20 relative">
+        {/* Warm radial gradient background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-background to-background pointer-events-none" />
+        <div className="max-w-xl relative z-10">
           <AnimatedSection>
             <p className="text-xs uppercase tracking-[0.3em] text-primary mb-6 font-sans font-medium">
               {homepage.heroOverline}
             </p>
           </AnimatedSection>
           <AnimatedSection delay={0.15}>
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-8 text-foreground">
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-bold leading-[1.05] mb-8 text-foreground">
               {homepage.heroTitle.split("\n").map((line, i, arr) => (
                 <span key={i}>
                   {i > 0 && <br />}
@@ -33,17 +34,17 @@ const HeroSection = () => {
           <AnimatedSection delay={0.35}>
             <div className="flex flex-wrap gap-4 mb-10">
               <a href="#configurator">
-                <Button className="bg-primary text-primary-foreground px-8 py-5 rounded-none tracking-[0.2em] uppercase text-sm font-medium hover:bg-accent-light transition-colors h-auto">
+                <Button variant="gradient" className="px-8 py-5 rounded-full tracking-[0.2em] uppercase text-sm font-medium h-auto shadow-lg hover:shadow-xl">
                   {homepage.heroCTA1}
                 </Button>
               </a>
             </div>
           </AnimatedSection>
           <AnimatedSection delay={0.45}>
-            <div className="flex flex-wrap gap-6 text-sm text-muted-foreground">
-              <span>⭐ 4.9/5 Trustpilot</span>
-              <span>🇫🇷 Made in France</span>
-              <span>🔧 Garantie 5 ans</span>
+            <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <span className="bg-primary/10 px-4 py-2 rounded-full">⭐ 4.9/5 Trustpilot</span>
+              <span className="bg-primary/10 px-4 py-2 rounded-full">🇫🇷 Made in France</span>
+              <span className="bg-primary/10 px-4 py-2 rounded-full">🔧 Garantie 5 ans</span>
             </div>
           </AnimatedSection>
         </div>
