@@ -16,11 +16,11 @@ const ProductHeroSection = () => {
             </p>
           </AnimatedSection>
           <AnimatedSection delay={0.15}>
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-8 text-foreground">
+            <h1 className="font-display text-5xl md:text-6xl lg:text-7xl font-extrabold leading-[1.05] mb-8 text-foreground">
               {productPage.heroTitle.split("\n").map((line, i, arr) => (
                 <span key={i}>
                   {i > 0 && <br />}
-                  {i === arr.length - 1 ? <span className="italic">{line}</span> : line}
+                  {i === arr.length - 1 ? <span className="text-primary">{line}</span> : line}
                 </span>
               ))}
             </h1>

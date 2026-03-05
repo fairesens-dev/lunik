@@ -6,8 +6,8 @@ const ContactCTASection = () => (
   <section className="py-16 lg:py-20 bg-gradient-to-br from-[hsl(20,15%,10%)] to-[hsl(25,20%,15%)]">
     <div className="max-w-3xl mx-auto px-6 text-center">
       <AnimatedSection>
-        <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-4">
-          Une question avant de <span className="italic text-primary">configurer</span> ?
+        <h2 className="font-display text-4xl md:text-5xl font-extrabold text-white mb-4">
+          Une question avant de <span className="text-primary">configurer</span> ?
         </h2>
         <p className="text-white/50 text-lg mb-10">
           Notre équipe est disponible du lundi au vendredi, de 9h à 18h.

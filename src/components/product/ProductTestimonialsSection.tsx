@@ -8,8 +8,8 @@ const ProductTestimonialsSection = () => {
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl md:text-5xl font-light mb-4">
-              Ce que nos clients <span className="italic">disent</span>
+            <h2 className="font-display text-4xl md:text-5xl font-extrabold mb-4">
+              Ce que nos clients <span className="text-primary">disent</span>
             </h2>
           </div>
         </AnimatedSection>

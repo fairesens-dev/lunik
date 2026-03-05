@@ -36,10 +36,10 @@ const ProductFeaturesSection = () => (
     <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
       <AnimatedSection>
         <div className="text-center mb-20">
-          <h2 className="font-serif text-4xl md:text-5xl font-bold leading-tight mb-4">
+          <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight mb-4">
             Conçu pour durer.
             <br />
-            <span className="italic">Pensé pour vous.</span>
+            <span className="text-primary">Pensé pour vous.</span>
           </h2>
           <p className="text-muted-foreground text-sm">Un store coffre haut de gamme où chaque détail compte.</p>
         </div>
@@ -56,7 +56,7 @@ const ProductFeaturesSection = () => (
               </div>
               <div className={`${row.reverse ? "lg:order-1" : ""}`}>
                 <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4 font-sans font-medium">{row.label}</p>
-                <h3 className="font-serif text-2xl md:text-3xl font-bold mb-4">{row.title}</h3>
+                <h3 className="font-display text-2xl md:text-3xl font-bold mb-4">{row.title}</h3>
                 <p className="text-muted-foreground text-sm leading-relaxed mb-6">{row.body}</p>
                 <div className="space-y-2">
                   {row.specs.map((spec) => (
