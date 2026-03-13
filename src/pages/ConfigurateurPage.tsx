@@ -430,15 +430,6 @@ const ConfigurateurPage = () => {
         </div>
       </div>
 
-      {/* Trust bar */}
-      <div className="bg-secondary/50 border-t border-border py-3">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" /> Paiement sécurisé</span>
-          <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Livraison 4-5 semaines</span>
-          <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Garantie 5 ans</span>
-          <span className="flex items-center gap-1.5">Fabriqué en France</span>
-        </div>
-      </div>
     </>
   );
 };
