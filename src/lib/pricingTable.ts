@@ -43,59 +43,68 @@ export interface PricingOption {
   label: string;
   description: string;
   price: number; // positif = supplément, négatif = réduction
-  icon: string;
   highlight?: boolean;
   badge?: string;
   tip?: string;
+  socialProof?: string;
+  order: number; // display order (lower = first)
 }
 
 export const PRICING_OPTIONS: PricingOption[] = [
   {
     id: "led-coffre",
     label: "Éclairage LED sous coffre SOMFY",
-    description: "Éclairage d'ambiance intégré sous le coffre du store",
+    description: "Éclairage d'ambiance intégré sous le coffre du store, pilotable depuis votre télécommande",
     price: 859,
-    icon: "💡",
-    tip: "💬 \"L'éclairage LED a transformé nos soirées d'été !\" — Marie, Lyon",
+    highlight: true,
+    badge: "POPULAIRE",
+    tip: "« L'éclairage LED a transformé nos soirées d'été, on ne s'en passe plus. » — Marie, Lyon",
+    socialProof: "78% des clients choisissent cette option",
+    order: 1,
   },
   {
     id: "led-bras",
     label: "Éclairage LED sous les bras SOMFY",
-    description: "Éclairage puissant sous les bras pour un rendu maximal",
+    description: "Éclairage puissant sous les bras pour un rendu spectaculaire et une luminosité optimale",
     price: 959,
-    icon: "💡",
-    tip: "🔥 L'option la plus spectaculaire pour vos soirées",
+    badge: "COUP DE CŒUR",
+    tip: "« L'effet est bluffant, tous nos invités nous demandent la référence. » — Thomas, Bordeaux",
+    socialProof: "Option la mieux notée par nos clients",
+    order: 2,
   },
   {
     id: "capteur-vent",
     label: "Automatisme Vent SOMFY 3D IO",
-    description: "Capteur vent intégré pour rétraction automatique",
+    description: "Capteur vent intégré : votre store se rétracte automatiquement pour se protéger",
     price: 199,
-    icon: "🌬️",
-    tip: "💡 Protège votre store automatiquement en cas de vent",
+    highlight: true,
+    badge: "RECOMMANDÉ",
+    tip: "« Indispensable si vous n'êtes pas toujours à la maison, ça m'a sauvé le store. » — Pascal, Nantes",
+    socialProof: "Recommandé par 9 installateurs sur 10",
+    order: 3,
   },
   {
     id: "pose-plafond",
     label: "Pose plafond avec équerre",
-    description: "Kit de fixation pour montage au plafond",
+    description: "Kit de fixation complet pour montage au plafond (sous-face, pergola, avancée de toit)",
     price: 289,
-    icon: "🔧",
-  },
-  {
-    id: "manoeuvre-manuelle",
-    label: "Manœuvre manuelle treuil + manivelle",
-    description: "Remplace la motorisation SOMFY incluse (−619 €)",
-    price: -619,
-    icon: "✋",
-    badge: "ÉCONOMIE",
-    tip: "⚠️ Retire la motorisation SOMFY incluse de série",
+    tip: "Idéal si vous ne disposez pas de façade porteuse pour la fixation murale",
+    order: 4,
   },
   {
     id: "radio-csi",
     label: "Manœuvre SOMFY RADIO CSI",
-    description: "Commande radio SOMFY CSI pour pilotage avancé",
+    description: "Commande radio SOMFY CSI pour pilotage avancé et intégration domotique",
     price: 199,
-    icon: "📡",
+    order: 5,
+  },
+  {
+    id: "manoeuvre-manuelle",
+    label: "Manœuvre manuelle treuil + manivelle",
+    description: "Remplace la motorisation SOMFY incluse de série (réduction de 619 €)",
+    price: -619,
+    tip: "Attention : retire la motorisation SOMFY incluse de série. Recommandé uniquement pour les petites largeurs.",
+    order: 6,
   },
 ];
 
