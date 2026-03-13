@@ -226,6 +226,15 @@ const defaultContent: SiteContent = {
     stepLabels: ["VOS DIMENSIONS", "COULEUR DE TOILE", "COULEUR DE L'ARMATURE", "OPTIONS"],
     orderConfirmationMessage: "",
     faqItems: [],
+    heroImage: "/images/store-salon-apero.webp",
+    galleryItems: [
+      { id: "pg1", src: "/images/real-sunset-terrasse.webp", alt: "Coucher de soleil sous le store sur terrasse", height: "h-64" },
+      { id: "pg2", src: "/images/real-maison-platine.webp", alt: "Store coffre toile Platine sur maison", height: "h-80" },
+      { id: "pg3", src: "/images/real-vin-apero.webp", alt: "Apéro sous le store avec télécommande Somfy", height: "h-72" },
+      { id: "pg4", src: "/images/real-3stores-paris.webp", alt: "Triple store blanc posé au 3ème étage à Paris", height: "h-80" },
+      { id: "pg5", src: "/images/real-montagne-cepe.webp", alt: "Store coffre avec vue montagne", height: "h-64" },
+      { id: "pg6", src: "/images/real-bordeaux.webp", alt: "Store coffre toile Bordeaux sur balcon bois", height: "h-72" },
+    ],
   },
   sav: {
     heroTitle: "Un SAV qui vous ressemble",
