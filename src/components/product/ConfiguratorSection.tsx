@@ -216,7 +216,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                           <div className="flex items-center gap-4">
                             <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
                             <div className="flex-1">
-                              <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
+                              <p className="text-sm font-medium">{opt.label}</p>
                               <p className="text-xs text-muted-foreground">{opt.description}</p>
                             </div>
                             <div className="text-right">
