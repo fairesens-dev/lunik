@@ -24,8 +24,8 @@ const CheckoutStep2 = ({ onNext, onBack }: Props) => {
   const steps = ["Commande validée", "Fabrication (3-4 sem)", "Expédition", "Livraison"];
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
-      <div className="space-y-8">
+    <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 w-full">
+      <div className="space-y-8 min-w-0">
         <h3 className="font-serif text-xl">Mode de livraison</h3>
 
         <div className="space-y-4">
