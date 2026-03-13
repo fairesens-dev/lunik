@@ -279,7 +279,7 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       settings, updatePricing, updateDimensions,
       updateToileColor, addToileColor, removeToileColor, reorderToileColors,
       updateArmatureColor, addArmatureColor, removeArmatureColor, reorderArmatureColors,
-      updateOption, addOption, removeOption, resetToDefaults,
+      updateOption, addOption, removeOption, updatePriceGrid, resetToDefaults,
     }}>
       {children}
     </ConfiguratorSettingsContext.Provider>
