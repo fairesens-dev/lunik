@@ -49,7 +49,7 @@ const App = () => (
             {/* Public site */}
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/store-coffre" element={<Navigate to="/#configurator" replace />} />
+              <Route path="/store-coffre" element={<Navigate to="/configurateur" replace />} />
               <Route path="/service-apres-vente" element={<SAVPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/conditions-generales-de-vente" element={<CGVPage />} />
