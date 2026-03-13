@@ -48,7 +48,7 @@ const TEMPLATES: Record<string, { label: string; html: string }> = {
     <p>Bonjour {{first_name}},</p>
     <p>Profitez de notre offre exclusive…</p>
     <div style="text-align:center;margin:20px 0;">
-      <a href="#" style="background:#4A5E3A;color:white;padding:12px 30px;text-decoration:none;border-radius:5px;">En profiter</a>
+      <a href="#" style="background:#B8826B;color:white;padding:12px 30px;text-decoration:none;border-radius:5px;">En profiter</a>
     </div>
   </div>
   <div style="padding:15px;text-align:center;font-size:12px;color:#999;">
