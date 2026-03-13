@@ -288,7 +288,7 @@ const TabHomepage = () => {
               <div className="flex-1 space-y-2">
                 <Input placeholder="Titre" value={v.title} onChange={(e) => updateValueCard(v.id, { title: e.target.value })} className="h-8 text-sm" />
                 <Input placeholder="Description" value={v.desc} onChange={(e) => updateValueCard(v.id, { desc: e.target.value })} className="h-8 text-sm" />
-                <Input placeholder="URL image" value={v.image} onChange={(e) => updateValueCard(v.id, { image: e.target.value })} className="h-8 text-sm" />
+                <ImagePicker value={v.image} onChange={(url) => updateValueCard(v.id, { image: url })} />
               </div>
               <button onClick={() => removeValueCard(v.id)} className="text-muted-foreground hover:text-destructive mt-1">
                 <Trash2 className="w-4 h-4" />
