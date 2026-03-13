@@ -128,8 +128,8 @@ const ConfigurateurPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] min-h-[calc(100vh-64px)]">
 
         {/* LEFT — Visual panel */}
-        <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
-          <div className="absolute inset-0 bottom-[140px]">
+        <div className="bg-background lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
+          <div className="absolute inset-0 bottom-0">
             <DynamicProductVisual
               toileColor={currentToile}
               armatureColor={currentArmature}
@@ -141,7 +141,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* 2 boutons en ligne — au-dessus de la fiche technique */}
-          <div className="absolute bottom-[180px] left-4 right-4 flex gap-2 z-20">
+          <div className="absolute bottom-[140px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
               className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
@@ -192,8 +192,8 @@ const ConfigurateurPage = () => {
             )}
           </div>
 
-          {/* Fiche technique + témoignage */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-6 z-10">
+          {/* Fiche technique + témoignage — aligned with right sticky bar */}
+          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-4 lg:py-6 z-10">
             <div className="flex items-start gap-6">
               {/* Specs */}
               <div className="flex-1 min-w-0">
