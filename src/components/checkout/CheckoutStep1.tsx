@@ -87,9 +87,9 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
   if (!item) return null;
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 w-full">
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-8 w-full">
       {/* LEFT – Form */}
-      <div className="space-y-8 min-w-0">
+      <form onSubmit={handleSubmit(onNext)} className="space-y-8 w-full min-w-0">
         {/* Coordonnées */}
         <div>
           <h3 className="font-serif text-xl mb-4">Vos coordonnées</h3>
@@ -279,7 +279,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
         >
           Continuer vers la livraison →
         </Button>
-      </div>
+      </form>
 
       {/* RIGHT – Summary (mobile: after form, desktop: sticky sidebar) */}
       <div className="lg:hidden">
@@ -290,7 +290,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
           <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
         </div>
       </div>
-    </form>
+    </div>
   );
 };
 

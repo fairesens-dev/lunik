@@ -162,8 +162,8 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     : `Confirmer ${total.toLocaleString("fr-FR")} €`;
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8 w-full">
-      <div className="space-y-8 min-w-0">
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-8 w-full">
+      <div className="space-y-8 w-full min-w-0">
         <h3 className="font-serif text-xl">Paiement</h3>
 
         <div className="space-y-4">
