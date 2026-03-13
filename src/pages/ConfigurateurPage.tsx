@@ -119,7 +119,7 @@ const ConfigurateurPage = () => {
           </Link>
         </div>
         <Link to="/">
-          <img src={logoLunik} alt="LuniK" className="h-7" />
+          <img src={logoLunik} alt="LuniK" className="h-[2.75rem]" />
         </Link>
         <div className="flex-1" />
       </header>
