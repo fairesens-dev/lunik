@@ -141,7 +141,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* 2 boutons en ligne — au-dessus de la fiche technique */}
-          <div className="absolute bottom-[180px] left-4 right-4 flex gap-2 z-20">
+          <div className="absolute bottom-[140px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
               className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
