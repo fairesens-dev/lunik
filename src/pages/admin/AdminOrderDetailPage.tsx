@@ -19,7 +19,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { generateInvoicePDF } from "@/lib/generateInvoice";
 
 const STATUS_OPTIONS = ["Nouveau", "En fabrication", "Expédié", "Livré", "Annulé"];
@@ -33,16 +37,19 @@ const statusColor: Record<string, string> = {
 };
 
 const TRACKING_STAGES = [
-  { key: "received", label: "Commande reçue", icon: "📥" },
+  { key: "received", label: "Commande reçue", icon: "📧" },
   { key: "paid", label: "Paiement confirmé", icon: "✅" },
+  { key: "call", label: "Appel de confirmation", icon: "📞" },
   { key: "fabrication", label: "Mise en fabrication", icon: "🏭" },
   { key: "quality", label: "Contrôle qualité", icon: "🔍" },
   { key: "ready", label: "Prêt à expédier", icon: "📦" },
   { key: "shipped", label: "Expédié", icon: "🚚" },
   { key: "in_transit", label: "En cours de livraison", icon: "📍" },
   { key: "delivered", label: "Livré", icon: "✅" },
-  { key: "satisfaction", label: "Satisfaction client", icon: "🌞" },
+  { key: "satisfaction", label: "Satisfaction client", icon: "⭐" },
 ];
+
+const CARRIERS = ["Geodis", "TNT", "Chronopost", "DPD", "GLS", "Colissimo", "Autre"];
 
 const TRANSACTIONAL_EMAILS = [
   { key: "confirmation", label: "Confirmation commande" },
@@ -52,9 +59,33 @@ const TRANSACTIONAL_EMAILS = [
   { key: "satisfaction", label: "Email satisfaction" },
 ];
 
+// Armature color hex map
+const ARMATURE_COLORS: Record<string, string> = {
+  "RAL 7016": "#383E42",
+  "Gris anthracite": "#383E42",
+  "Blanc": "#FFFFFF",
+  "RAL 9016": "#FFFFFF",
+  "RAL 9010": "#F5F0E8",
+  "Ivoire": "#F5F0E8",
+  "Gris clair": "#C0C0C0",
+  "RAL 7035": "#C0C0C0",
+  "Noir": "#1A1A1A",
+  "RAL 9005": "#1A1A1A",
+  "Marron": "#5C4033",
+};
+
+function getArmatureHex(label: string | null): string | undefined {
+  if (!label) return undefined;
+  for (const [key, hex] of Object.entries(ARMATURE_COLORS)) {
+    if (label.toLowerCase().includes(key.toLowerCase())) return hex;
+  }
+  return undefined;
+}
+
 const AdminOrderDetailPage = () => {
   const { orderId } = useParams<{ orderId: string }>();
   const { toast } = useToast();
+  const { admin } = useAuth();
   const [order, setOrder] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [newStatus, setNewStatus] = useState("");
@@ -63,11 +94,23 @@ const AdminOrderDetailPage = () => {
   const [sendingEmail, setSendingEmail] = useState<string | null>(null);
   const [clientStats, setClientStats] = useState<{ count: number; total: number; first: string; last: string } | null>(null);
 
+  // Store generated image
+  const [storeImageUrl, setStoreImageUrl] = useState<string | null>(null);
+  const [storeImageLoading, setStoreImageLoading] = useState(false);
+
+  // Toile color photo URL from bucket
+  const [toilePhotoUrl, setToilePhotoUrl] = useState<string | null>(null);
+
   // Tracking stages state
   const [stages, setStages] = useState<Record<string, { done: boolean; date: string; note: string }>>({});
+  const [savingStages, setSavingStages] = useState(false);
+
+  // Tracking modal
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
   const [trackingCarrier, setTrackingCarrier] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [trackingUrl, setTrackingUrl] = useState("");
+  const [carrierSearch, setCarrierSearch] = useState("");
 
   useEffect(() => {
     if (!orderId) return;
@@ -87,9 +130,8 @@ const AdminOrderDetailPage = () => {
         const found = sh.find?.((h: any) => h.stage === s.key);
         stageState[s.key] = found ? { done: true, date: found.date || "", note: found.note || "" } : { done: false, date: "", note: "" };
       });
-      // Auto-mark received & paid based on status_history
-      if (sh.length > 0) stageState.received = { done: true, date: sh[0]?.date || "", note: "" };
-      if (data.payment_status === "paid") stageState.paid = { done: true, date: stageState.paid?.date || "", note: "" };
+      if (sh.length > 0) stageState.received = { done: true, date: sh[0]?.date || "", note: stageState.received?.note || "" };
+      if (data.payment_status === "paid") stageState.paid = { done: true, date: stageState.paid?.date || "", note: stageState.paid?.note || "" };
       setStages(stageState);
 
       // Tracking info from metadata
@@ -111,9 +153,53 @@ const AdminOrderDetailPage = () => {
           });
         }
       }
+
+      // Try to get toile photo from bucket
+      if (data.toile_color) {
+        const toileSlug = data.toile_color.toLowerCase().replace(/\s+/g, "-").replace(/[éèê]/g, "e").replace(/[àâ]/g, "a");
+        const { data: files } = await supabase.storage.from("toile-colors").list("", { limit: 200 });
+        if (files) {
+          const match = files.find(f => {
+            const fName = f.name.toLowerCase().replace(/\.(jpg|jpeg|png|webp)$/, "");
+            return fName.includes(toileSlug) || toileSlug.includes(fName);
+          });
+          if (match) {
+            const { data: urlData } = supabase.storage.from("toile-colors").getPublicUrl(match.name);
+            setToilePhotoUrl(urlData.publicUrl);
+          }
+        }
+      }
+
       setLoading(false);
     })();
   }, [orderId]);
+
+  // Generate store image on mount if we have colors
+  useEffect(() => {
+    if (!order || storeImageUrl || storeImageLoading) return;
+    const toile = order.toile_color;
+    const armature = order.armature_color;
+    if (!toile && !armature) return;
+
+    setStoreImageLoading(true);
+    const hasLed = (order.options || []).some((o: string) => o.toLowerCase().includes("led") || o.toLowerCase().includes("éclairage"));
+    
+    supabase.functions.invoke("generate-store-image", {
+      body: {
+        toileColorHex: "#7B8E7B",
+        toileColorLabel: toile || "Naturel",
+        armatureColorHex: getArmatureHex(armature) || "#383E42",
+        armatureColorLabel: armature || "Gris anthracite",
+        led: hasLed,
+        toilePhotoUrl: toilePhotoUrl,
+      },
+    }).then(({ data, error }) => {
+      if (!error && data?.imageUrl) {
+        setStoreImageUrl(data.imageUrl);
+      }
+      setStoreImageLoading(false);
+    }).catch(() => setStoreImageLoading(false));
+  }, [order, toilePhotoUrl]);
 
   if (loading) return <div className="p-8 text-center text-muted-foreground">Chargement...</div>;
   if (!order) return <div className="p-8 text-center text-muted-foreground">Commande introuvable.</div>;
@@ -131,7 +217,6 @@ const AdminOrderDetailPage = () => {
       if (error) throw error;
       if (data?.success) {
         toast({ title: "Email envoyé", description: `Email "${type}" envoyé avec succès.` });
-        // Refresh order to get updated emails_sent
         const { data: refreshed } = await supabase.from("orders").select("*").eq("id", order.id).single();
         if (refreshed) setOrder(refreshed);
       } else {
@@ -153,7 +238,6 @@ const AdminOrderDetailPage = () => {
       setOrder({ ...order, status: newStatus, status_history: newHistory });
       toast({ title: "Statut mis à jour", description: `Commande ${order.ref} → ${newStatus}` });
 
-      // Auto-trigger emails based on status change
       const emailMap: Record<string, string> = {
         "En fabrication": "fabrication",
         "Expédié": "shipped",
@@ -162,8 +246,11 @@ const AdminOrderDetailPage = () => {
       };
       const emailType = emailMap[newStatus];
       if (emailType) {
-        const extra = emailType === "shipped" ? { tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } } : undefined;
-        await sendOrderEmail(emailType, extra);
+        if (emailType === "shipped") {
+          setShowTrackingModal(true);
+        } else {
+          await sendOrderEmail(emailType);
+        }
       }
     }
   };
@@ -172,13 +259,52 @@ const AdminOrderDetailPage = () => {
     if (!noteText.trim()) return;
     const currentNotes = order.notes || "";
     const timestamp = new Date().toLocaleString("fr-FR");
-    const updated = `[${timestamp}] ${noteText.trim()}\n${currentNotes}`;
+    const adminName = admin?.name || "Admin";
+    const updated = `[${timestamp}] [${adminName}] ${noteText.trim()}\n${currentNotes}`;
     const { error } = await supabase.from("orders").update({ notes: updated } as any).eq("id", order.id);
     if (!error) {
       setOrder({ ...order, notes: updated });
       setNoteText("");
       toast({ title: "Note ajoutée" });
     }
+  };
+
+  const handleSaveStages = async () => {
+    setSavingStages(true);
+    // Build status_history from stages
+    const stageHistory = TRACKING_STAGES
+      .filter(s => stages[s.key]?.done)
+      .map(s => ({
+        stage: s.key,
+        label: s.label,
+        date: stages[s.key]?.date || new Date().toISOString(),
+        note: stages[s.key]?.note || "",
+        ...(s.key === "shipped" ? { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } : {}),
+      }));
+
+    // Merge with existing status changes
+    const existingStatusChanges = statusHistory.filter((h: any) => h.status && !h.stage);
+    const merged = [...existingStatusChanges, ...stageHistory];
+
+    const { error } = await supabase.from("orders").update({ status_history: merged } as any).eq("id", order.id);
+    if (!error) {
+      setOrder({ ...order, status_history: merged });
+      toast({ title: "Suivi enregistré" });
+    } else {
+      toast({ title: "Erreur", description: "Impossible d'enregistrer.", variant: "destructive" });
+    }
+    setSavingStages(false);
+  };
+
+  const handleTrackingConfirm = async () => {
+    if (!trackingCarrier || !trackingNumber) {
+      toast({ title: "Veuillez remplir tous les champs", variant: "destructive" });
+      return;
+    }
+    setShowTrackingModal(false);
+    await sendOrderEmail("shipped", {
+      tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl },
+    });
   };
 
   const copyToClipboard = (text: string) => {
@@ -194,12 +320,10 @@ const AdminOrderDetailPage = () => {
 
   const initials = order.client_name?.split(" ").map((w: string) => w[0]).join("").toUpperCase().slice(0, 2) || "??";
 
-  // Price breakdown (estimated from amount)
   const totalTTC = order.amount || 0;
   const totalHT = +(totalTTC / 1.2).toFixed(2);
   const tva = +(totalTTC - totalHT).toFixed(2);
 
-  // Options pricing estimates
   const hasMotor = options.some((o: string) => o.toLowerCase().includes("motor"));
   const hasLED = options.some((o: string) => o.toLowerCase().includes("led") || o.toLowerCase().includes("éclairage"));
   const hasConnect = options.some((o: string) => o.toLowerCase().includes("connect"));
@@ -208,6 +332,30 @@ const AdminOrderDetailPage = () => {
   const connectPrice = hasConnect ? 190 : 0;
   const optionsTotal = motorPrice + ledPrice + connectPrice;
   const basePrice = totalTTC - optionsTotal;
+
+  // Parse note lines to extract admin name
+  const parseNoteLine = (line: string) => {
+    const match = line.match(/^\[([^\]]+)\]\s*\[([^\]]+)\]\s*(.*)$/);
+    if (match) {
+      return { date: match[1], author: match[2], text: match[3] };
+    }
+    // Legacy format without author
+    const legacyMatch = line.match(/^\[([^\]]+)\]\s*(.*)$/);
+    if (legacyMatch) {
+      return { date: legacyMatch[1], author: "Admin", text: legacyMatch[2] };
+    }
+    return { date: "", author: "", text: line };
+  };
+
+  const getAuthorInitials = (name: string) => {
+    return name.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2) || "A";
+  };
+
+  const filteredCarriers = carrierSearch
+    ? CARRIERS.filter(c => c.toLowerCase().includes(carrierSearch.toLowerCase()))
+    : CARRIERS;
+
+  const armatureHex = getArmatureHex(order.armature_color);
 
   return (
     <div className="space-y-6 font-sans print:space-y-4" id="order-detail">
@@ -225,10 +373,9 @@ const AdminOrderDetailPage = () => {
         </div>
       </div>
 
-      {/* Sticky action bar */}
-      <div className="sticky top-16 z-20 bg-gray-50 -mx-4 lg:-mx-8 px-4 lg:px-8 py-3 border-b border-gray-200 print:hidden" id="action-bar">
+      {/* Sticky action bar — pt-0 collé au header */}
+      <div className="sticky top-16 z-20 bg-gray-50 -mx-4 lg:-mx-8 px-4 lg:px-8 py-3 -mt-6 border-b border-gray-200 print:hidden" id="action-bar">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-          {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm">
             <Link to="/admin/commandes" className="text-gray-500 hover:text-gray-700">Commandes</Link>
             <ChevronRight className="w-3 h-3 text-gray-400" />
@@ -236,7 +383,6 @@ const AdminOrderDetailPage = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
-            {/* Status badge + select */}
             <Badge className={`text-xs px-3 py-1 ${statusColor[order.status] || "bg-gray-100 text-gray-700"}`}>
               {order.status}
             </Badge>
@@ -298,10 +444,16 @@ const AdminOrderDetailPage = () => {
               <CardTitle className="text-base font-sans font-semibold">Détail de la commande</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Product row */}
+              {/* Product row with generated image */}
               <div className="flex gap-4 items-start">
-                <div className="w-20 h-20 bg-stone-200 rounded flex items-center justify-center shrink-0">
-                  <Package className="w-8 h-8 text-stone-400" />
+                <div className="w-20 h-20 bg-stone-200 rounded overflow-hidden flex items-center justify-center shrink-0">
+                  {storeImageLoading ? (
+                    <Loader2 className="w-6 h-6 text-stone-400 animate-spin" />
+                  ) : storeImageUrl ? (
+                    <img src={storeImageUrl} alt="Store configuré" className="w-full h-full object-cover" />
+                  ) : (
+                    <Package className="w-8 h-8 text-stone-400" />
+                  )}
                 </div>
                 <div>
                   <p className="font-semibold text-sm">Store Coffre Sur-Mesure</p>
@@ -320,12 +472,18 @@ const AdminOrderDetailPage = () => {
                   <div className="px-3 py-2">{area} m²</div>
                   <div className="px-3 py-2 bg-gray-50 font-medium border-r">Couleur toile</div>
                   <div className="px-3 py-2 flex items-center gap-2">
-                    {order.toile_color && <span className="w-3 h-3 rounded-full inline-block border" style={{ backgroundColor: order.toile_color === "Sauge" ? "#7B8E7B" : undefined }} />}
+                    {toilePhotoUrl ? (
+                      <img src={toilePhotoUrl} alt={order.toile_color} className="w-6 h-6 rounded border object-cover" />
+                    ) : (
+                      order.toile_color && <span className="w-4 h-4 rounded-full inline-block border" style={{ backgroundColor: "#7B8E7B" }} />
+                    )}
                     {order.toile_color || "—"}
                   </div>
                   <div className="px-3 py-2 bg-gray-50 font-medium border-r">Couleur armature</div>
                   <div className="px-3 py-2 flex items-center gap-2">
-                    {order.armature_color && <span className="w-3 h-3 rounded-full inline-block border" style={{ backgroundColor: order.armature_color?.includes("7016") ? "#383E42" : undefined }} />}
+                    {armatureHex && (
+                      <span className="w-4 h-4 rounded-full inline-block border" style={{ backgroundColor: armatureHex }} />
+                    )}
                     {order.armature_color || "—"}
                   </div>
                   {options.map((opt: string) => (
@@ -344,7 +502,6 @@ const AdminOrderDetailPage = () => {
                 </div>
               </div>
 
-              {/* Client note */}
               {order.message && (
                 <div className="bg-gray-50 rounded-md p-3 text-sm text-muted-foreground italic border">
                   <p className="text-xs font-medium text-gray-500 mb-1 not-italic">Note du client :</p>
@@ -387,7 +544,6 @@ const AdminOrderDetailPage = () => {
                 </div>
               </div>
 
-              {/* Payment info */}
               <div className="flex flex-wrap gap-4 text-sm">
                 <div>
                   <p className="text-xs text-muted-foreground mb-1">Paiement</p>
@@ -428,7 +584,11 @@ const AdminOrderDetailPage = () => {
                       checked={stages[stage.key]?.done || false}
                       onCheckedChange={(checked) => setStages(prev => ({
                         ...prev,
-                        [stage.key]: { ...prev[stage.key], done: !!checked },
+                        [stage.key]: {
+                          ...prev[stage.key],
+                          done: !!checked,
+                          date: checked ? new Date().toISOString() : prev[stage.key]?.date || "",
+                        },
                       }))}
                       className="mt-0.5"
                     />
@@ -436,18 +596,14 @@ const AdminOrderDetailPage = () => {
                     <span className={`text-sm flex-1 ${stages[stage.key]?.done ? "font-medium" : "text-muted-foreground"}`}>
                       {stage.label}
                     </span>
-                    <Input
-                      type="date"
-                      className="w-[130px] h-7 text-xs"
-                      value={stages[stage.key]?.date || ""}
-                      onChange={(e) => setStages(prev => ({
-                        ...prev,
-                        [stage.key]: { ...prev[stage.key], date: e.target.value },
-                      }))}
-                    />
+                    {stages[stage.key]?.done && stages[stage.key]?.date && (
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {new Date(stages[stage.key].date).toLocaleDateString("fr-FR")}
+                      </span>
+                    )}
                     <Input
                       placeholder="Note..."
-                      className="w-[140px] h-7 text-xs"
+                      className="w-[220px] h-8 text-xs"
                       value={stages[stage.key]?.note || ""}
                       onChange={(e) => setStages(prev => ({
                         ...prev,
@@ -458,44 +614,15 @@ const AdminOrderDetailPage = () => {
                 ))}
               </div>
 
-              {/* Tracking section */}
-              {stages.shipped?.done && (
-                <>
-                  <Separator />
-                  <div className="space-y-3">
-                    <p className="text-sm font-semibold">Informations de suivi</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs text-muted-foreground mb-1 block">Transporteur</label>
-                        <Select value={trackingCarrier} onValueChange={setTrackingCarrier}>
-                          <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Choisir..." /></SelectTrigger>
-                          <SelectContent>
-                            {["Geodis", "TNT", "Chronopost", "Autre"].map(c => <SelectItem key={c} value={c} className="text-xs">{c}</SelectItem>)}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div>
-                        <label className="text-xs text-muted-foreground mb-1 block">Numéro de suivi</label>
-                        <Input className="h-8 text-xs" value={trackingNumber} onChange={e => setTrackingNumber(e.target.value)} placeholder="Ex: 1Z999AA10123456784" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-xs text-muted-foreground mb-1 block">URL de tracking</label>
-                      <Input className="h-8 text-xs" value={trackingUrl} onChange={e => setTrackingUrl(e.target.value)} placeholder="https://..." />
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-xs"
-                      disabled={sendingEmail === "shipped"}
-                      onClick={() => sendOrderEmail("shipped", { tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } })}
-                    >
-                      {sendingEmail === "shipped" ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Send className="w-3.5 h-3.5 mr-1" />}
-                      Envoyer le tracking au client
-                    </Button>
-                  </div>
-                </>
-              )}
+              <Button
+                size="sm"
+                className="text-xs"
+                onClick={handleSaveStages}
+                disabled={savingStages}
+              >
+                {savingStages ? <Loader2 className="w-3.5 h-3.5 mr-1 animate-spin" /> : <Check className="w-3.5 h-3.5 mr-1" />}
+                Enregistrer le suivi
+              </Button>
             </CardContent>
           </Card>
 
@@ -508,7 +635,7 @@ const AdminOrderDetailPage = () => {
               <div className="flex gap-2">
                 <Textarea
                   placeholder="Ajouter une note interne..."
-                  className="text-sm flex-1 min-h-[60px]"
+                  className="text-sm flex-1 min-h-[80px]"
                   value={noteText}
                   onChange={e => setNoteText(e.target.value)}
                 />
@@ -518,11 +645,25 @@ const AdminOrderDetailPage = () => {
               </div>
               {order.notes && (
                 <div className="space-y-2 mt-2">
-                  {order.notes.split("\n").filter((l: string) => l.trim()).map((line: string, i: number) => (
-                    <div key={i} className="text-xs bg-gray-50 rounded p-2.5 border">
-                      {line}
-                    </div>
-                  ))}
+                  {order.notes.split("\n").filter((l: string) => l.trim()).map((line: string, i: number) => {
+                    const parsed = parseNoteLine(line);
+                    return (
+                      <div key={i} className="flex items-start gap-2.5 bg-gray-50 rounded p-2.5 border">
+                        <Avatar className="h-7 w-7 shrink-0 mt-0.5">
+                          <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-semibold">
+                            {getAuthorInitials(parsed.author)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 text-[10px] text-muted-foreground mb-0.5">
+                            <span className="font-medium text-foreground">{parsed.author}</span>
+                            {parsed.date && <span>· {parsed.date}</span>}
+                          </div>
+                          <p className="text-xs">{parsed.text}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </CardContent>
@@ -607,7 +748,7 @@ const AdminOrderDetailPage = () => {
                       {i < statusHistory.length - 1 && <div className="w-px h-full bg-gray-200 min-h-[16px]" />}
                     </div>
                     <div className="text-xs">
-                      <span className="font-medium">{h.status}</span>
+                      <span className="font-medium">{h.status || h.label}</span>
                       <span className="text-muted-foreground ml-1">— {formatDate(h.date)}</span>
                     </div>
                   </div>
@@ -677,10 +818,10 @@ const AdminOrderDetailPage = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               {[
-                { label: "Envoyer confirmation commande", icon: Mail, type: "confirmation" },
-                { label: "Notifier mise en fabrication", icon: Bell, type: "fabrication" },
-                { label: "Envoyer numéro de suivi", icon: Truck, type: "shipped" },
-                { label: "Demander un avis", icon: Star, type: "review_request" },
+                { label: "Envoyer confirmation commande", icon: Mail, type: "confirmation", openModal: false },
+                { label: "Notifier mise en fabrication", icon: Bell, type: "fabrication", openModal: false },
+                { label: "Envoyer numéro de suivi", icon: Truck, type: "shipped", openModal: true },
+                { label: "Demander un avis", icon: Star, type: "review_request", openModal: false },
               ].map((action) => (
                 <Button
                   key={action.type}
@@ -688,8 +829,11 @@ const AdminOrderDetailPage = () => {
                   className="w-full justify-start text-xs h-9"
                   disabled={sendingEmail === action.type}
                   onClick={() => {
-                    const extra = action.type === "shipped" ? { tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl } } : undefined;
-                    sendOrderEmail(action.type, extra);
+                    if (action.openModal) {
+                      setShowTrackingModal(true);
+                    } else {
+                      sendOrderEmail(action.type);
+                    }
                   }}
                 >
                   {sendingEmail === action.type ? <Loader2 className="w-3.5 h-3.5 mr-2 animate-spin" /> : <action.icon className="w-3.5 h-3.5 mr-2" />}
@@ -712,6 +856,67 @@ const AdminOrderDetailPage = () => {
       <div className="hidden print:block mt-8 pt-4 border-t-2 border-gray-900 text-center text-xs text-gray-500">
         CONFIDENTIEL — Document interne
       </div>
+
+      {/* Tracking Modal */}
+      <Dialog open={showTrackingModal} onOpenChange={setShowTrackingModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Envoyer le numéro de suivi</DialogTitle>
+            <DialogDescription>Le client recevra un email avec les informations de suivi.</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Transporteur</label>
+              <Input
+                placeholder="Rechercher un transporteur..."
+                className="mb-2 h-9 text-sm"
+                value={carrierSearch}
+                onChange={e => setCarrierSearch(e.target.value)}
+              />
+              <div className="flex flex-wrap gap-1.5">
+                {filteredCarriers.map(c => (
+                  <button
+                    key={c}
+                    onClick={() => { setTrackingCarrier(c); setCarrierSearch(""); }}
+                    className={`px-3 py-1.5 text-xs rounded-full border transition-colors ${
+                      trackingCarrier === c
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "bg-background hover:bg-muted border-border"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">Numéro de suivi</label>
+              <Input
+                className="h-9 text-sm"
+                value={trackingNumber}
+                onChange={e => setTrackingNumber(e.target.value)}
+                placeholder="Ex: 1Z999AA10123456784"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1.5 block">URL de tracking (optionnel)</label>
+              <Input
+                className="h-9 text-sm"
+                value={trackingUrl}
+                onChange={e => setTrackingUrl(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowTrackingModal(false)}>Annuler</Button>
+            <Button onClick={handleTrackingConfirm} disabled={!trackingCarrier || !trackingNumber || sendingEmail === "shipped"}>
+              {sendingEmail === "shipped" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
+              Confirmer & Envoyer
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
