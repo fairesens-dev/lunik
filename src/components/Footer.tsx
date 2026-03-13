@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { useContent } from "@/contexts/ContentContext";
-import logoLunik from "@/assets/logo-lunik.png";
+import logoFullWhite from "@/assets/logo-lunik-full-white.png";
 
 const Footer = () => {
   const { content } = useContent();
