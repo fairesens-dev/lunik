@@ -214,6 +214,10 @@ const TabHomepage = () => {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Texte CTA bouton 1" value={form.heroCTA1} onChange={(v) => set("heroCTA1", v)} />
           </div>
+          <div className="grid grid-cols-2 gap-4">
+            <ImagePicker label="Image poster (fond vidéo)" value={form.heroPosterImage} onChange={(v) => set("heroPosterImage", v)} helper="Affichée avant le chargement de la vidéo" />
+            <Field label="URL vidéo de fond" value={form.heroVideoUrl} onChange={(v) => set("heroVideoUrl", v)} helper="Chemin vers la vidéo MP4" />
+          </div>
         </CardContent>
       </Card>
 
