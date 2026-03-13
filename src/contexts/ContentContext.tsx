@@ -213,6 +213,9 @@ const defaultContent: SiteContent = {
     contactCTATitle: "Une question avant de configurer ?",
     contactCTASubtitle: "Notre équipe est disponible du lundi au vendredi, de 9h à 18h.",
     contactCTAImage: "/images/real-sunset-terrasse.webp",
+    heroPosterImage: "/images/store-vue-ensemble.webp",
+    heroVideoUrl: "/videos/hero-store.mp4",
+    fabricSectionImage: "/images/store-toile-detail.webp",
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
