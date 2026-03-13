@@ -48,6 +48,7 @@ const ConfigurateurPage = () => {
 
   // Step navigation (not accordion — all config preserved)
   const [activeStep, setActiveStep] = useState<"01" | "02" | "03">("01");
+  const [visualizeOpen, setVisualizeOpen] = useState(false);
 
   const goNext = () => {
     if (activeStep === "01") setActiveStep("02");
