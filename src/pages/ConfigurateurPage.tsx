@@ -171,21 +171,21 @@ const ConfigurateurPage = () => {
             />
           </div>
 
-          {/* 2 miniatures en bas à gauche */}
-          <div className="absolute bottom-[100px] left-4 flex gap-2 z-20">
+          {/* 2 boutons en ligne — au-dessus de la fiche technique */}
+          <div className="absolute bottom-[108px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
-              className="w-[140px] h-[72px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex flex-col items-center justify-center gap-1.5 shadow-md hover:bg-background hover:shadow-lg transition-all group"
+              className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
             >
               <Camera className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium text-foreground leading-tight text-center">Projeter sur<br />ma terrasse</span>
+              <span className="text-[11px] font-medium text-foreground">Projeter sur ma terrasse</span>
             </button>
             <button
               onClick={() => setCloseUpOpen(true)}
-              className="w-[140px] h-[72px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex flex-col items-center justify-center gap-1.5 shadow-md hover:bg-background hover:shadow-lg transition-all group"
+              className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
             >
               <ZoomIn className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium text-foreground leading-tight text-center">Voir la toile<br />de près</span>
+              <span className="text-[11px] font-medium text-foreground">Voir la toile de près</span>
             </button>
           </div>
 
