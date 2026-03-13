@@ -41,7 +41,7 @@ const TEMPLATES: Record<string, { label: string; html: string }> = {
   promo: {
     label: "Promo",
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#f8f8f8;padding:0;">
-  <div style="background:#4A5E3A;color:white;padding:30px;text-align:center;">
+  <div style="background:#7B8E7B;color:white;padding:30px;text-align:center;">
     <h1 style="margin:0;">🎉 Offre Spéciale</h1>
   </div>
   <div style="padding:30px;">
