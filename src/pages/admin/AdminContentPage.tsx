@@ -370,6 +370,52 @@ const TabHomepage = () => {
           <Textarea value={form.orderConfirmationMessage} onChange={(e) => set("orderConfirmationMessage", e.target.value)} rows={3} />
         </CardContent>
       </Card>
+
+      {/* Fabric section image */}
+      <Card>
+        <CardHeader><CardTitle>Section Toile Dickson</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <ImagePicker label="Image de la toile" value={form.fabricSectionImage} onChange={(v) => set("fabricSectionImage", v)} helper="Image affichée à gauche dans la section Toile Dickson" />
+        </CardContent>
+      </Card>
+
+      {/* Product page visuals */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Page produit — Visuels</CardTitle>
+          <CardDescription>Image hero et galerie de la page produit</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <ImagePicker label="Image hero produit" value={form.productHeroImage} onChange={(v) => set("productHeroImage", v)} helper="Grande image à droite sur la page produit" />
+
+          <div className="space-y-3 mt-4">
+            <Label className="text-sm font-medium">Galerie produit</Label>
+            {form.productGalleryItems.map((g: ProductGalleryItem) => (
+              <div key={g.id} className="flex items-start gap-3 border rounded-lg p-3 bg-muted/30">
+                <div className="flex-1 space-y-2">
+                  <ImagePicker value={g.src} onChange={(url) => updateProductGalleryItem(g.id, { src: url })} />
+                  <Input placeholder="Texte alt SEO" value={g.alt} onChange={(e) => updateProductGalleryItem(g.id, { alt: e.target.value })} className="h-8 text-sm" />
+                  <Select value={g.height} onValueChange={(v) => updateProductGalleryItem(g.id, { height: v })}>
+                    <SelectTrigger className="w-32 h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="h-64">Petit</SelectItem>
+                      <SelectItem value="h-72">Moyen</SelectItem>
+                      <SelectItem value="h-80">Grand</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <button onClick={() => removeProductGalleryItem(g.id)} className="text-muted-foreground hover:text-destructive mt-1">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addProductGalleryItem}>
+              <Plus className="w-3 h-3 mr-1" /> Ajouter une image
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Button onClick={save}>Sauvegarder</Button>
     </div>
   );
