@@ -1,5 +1,6 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { X, ZoomIn } from "lucide-react";
+import { useState } from "react";
 
 interface ToileCloseUpDialogProps {
   open: boolean;
@@ -10,17 +11,22 @@ interface ToileCloseUpDialogProps {
 }
 
 const ToileCloseUpDialog = ({ open, onOpenChange, toileLabel, photoUrl, hex }: ToileCloseUpDialogProps) => {
+  const [imgError, setImgError] = useState(false);
+
+  const showImage = photoUrl && !imgError;
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl p-0 overflow-hidden rounded-2xl">
         <DialogTitle className="sr-only">Toile {toileLabel} — Gros plan</DialogTitle>
 
         <div className="relative">
-          {photoUrl ? (
+          {showImage ? (
             <img
               src={photoUrl}
               alt={`Toile ${toileLabel} — vue rapprochée`}
-              className="w-full h-auto max-h-[80vh] object-contain"
+              className="w-full h-auto max-h-[80vh] object-contain bg-secondary"
+              onError={() => setImgError(true)}
             />
           ) : (
             <div

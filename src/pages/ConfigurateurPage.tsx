@@ -24,26 +24,39 @@ const STEP_TESTIMONIALS = {
     trust: "Fabrication française sur-mesure · Garantie 5 ans structure",
     quote: "« Le store est arrivé exactement aux dimensions, au millimètre. Impressionnant. »",
     author: "Laurent, Aix-en-Provence",
+    stars: 5,
   },
   "02": {
     trust: "Toile Dickson garantie 10 ans · Résistance UV maximale",
     quote: "« Après 3 étés, la toile n'a pas bougé d'un ton. Qualité Dickson irréprochable. »",
     author: "Isabelle, Montpellier",
+    stars: 5,
   },
   "03": {
     trust: "Installation professionnelle · SAV réactif sous 48h",
     quote: "« Le capteur vent m'a sauvé le store pendant un orage, je recommande vivement. »",
     author: "Jean-Pierre, Toulouse",
+    stars: 5,
   },
 } as const;
 
 const StepReassurance = ({ step }: { step: "01" | "02" | "03" }) => {
   const data = STEP_TESTIMONIALS[step];
   return (
-    <div className="border-l-2 border-primary pl-4 py-2 mt-6">
-      <p className="text-[11px] text-muted-foreground font-medium tracking-wide">{data.trust}</p>
-      <p className="text-[11px] text-foreground/70 italic mt-1.5">{data.quote}</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">— {data.author}</p>
+    <div className="bg-secondary/50 rounded-xl p-5 mt-8">
+      <div className="flex items-center gap-1 mb-2">
+        {Array.from({ length: data.stars }).map((_, i) => (
+          <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
+        ))}
+      </div>
+      <p className="text-sm text-foreground italic leading-relaxed">{data.quote}</p>
+      <p className="text-xs text-muted-foreground mt-2 font-medium">— {data.author}</p>
+      <div className="border-t border-border/50 mt-3 pt-3">
+        <p className="text-[11px] text-muted-foreground tracking-wide flex items-center gap-1.5">
+          <Shield className="w-3 h-3 text-primary" />
+          {data.trust}
+        </p>
+      </div>
     </div>
   );
 };
@@ -158,21 +171,21 @@ const ConfigurateurPage = () => {
             />
           </div>
 
-          {/* 2 miniatures en bas à gauche */}
-          <div className="absolute bottom-[100px] left-4 flex gap-2 z-20">
+          {/* 2 boutons en ligne — au-dessus de la fiche technique */}
+          <div className="absolute bottom-[108px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
-              className="w-[140px] h-[72px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex flex-col items-center justify-center gap-1.5 shadow-md hover:bg-background hover:shadow-lg transition-all group"
+              className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
             >
               <Camera className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium text-foreground leading-tight text-center">Projeter sur<br />ma terrasse</span>
+              <span className="text-[11px] font-medium text-foreground">Projeter sur ma terrasse</span>
             </button>
             <button
               onClick={() => setCloseUpOpen(true)}
-              className="w-[140px] h-[72px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex flex-col items-center justify-center gap-1.5 shadow-md hover:bg-background hover:shadow-lg transition-all group"
+              className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
             >
               <ZoomIn className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium text-foreground leading-tight text-center">Voir la toile<br />de près</span>
+              <span className="text-[11px] font-medium text-foreground">Voir la toile de près</span>
             </button>
           </div>
 
@@ -300,7 +313,7 @@ const ConfigurateurPage = () => {
 
                 <div className="pt-4">
                   <Button onClick={goNext} className="w-full rounded-full flex items-center justify-center gap-2">
-                    Couleurs <ChevronRight className="w-4 h-4" />
+                    Choisir mes couleurs <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
@@ -321,22 +334,22 @@ const ConfigurateurPage = () => {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Armature</p>
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
-                  <div className="flex flex-wrap gap-4">
+                  <div className="flex flex-wrap gap-3">
                     {ARMATURE_COLORS.map((c) => (
                       <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
                         <div
-                          className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
+                          className={`w-11 h-4 rounded-lg border-2 relative transition-all ${
                             armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
                           }`}
                           style={{ backgroundColor: c.hex }}
                         >
                           {armatureColor === c.name && (
                             <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                              <Check className="w-3 h-3 text-primary-foreground drop-shadow" />
                             </div>
                           )}
                         </div>
-                        <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                        <span className="text-[9px] text-muted-foreground text-center leading-tight max-w-[44px]">{c.name}</span>
                       </button>
                     ))}
                   </div>
@@ -349,7 +362,7 @@ const ConfigurateurPage = () => {
                     Dimensions
                   </Button>
                   <Button onClick={goNext} className="flex-1 rounded-full flex items-center justify-center gap-2">
-                    Options <ChevronRight className="w-4 h-4" />
+                    Personnaliser les options <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
