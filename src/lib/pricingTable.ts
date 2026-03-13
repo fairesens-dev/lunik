@@ -26,7 +26,7 @@ export type Projection = (typeof PROJECTIONS)[number];
 
 // Grid: widthRangeIndex → projection → price TTC (€)
 // null = combination not available
-const PRICE_GRID: (number | null)[][] = [
+const DEFAULT_PRICE_GRID: (number | null)[][] = [
   /* 1900-2399 */ [2849, null, null, null, null],
   /* 2400-2899 */ [3159, 3239, null, null, null],
   /* 2900-3399 */ [3159, 3239, 3359, null, null],
@@ -36,6 +36,23 @@ const PRICE_GRID: (number | null)[][] = [
   /* 4400-4800 */ [3569, 3669, 3809, 3969, 4089],
   /* 4801-5920 */ [3789, 3919, 4079, 4269, null],
 ];
+
+let PRICE_GRID: (number | null)[][] = DEFAULT_PRICE_GRID.map(r => [...r]);
+
+/** Override the price grid at runtime (called from ConfiguratorSettingsContext). */
+export function setPriceGrid(grid: (number | null)[][]) {
+  PRICE_GRID = grid;
+}
+
+/** Get the current price grid (for admin display). */
+export function getPriceGrid(): (number | null)[][] {
+  return PRICE_GRID;
+}
+
+/** Get the default (hardcoded) price grid. */
+export function getDefaultPriceGrid(): (number | null)[][] {
+  return DEFAULT_PRICE_GRID.map(r => [...r]);
+}
 
 /** Options disponibles (prix TTC) */
 export interface PricingOption {

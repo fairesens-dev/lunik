@@ -66,6 +66,7 @@ export const DEFAULT_SETTINGS: ConfiguratorSettings = {
   toileColors: [], // Loaded dynamically from the toile-colors bucket
   armatureColors: [],
   options: [],
+  priceGrid: getDefaultPriceGrid(),
 };
 
 /* ─── Supabase helpers ───────────────────────────────── */
