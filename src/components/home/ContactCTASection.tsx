@@ -6,7 +6,7 @@ const ContactCTASection = () => (
   <section className="py-20 lg:py-28 bg-primary text-primary-foreground">
     <div className="max-w-3xl mx-auto px-6 text-center">
       <AnimatedSection>
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+        <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
           Une question avant de configurer ?
         </h2>
         <p className="text-primary-foreground/50 text-lg mb-12">

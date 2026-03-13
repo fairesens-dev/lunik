@@ -19,7 +19,7 @@ const HeroSection = () => {
 
         {/* Giant headline */}
         <AnimatedSection delay={0.1}>
-          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl xl:text-[7rem] font-bold leading-[0.95] tracking-tight mb-10 text-foreground max-w-5xl">
+          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold leading-[0.95] tracking-tight mb-10 text-foreground max-w-5xl">
             {homepage.heroTitle.split("\n").map((line, i, arr) => (
               <span key={i}>
                 {i > 0 && <br />}

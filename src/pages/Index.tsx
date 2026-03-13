@@ -51,7 +51,7 @@ const Index = () => {
       <MarqueeSection />
       <ProductHighlightSection />
       <ProductFeaturesSection />
-      <ValuesSection />
+      
       <ConfiguratorCTASection />
       <GallerySection />
       <TestimonialsSection />

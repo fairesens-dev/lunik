@@ -39,7 +39,7 @@ const ProductFeaturesSection = () => {
     <section id="features" className="py-20 lg:py-28 bg-foreground text-background">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-16">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-16">
             Conçu pour durer.<br />
             <span className="text-accent-light">Pensé pour vous.</span>
           </h2>
@@ -59,7 +59,7 @@ const ProductFeaturesSection = () => {
                 <div className="flex items-start gap-4">
                   <span className="text-xs font-mono text-accent-light mt-1">{tab.num}.</span>
                   <div>
-                    <h3 className="font-display text-xl font-bold mb-1">{tab.label}</h3>
+                    <h3 className="font-display text-lg font-semibold mb-1">{tab.label}</h3>
                     {i === active && (
                       <div className="animate-fade-in">
                         <p className="text-background/60 text-sm leading-relaxed mb-4">{tab.body}</p>

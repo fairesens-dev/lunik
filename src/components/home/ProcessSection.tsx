@@ -12,8 +12,8 @@ const ProcessSection = () => (
   <section className="py-20 lg:py-28">
     <div className="max-w-[900px] mx-auto px-6">
       <AnimatedSection>
-        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center mb-20">
-          De votre canapé<br />à votre terrasse
+        <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-center mb-20">
+          Comment ça marche ?
         </h2>
       </AnimatedSection>
 
@@ -29,7 +29,7 @@ const ProcessSection = () => (
                   {i + 1}
                 </div>
                 <div className="pt-1">
-                  <h3 className="font-display text-xl font-bold mb-1">{step.title}</h3>
+                  <h3 className="font-display text-lg font-semibold mb-1">{step.title}</h3>
                   <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
                 </div>
               </div>

@@ -17,7 +17,6 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          let start = 0;
           const duration = 2000;
           const startTime = performance.now();
           const animate = (now: number) => {
@@ -38,7 +37,7 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
 
   return (
     <div ref={ref} className="text-center">
-      <p className="font-display text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight text-foreground">
+      <p className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground">
         {decimals > 0 ? count.toFixed(decimals) : Math.floor(count).toLocaleString("fr-FR")}
         {suffix}
       </p>
@@ -76,7 +75,7 @@ const ConfiguratorCTASection = () => (
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium">
               Configurateur en ligne
             </p>
-            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-[1.05]">
+            <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight leading-[1.1]">
               Votre store en<br />
               <span className="text-accent-light">quelques clics</span>
             </h2>
