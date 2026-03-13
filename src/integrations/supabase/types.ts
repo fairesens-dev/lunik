@@ -320,6 +320,7 @@ export type Database = {
           company: string | null
           created_at: string
           email: string
+          estimated_revenue: number | null
           first_name: string
           id: string
           job_title: string | null
@@ -328,6 +329,7 @@ export type Database = {
           lead_score: number
           lifecycle_stage: string | null
           phone: string | null
+          pipeline_stage: string
           source: Database["public"]["Enums"]["contact_source"]
           status: Database["public"]["Enums"]["contact_status"]
           updated_at: string
@@ -337,6 +339,7 @@ export type Database = {
           company?: string | null
           created_at?: string
           email: string
+          estimated_revenue?: number | null
           first_name?: string
           id?: string
           job_title?: string | null
@@ -345,6 +348,7 @@ export type Database = {
           lead_score?: number
           lifecycle_stage?: string | null
           phone?: string | null
+          pipeline_stage?: string
           source?: Database["public"]["Enums"]["contact_source"]
           status?: Database["public"]["Enums"]["contact_status"]
           updated_at?: string
@@ -354,6 +358,7 @@ export type Database = {
           company?: string | null
           created_at?: string
           email?: string
+          estimated_revenue?: number | null
           first_name?: string
           id?: string
           job_title?: string | null
@@ -362,6 +367,7 @@ export type Database = {
           lead_score?: number
           lifecycle_stage?: string | null
           phone?: string | null
+          pipeline_stage?: string
           source?: Database["public"]["Enums"]["contact_source"]
           status?: Database["public"]["Enums"]["contact_status"]
           updated_at?: string
@@ -770,6 +776,33 @@ export type Database = {
           valid_from?: string
           valid_until?: string
           value?: number
+        }
+        Relationships: []
+      }
+      scoring_rules: {
+        Row: {
+          action: string
+          active: boolean
+          condition: string | null
+          created_at: string
+          id: string
+          points: number
+        }
+        Insert: {
+          action: string
+          active?: boolean
+          condition?: string | null
+          created_at?: string
+          id?: string
+          points?: number
+        }
+        Update: {
+          action?: string
+          active?: boolean
+          condition?: string | null
+          created_at?: string
+          id?: string
+          points?: number
         }
         Relationships: []
       }

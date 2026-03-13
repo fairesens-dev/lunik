@@ -40,6 +40,7 @@ import AdminCampaignBuilderPage from "./pages/admin/AdminCampaignBuilderPage";
 import AdminCampaignReportPage from "./pages/admin/AdminCampaignReportPage";
 import AdminModalsPage from "./pages/admin/AdminModalsPage";
 import AdminModalBuilderPage from "./pages/admin/AdminModalBuilderPage";
+import AdminScoringPage from "./pages/admin/AdminScoringPage";
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,7 @@ const App = () => (
                 <Route path="/admin/modals" element={<AdminModalsPage />} />
                 <Route path="/admin/modals/new" element={<AdminModalBuilderPage />} />
                 <Route path="/admin/modals/:id/edit" element={<AdminModalBuilderPage />} />
+                <Route path="/admin/scoring" element={<AdminScoringPage />} />
                 <Route path="/admin/parametres" element={<AdminSettingsPage />} />
               </Route>
             </Route>
