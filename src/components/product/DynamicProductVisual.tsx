@@ -115,8 +115,8 @@ const DynamicProductVisual = ({
   return (
     <div
       className={cn(
-        "relative w-full overflow-hidden rounded-sm transition-all duration-300",
-        fillContainer ? "h-full" : "",
+        "relative w-full overflow-hidden transition-all duration-300",
+        fillContainer ? "h-full" : "rounded-sm",
         className
       )}
       style={fillContainer ? undefined : { aspectRatio: "1.5/2" }}

@@ -1,5 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
-import { Check, ArrowLeft, Lock, Truck, Shield } from "lucide-react";
+import { Check, ArrowLeft, Lock, Truck, Shield, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
@@ -15,6 +15,7 @@ import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.png";
 import { useEffect, useState } from "react";
 import SEOMeta from "@/components/SEOMeta";
+import VisualizeAtHomeDialog from "@/components/product/VisualizeAtHomeDialog";
 
 const ConfigurateurPage = () => {
   const configurator = useConfigurator();
@@ -47,6 +48,7 @@ const ConfigurateurPage = () => {
 
   // Step navigation (not accordion — all config preserved)
   const [activeStep, setActiveStep] = useState<"01" | "02" | "03">("01");
+  const [visualizeOpen, setVisualizeOpen] = useState(false);
 
   const goNext = () => {
     if (activeStep === "01") setActiveStep("02");
@@ -121,8 +123,8 @@ const ConfigurateurPage = () => {
 
         {/* LEFT — Visual panel (no scroll) */}
         <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
-          {/* Visual fills all available space */}
-          <div className="flex-1 flex items-center justify-center p-6 lg:p-10 pb-28">
+          {/* Visual fills all available space — no padding */}
+          <div className="absolute inset-0 bottom-[88px]">
             <DynamicProductVisual
               toileColor={currentToile}
               armatureColor={currentArmature}
@@ -130,9 +132,25 @@ const ConfigurateurPage = () => {
               width={width * 10}
               projection={projection}
               fillContainer
-              className="rounded-lg"
             />
           </div>
+
+          {/* Bouton Visualiser chez moi */}
+          <button
+            onClick={() => setVisualizeOpen(true)}
+            className="absolute bottom-[100px] right-4 z-20 bg-background/90 backdrop-blur-sm border border-border rounded-full px-4 py-2 flex items-center gap-2 shadow-lg hover:bg-background transition-colors"
+          >
+            <Camera className="w-4 h-4 text-primary" />
+            <span className="text-xs font-medium text-foreground">Visualiser chez moi</span>
+          </button>
+
+          <VisualizeAtHomeDialog
+            open={visualizeOpen}
+            onOpenChange={setVisualizeOpen}
+            toileColor={currentToile}
+            armatureColor={currentArmature}
+            options={currentOptions}
+          />
 
           {/* Overlay badges */}
           <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
@@ -339,7 +357,9 @@ const ConfigurateurPage = () => {
               </div>
             )}
 
-            <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
+            <div className="mt-10">
+              <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
+            </div>
           </div>
 
           {/* Sticky price bar */}
