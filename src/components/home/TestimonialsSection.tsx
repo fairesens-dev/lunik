@@ -122,14 +122,14 @@ const TestimonialsSection = () => {
               <p className="text-muted-foreground line-clamp-5 flex-1 mt-3 leading-relaxed">
                 "{review.text}"
               </p>
-              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-primary-foreground/10">
-                <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center text-sm font-bold text-primary-foreground">
+              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-foreground">
                   {initials(review.consumer.displayName)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-primary-foreground truncate">{review.consumer.displayName}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{review.consumer.displayName}</p>
                   {review.createdAt && (
-                    <p className="text-xs text-primary-foreground/50">{timeAgo(review.createdAt)}</p>
+                    <p className="text-xs text-muted-foreground">{timeAgo(review.createdAt)}</p>
                   )}
                 </div>
                 <span className="inline-flex items-center gap-1 text-[11px] text-[#00b67a] font-medium whitespace-nowrap">
