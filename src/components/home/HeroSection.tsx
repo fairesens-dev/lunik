@@ -1,65 +1,188 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import AnimatedSection from "@/components/AnimatedSection";
 import { useContent } from "@/contexts/ContentContext";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+
+function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffix: string; decimals?: number }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const duration = 2000;
+          const startTime = performance.now();
+          const animate = (now: number) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(eased * value);
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [value]);
+
+  return (
+    <div ref={ref}>
+      <span className="font-display text-3xl md:text-4xl font-bold tracking-tight">
+        {decimals > 0 ? count.toFixed(decimals) : Math.floor(count).toLocaleString("fr-FR")}
+        {suffix}
+      </span>
+    </div>
+  );
+}
+
+const stats = [
+  { value: 5000, suffix: "+", label: "Stores installés", decimals: 0 },
+  { value: 4.9, suffix: "/5", label: "Trustpilot", decimals: 1 },
+  { value: 173, suffix: "", label: "Coloris Dickson", decimals: 0 },
+];
 
 const HeroSection = () => {
   const { content } = useContent();
   const { homepage } = content;
 
   return (
-    <section className="relative pt-32 pb-8 lg:pt-40 lg:pb-12 -mt-20">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24">
-        {/* Overline */}
-        <AnimatedSection>
-          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground mb-6 font-sans font-medium">
-            {homepage.heroOverline}
-          </p>
-        </AnimatedSection>
+    <section id="hero" className="relative min-h-screen flex items-center justify-center -mt-20 overflow-hidden">
+      {/* Video background */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        poster="/images/store-vue-ensemble.webp"
+        className="absolute inset-0 w-full h-full object-cover"
+      >
+        <source
+          src="https://videos.pexels.com/video-files/4063585/4063585-uhd_2560_1440_25fps.mp4"
+          type="video/mp4"
+        />
+      </video>
 
-        {/* Giant headline */}
-        <AnimatedSection delay={0.1}>
-          <h1 className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-semibold leading-[0.95] tracking-tight mb-10 text-foreground max-w-5xl">
+      {/* Overlay gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70" />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full pt-32 pb-20">
+        <div className="flex flex-col items-center text-center">
+          {/* Overline */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-xs uppercase tracking-[0.4em] text-white/60 mb-8 font-sans font-medium"
+          >
+            {homepage.heroOverline}
+          </motion.p>
+
+          {/* Giant headline */}
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1, delay: 0.4 }}
+            className="font-display text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold leading-[0.92] tracking-tight mb-8 text-white max-w-5xl"
+          >
             {homepage.heroTitle.split("\n").map((line, i, arr) => (
               <span key={i}>
                 {i > 0 && <br />}
-                {i === arr.length - 1 ? <span className="text-accent-light">{line}</span> : line}
+                {i === arr.length - 1 ? (
+                  <span className="text-accent-light">{line}</span>
+                ) : (
+                  line
+                )}
               </span>
             ))}
-          </h1>
-        </AnimatedSection>
+          </motion.h1>
 
-        {/* Subtitle + CTA row */}
-        <AnimatedSection delay={0.2}>
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8 mb-12">
-            <div className="max-w-md">
-              <p className="text-muted-foreground text-lg leading-relaxed mb-6">{homepage.heroSubtitle}</p>
-              <Link to="/configurateur">
-                <Button className="px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto">
-                  {homepage.heroCTA1}
-                </Button>
-              </Link>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <span className="border border-border px-4 py-2 rounded-full text-sm text-muted-foreground">⭐ 4.9/5 Trustpilot</span>
-              <span className="border border-border px-4 py-2 rounded-full text-sm text-muted-foreground">🇫🇷 Made in France</span>
-              <span className="border border-border px-4 py-2 rounded-full text-sm text-muted-foreground">🔧 Garantie 5 ans</span>
-            </div>
-          </div>
-        </AnimatedSection>
+          {/* Subtitle */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+            className="text-white/70 text-lg md:text-xl leading-relaxed mb-10 max-w-xl"
+          >
+            {homepage.heroSubtitle}
+          </motion.p>
 
-        {/* Panoramic image */}
-        <AnimatedSection delay={0.3}>
-          <div className="aspect-[21/9] overflow-hidden rounded-2xl">
-            <img
-              src="/images/store-vue-ensemble.webp"
-              alt="Store coffre sur-mesure déployé sur une terrasse"
-              className="w-full h-full object-cover"
-              loading="eager"
-            />
-          </div>
-        </AnimatedSection>
+          {/* CTAs */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
+            className="flex flex-col sm:flex-row gap-4 mb-16"
+          >
+            <Link to="/configurateur">
+              <Button className="px-10 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto">
+                {homepage.heroCTA1}
+              </Button>
+            </Link>
+            <a href="#gallery">
+              <Button
+                variant="outline"
+                className="border-white/30 text-white px-10 py-5 tracking-[0.15em] uppercase text-sm font-medium hover:bg-white/10 h-auto bg-transparent"
+              >
+                Voir nos réalisations
+              </Button>
+            </a>
+          </motion.div>
+
+          {/* Stats counters */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 1 }}
+            className="grid grid-cols-3 gap-8 md:gap-16"
+          >
+            {stats.map((stat) => (
+              <div key={stat.label} className="text-center text-white">
+                <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+                <p className="text-white/50 text-xs uppercase tracking-[0.15em] mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </motion.div>
+
+          {/* Glass trust badges */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.2 }}
+            className="flex flex-wrap justify-center gap-3 mt-12"
+          >
+            {["🇫🇷 Made in France", "🔧 Garantie 5 ans", "⚡ Motorisation Somfy"].map((badge) => (
+              <span
+                key={badge}
+                className="bg-white/10 backdrop-blur-sm border border-white/10 px-5 py-2.5 rounded-full text-xs text-white/80 font-medium"
+              >
+                {badge}
+              </span>
+            ))}
+          </motion.div>
+        </div>
       </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10"
+      >
+        <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center p-1.5">
+          <motion.div
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="w-1.5 h-1.5 bg-white/60 rounded-full"
+          />
+        </div>
+      </motion.div>
     </section>
   );
 };
