@@ -411,7 +411,7 @@ const ContactWidget = () => {
             )}
             {savData.problem_detail && (
               <div className="flex justify-end">
-                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                <div className="bg-primary text-primary-foreground px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
                   {savData.problem_detail}
                 </div>
               </div>
