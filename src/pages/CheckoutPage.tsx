@@ -69,7 +69,7 @@ const CheckoutPage = () => {
       </header>
 
       {/* Progress */}
-      <div className="max-w-[1100px] mx-auto px-6 py-6 flex-1">
+      <div className="max-w-[1100px] mx-auto px-6 py-6 flex-1 checkout-inputs">
         <div className="flex items-center justify-center gap-0 mb-10">
           {STEPS.map((label, i) => (
             <div key={label} className="flex items-center">
