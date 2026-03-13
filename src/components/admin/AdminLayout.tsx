@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Package, MessageSquare, Settings2,
   FileEdit, BarChart3, Wrench, LogOut, Bell, ExternalLink,
-  Menu, X, ChevronRight, ShoppingCart, Tag,
+  Menu, X, ChevronRight, ShoppingCart, Tag, Users,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ const navGroups = [
       { to: "/admin/commandes", icon: Package, label: "Commandes" },
       { to: "/admin/paniers-abandonnes", icon: ShoppingCart, label: "Paniers abandonnés" },
       { to: "/admin/leads", icon: MessageSquare, label: "Leads", badge: 3 },
+      { to: "/admin/contacts", icon: Users, label: "Contacts" },
     ],
   },
   {
@@ -51,6 +52,7 @@ const routeTitles: Record<string, string> = {
   "/admin/contenu": "Contenu",
   "/admin/marketing": "Marketing",
   "/admin/tracking": "Tracking",
+  "/admin/contacts": "Contacts",
   "/admin/parametres": "Paramètres",
 };
 
