@@ -91,7 +91,7 @@ const HeroSection = () => {
               <span key={i}>
                 {i > 0 && <br />}
                 {i === arr.length - 1 ? (
-                  <span className="text-accent-light">{line}</span>
+                  <span className="text-white/50">{line}</span>
                 ) : (
                   line
                 )}
