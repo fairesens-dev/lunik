@@ -111,28 +111,28 @@ const HeroSection = () => {
               </Button>
             </a>
           </motion.div>
+
+          {/* Stats - inline under buttons */}
+          {heroStats.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1 }}
+              className="flex items-center gap-6 mt-10"
+            >
+              {heroStats.map((stat, i) => (
+                <div key={stat.id} className="flex items-center gap-6">
+                  {i > 0 && <span className="w-px h-8 bg-white/20" />}
+                  <div className="text-center text-white">
+                    <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+                    <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mt-0.5">{stat.label}</p>
+                  </div>
+                </div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </div>
-
-      {/* Stats - absolute bottom right */}
-      {heroStats.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 1 }}
-          className="absolute bottom-8 right-8 lg:right-16 xl:right-24 z-10 hidden md:flex items-center gap-6"
-        >
-          {heroStats.map((stat, i) => (
-            <div key={stat.id} className="flex items-center gap-6">
-              {i > 0 && <span className="w-px h-8 bg-white/20" />}
-              <div className="text-center text-white">
-                <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
-                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mt-0.5">{stat.label}</p>
-              </div>
-            </div>
-          ))}
-        </motion.div>
-      )}
 
       {/* Scroll indicator */}
       <motion.div
