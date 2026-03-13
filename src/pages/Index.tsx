@@ -11,7 +11,6 @@ import ValuesSection from "@/components/home/ValuesSection";
 import GallerySection from "@/components/home/GallerySection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 
-import FAQSection from "@/components/home/FAQSection";
 import ContactCTASection from "@/components/home/ContactCTASection";
 import StickyCTABar from "@/components/home/StickyCTABar";
 import SocialProofToast from "@/components/SocialProofToast";
@@ -54,8 +53,6 @@ const Index = () => {
       <ValuesSection />
       <GallerySection />
       <TestimonialsSection />
-      
-      <FAQSection />
       <ContactCTASection />
       <StickyCTABar />
       <SocialProofToast />

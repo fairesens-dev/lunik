@@ -51,7 +51,7 @@ const HeroSection = () => {
   const { homepage } = content;
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center -mt-20 overflow-hidden">
+    <section id="hero" className="relative min-h-[50vh] flex items-center justify-center -mt-20 overflow-hidden">
       {/* Video background */}
       <video
         autoPlay
@@ -91,7 +91,7 @@ const HeroSection = () => {
               <span key={i}>
                 {i > 0 && <br />}
                 {i === arr.length - 1 ? (
-                  <span className="text-accent-light">{line}</span>
+                  <span className="text-white/50">{line}</span>
                 ) : (
                   line
                 )}
@@ -146,22 +146,6 @@ const HeroSection = () => {
             ))}
           </motion.div>
 
-          {/* Glass trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.2 }}
-            className="flex flex-wrap justify-center gap-3 mt-12"
-          >
-            {["🇫🇷 Made in France", "🔧 Garantie 5 ans", "⚡ Motorisation Somfy"].map((badge) => (
-              <span
-                key={badge}
-                className="bg-white/10 backdrop-blur-sm border border-white/10 px-5 py-2.5 rounded-full text-xs text-white/80 font-medium"
-              >
-                {badge}
-              </span>
-            ))}
-          </motion.div>
         </div>
       </div>
 
