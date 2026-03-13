@@ -112,12 +112,8 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
         {/* Payment method selector */}
         <div className="space-y-4">
           {/* CB comptant */}
-          <button
-            type="button"
-            onClick={() => setPaymentMethod("card")}
-            className={`w-full text-left border p-5 transition-colors ${
-              paymentMethod === "card" ? "border-primary bg-primary/5" : "border-border"
-            }`}
+          <div
+            className="w-full text-left border p-5 transition-colors border-primary bg-primary/5"
           >
             <div className="flex items-start gap-4">
               <div className="flex-1">
