@@ -8,10 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useContent, type Testimonial, type FAQItem, type GalleryItem, type HighlightFeature, type ValueCard, type StatItem } from "@/contexts/ContentContext";
+import { useContent, type Testimonial, type FAQItem, type GalleryItem, type HighlightFeature, type ValueCard, type StatItem, type ProductGalleryItem } from "@/contexts/ContentContext";
 import { ExternalLink, Trash2, ArrowUp, ArrowDown, Plus, Upload, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import ImagePicker from "@/components/admin/ImagePicker";
 
 const genId = () => Math.random().toString(36).slice(2, 10);
 
