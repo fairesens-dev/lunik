@@ -67,7 +67,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
               </span>
             </AccordionTrigger>
             <AccordionContent>
-              <div className="flex flex-wrap gap-3 pt-1 pb-2">
+              <div className="grid grid-cols-4 gap-3 pt-1 pb-2">
                 {group.colors.map((c) => (
                   <button
                     key={c.name}
@@ -76,7 +76,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                     title={c.name}
                   >
                     <div
-                      className={`w-16 h-16 border-2 relative transition-all rounded-sm ${
+                      className={`w-full aspect-[11/4] border-2 relative transition-all rounded-sm ${
                         selected === c.name
                           ? "border-primary shadow-md ring-2 ring-primary/30"
                           : "border-border group-hover:border-primary/50"
@@ -100,7 +100,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                         </div>
                       )}
                     </div>
-                    <span className="text-[9px] text-muted-foreground text-center leading-tight max-w-[64px] truncate">
+                    <span className="text-[9px] text-muted-foreground text-center leading-tight w-full truncate">
                       {c.name}
                     </span>
                   </button>
