@@ -69,7 +69,7 @@ const TestimonialsSection = () => {
   if (loading && items.length === 0) return null;
 
   return (
-    <section className="py-20 lg:py-28 bg-primary text-primary-foreground">
+    <section className="py-20 lg:py-28 bg-background text-foreground">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="flex items-end justify-between mb-12">
