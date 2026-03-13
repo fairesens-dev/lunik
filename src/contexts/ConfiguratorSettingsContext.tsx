@@ -52,6 +52,7 @@ export interface ConfiguratorSettings {
   toileColors: ColorEntry[];
   armatureColors: ColorEntry[];
   options: OptionEntry[];
+  priceGrid: (number | null)[][];
 }
 
 /* ─── Defaults ───────────────────────────────────────── */
