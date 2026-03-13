@@ -170,12 +170,16 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
         }
       }
 
+      const loadedGrid = map.priceGrid ?? DEFAULT_SETTINGS.priceGrid;
+      setPriceGrid(loadedGrid);
+
       setSettings({
         pricing: map.pricing ?? DEFAULT_SETTINGS.pricing,
         dimensions: map.dimensions ?? DEFAULT_SETTINGS.dimensions,
         toileColors,
         armatureColors: map.armatureColors ?? DEFAULT_SETTINGS.armatureColors,
         options: map.options ?? DEFAULT_SETTINGS.options,
+        priceGrid: loadedGrid,
       });
     })();
   }, []);
