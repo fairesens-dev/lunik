@@ -5,7 +5,8 @@
 export type ToileCategory = "unis" | "rayes" | "motifs";
 
 const RAYES_KEYWORDS = [
-  "bs ", "bs_", "bloc", "rayé", "rayure", "stripe", "striped",
+  "bs ", "bs_", "bs-", "bloc", "rayé", "rayure", "stripe", "striped",
+  "ray ", "ray-", "bayadère", "bayadere", "regatta", "multi ",
 ];
 
 const MOTIFS_KEYWORDS = [
@@ -13,6 +14,9 @@ const MOTIFS_KEYWORDS = [
   "jacquard", "manosque", "littoral", "fleur", "flower",
   "damier", "losange", "vichy", "tartan", "provenc",
   "arabesque", "baroque", "botanic", "tropical",
+  "marl", "mélange", "melange", "grain", "natté", "natte",
+  "canvas", "dickson woven", "herringbone", "chevron",
+  "géométrique", "geometrique", "ethnic", "ethnique",
 ];
 
 /**
