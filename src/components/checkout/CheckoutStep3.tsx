@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import OrderSummary from "./OrderSummary";
@@ -7,6 +7,30 @@ import type { Step1Data } from "./CheckoutStep1";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+
+interface PaymentMethodsSettings {
+  card: { enabled: boolean };
+  transfer: {
+    enabled: boolean;
+    iban: string;
+    bic: string;
+    accountHolder: string;
+    bank: string;
+    instructions: string;
+  };
+  check: {
+    enabled: boolean;
+    orderTo: string;
+    sendAddress: string;
+    instructions: string;
+  };
+}
+
+const defaultPaymentSettings: PaymentMethodsSettings = {
+  card: { enabled: true },
+  transfer: { enabled: false, iban: "", bic: "", accountHolder: "", bank: "", instructions: "" },
+  check: { enabled: false, orderTo: "", sendAddress: "", instructions: "" },
+};
 
 interface Props {
   contactData: Step1Data;
@@ -20,14 +44,31 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
   const { item, clearCart } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [paymentMethod] = useState<"card">("card");
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "transfer" | "check">("card");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [settings, setSettings] = useState<PaymentMethodsSettings>(defaultPaymentSettings);
+  const [settingsLoaded, setSettingsLoaded] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase.from("admin_settings").select("data").eq("id", "payment_methods").single();
+      if (data?.data) setSettings({ ...defaultPaymentSettings, ...(data.data as any) });
+      setSettingsLoaded(true);
+    })();
+  }, []);
+
+  // Auto-select first enabled method
+  useEffect(() => {
+    if (!settingsLoaded) return;
+    if (settings.card.enabled) setPaymentMethod("card");
+    else if (settings.transfer.enabled) setPaymentMethod("transfer");
+    else if (settings.check.enabled) setPaymentMethod("check");
+  }, [settingsLoaded, settings]);
 
   if (!item) return null;
 
   const total = item.pricing.total - promoDiscount;
-  const installment = Math.round(total / 3);
 
   const generateRef = () => "SC-" + Date.now().toString(36).toUpperCase();
 
@@ -36,7 +77,6 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     setError("");
 
     try {
-      // Build options array
       const options: string[] = [];
       if (item.configuration.options.packConnect) options.push("Pack Connect");
       else {
@@ -46,7 +86,6 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
 
       const ref = generateRef();
 
-      // Call edge function to create Stripe checkout session
       const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
         body: {
           amount: total,
@@ -86,8 +125,10 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
       if (fnError) throw new Error(fnError.message);
 
       if (data?.url) {
-        // Redirect to Stripe Checkout
         window.location.href = data.url;
+      } else if (data?.redirect) {
+        clearCart();
+        navigate(`${data.redirect}`);
       } else {
         throw new Error("Aucune URL de paiement retournée");
       }
@@ -104,36 +145,140 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     }
   };
 
+  const enabledMethods = [
+    settings.card.enabled && "card",
+    settings.transfer.enabled && "transfer",
+    settings.check.enabled && "check",
+  ].filter(Boolean) as string[];
+
+  const buttonLabel = paymentMethod === "card"
+    ? `Payer ${total.toLocaleString("fr-FR")} € maintenant`
+    : paymentMethod === "transfer"
+    ? `Confirmer — Paiement par virement (${total.toLocaleString("fr-FR")} €)`
+    : `Confirmer — Paiement par chèque (${total.toLocaleString("fr-FR")} €)`;
+
+  const buttonLabelMobile = paymentMethod === "card"
+    ? `Payer ${total.toLocaleString("fr-FR")} €`
+    : `Confirmer ${total.toLocaleString("fr-FR")} €`;
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
       <div className="space-y-8">
         <h3 className="font-serif text-xl">Paiement</h3>
 
-        {/* Payment method selector */}
         <div className="space-y-4">
-          {/* CB comptant */}
-          <div
-            className="w-full text-left border p-5 transition-colors border-primary bg-primary/5"
-          >
-            <div className="flex items-start gap-4">
-              <div className="flex-1">
-                <p className="text-sm font-medium">💳 Paiement comptant par CB</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Paiement sécurisé via Stripe. Vos données ne sont jamais stockées sur nos serveurs.
-                </p>
-                <div className="flex gap-2 mt-2">
-                  <span className="text-xs bg-secondary px-2 py-0.5">Visa</span>
-                  <span className="text-xs bg-secondary px-2 py-0.5">Mastercard</span>
-                  <span className="text-xs bg-secondary px-2 py-0.5">Amex</span>
+          {/* CB */}
+          {settings.card.enabled && (
+            <button
+              type="button"
+              onClick={() => setPaymentMethod("card")}
+              className={`w-full text-left border p-5 transition-colors ${paymentMethod === "card" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${paymentMethod === 'card' ? 'border-primary' : 'border-muted-foreground/40'}">
+                  {paymentMethod === "card" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">💳 Paiement comptant par CB</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Paiement sécurisé via Stripe. Vos données ne sont jamais stockées sur nos serveurs.
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <span className="text-xs bg-secondary px-2 py-0.5">Visa</span>
+                    <span className="text-xs bg-secondary px-2 py-0.5">Mastercard</span>
+                    <span className="text-xs bg-secondary px-2 py-0.5">Amex</span>
+                  </div>
                 </div>
               </div>
+            </button>
+          )}
+
+          {/* Virement */}
+          {settings.transfer.enabled && (
+            <button
+              type="button"
+              onClick={() => setPaymentMethod("transfer")}
+              className={`w-full text-left border p-5 transition-colors ${paymentMethod === "transfer" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0">
+                  {paymentMethod === "transfer" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">🏦 Virement bancaire</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Effectuez un virement depuis votre banque. Les coordonnées bancaires vous seront communiquées après confirmation.
+                  </p>
+                </div>
+              </div>
+            </button>
+          )}
+
+          {/* Virement details */}
+          {paymentMethod === "transfer" && settings.transfer.enabled && (
+            <div className="border border-primary/20 bg-primary/5 p-5 space-y-3">
+              <p className="text-sm font-medium">Coordonnées bancaires :</p>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {settings.transfer.accountHolder && (
+                  <div><span className="text-muted-foreground">Titulaire :</span> <span className="font-medium">{settings.transfer.accountHolder}</span></div>
+                )}
+                {settings.transfer.bank && (
+                  <div><span className="text-muted-foreground">Banque :</span> <span className="font-medium">{settings.transfer.bank}</span></div>
+                )}
+                {settings.transfer.iban && (
+                  <div className="col-span-2"><span className="text-muted-foreground">IBAN :</span> <span className="font-mono font-medium">{settings.transfer.iban}</span></div>
+                )}
+                {settings.transfer.bic && (
+                  <div><span className="text-muted-foreground">BIC :</span> <span className="font-mono font-medium">{settings.transfer.bic}</span></div>
+                )}
+              </div>
+              {settings.transfer.instructions && (
+                <p className="text-xs text-muted-foreground mt-2">{settings.transfer.instructions}</p>
+              )}
             </div>
-          </div>
+          )}
+
+          {/* Chèque */}
+          {settings.check.enabled && (
+            <button
+              type="button"
+              onClick={() => setPaymentMethod("check")}
+              className={`w-full text-left border p-5 transition-colors ${paymentMethod === "check" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="mt-0.5 w-4 h-4 rounded-full border-2 flex items-center justify-center flex-shrink-0">
+                  {paymentMethod === "check" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">📝 Paiement par chèque</p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Envoyez un chèque par courrier. Les instructions vous seront communiquées après confirmation.
+                  </p>
+                </div>
+              </div>
+            </button>
+          )}
+
+          {/* Chèque details */}
+          {paymentMethod === "check" && settings.check.enabled && (
+            <div className="border border-primary/20 bg-primary/5 p-5 space-y-3">
+              <p className="text-sm font-medium">Instructions pour le chèque :</p>
+              <div className="text-sm space-y-1">
+                {settings.check.orderTo && (
+                  <p><span className="text-muted-foreground">À l'ordre de :</span> <span className="font-medium">{settings.check.orderTo}</span></p>
+                )}
+                {settings.check.sendAddress && (
+                  <p><span className="text-muted-foreground">Adresse d'envoi :</span> <span className="font-medium whitespace-pre-line">{settings.check.sendAddress}</span></p>
+                )}
+              </div>
+              {settings.check.instructions && (
+                <p className="text-xs text-muted-foreground mt-2">{settings.check.instructions}</p>
+              )}
+            </div>
+          )}
 
           {/* 3x sans frais — disabled */}
-          <div
-            className="w-full text-left border p-5 relative border-border opacity-60 cursor-not-allowed"
-          >
+          <div className="w-full text-left border p-5 relative border-border opacity-60 cursor-not-allowed">
             <span className="absolute -top-2.5 right-4 bg-muted text-muted-foreground text-[10px] px-2 py-0.5 uppercase tracking-wider font-medium">
               Bientôt
             </span>
@@ -156,7 +301,6 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
           <span>🇫🇷 Données hébergées en France</span>
         </div>
 
-        {/* Error */}
         {error && (
           <div className="bg-destructive/10 border border-destructive/20 p-4 text-sm text-destructive">
             ❌ {error}
@@ -179,12 +323,8 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
               </span>
             ) : (
               <>
-                <span className="hidden sm:inline">
-                  {`Payer ${total.toLocaleString("fr-FR")} € maintenant`}
-                </span>
-                <span className="sm:hidden">
-                  {`Payer ${total.toLocaleString("fr-FR")} €`}
-                </span>
+                <span className="hidden sm:inline">{buttonLabel}</span>
+                <span className="sm:hidden">{buttonLabelMobile}</span>
               </>
             )}
           </Button>

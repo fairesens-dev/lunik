@@ -732,24 +732,204 @@ function NotificationsTab() {
   );
 }
 
+// ── Tab 6: Paiement ────────────────────────────────────
+
+interface PaymentMethodsSettings {
+  card: { enabled: boolean };
+  transfer: {
+    enabled: boolean;
+    iban: string;
+    bic: string;
+    accountHolder: string;
+    bank: string;
+    instructions: string;
+  };
+  check: {
+    enabled: boolean;
+    orderTo: string;
+    sendAddress: string;
+    instructions: string;
+  };
+}
+
+const defaultPaymentSettings: PaymentMethodsSettings = {
+  card: { enabled: true },
+  transfer: {
+    enabled: false,
+    iban: "",
+    bic: "",
+    accountHolder: "",
+    bank: "",
+    instructions: "Effectuez votre virement en indiquant la référence de commande dans le libellé. La commande sera validée dès réception du paiement.",
+  },
+  check: {
+    enabled: false,
+    orderTo: "",
+    sendAddress: "",
+    instructions: "Envoyez votre chèque en indiquant la référence de commande au dos. La commande sera validée dès réception et encaissement.",
+  },
+};
+
+function PaymentTab() {
+  const { toast } = useToast();
+  const [settings, setSettings] = useState<PaymentMethodsSettings>(defaultPaymentSettings);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const d = await loadSetting("payment_methods");
+      if (d) setSettings({ ...defaultPaymentSettings, ...d } as any);
+      setLoading(false);
+    })();
+  }, []);
+
+  const save = async () => {
+    await saveSetting("payment_methods", settings as any);
+    toast({ title: "Paramètres de paiement enregistrés" });
+  };
+
+  const updateTransfer = (key: string, value: string | boolean) =>
+    setSettings(s => ({ ...s, transfer: { ...s.transfer, [key]: value } }));
+
+  const updateCheck = (key: string, value: string | boolean) =>
+    setSettings(s => ({ ...s, check: { ...s.check, [key]: value } }));
+
+  if (loading) return <p className="text-sm text-muted-foreground py-8 text-center">Chargement...</p>;
+
+  return (
+    <div className="space-y-6">
+      {/* CB */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">💳 Carte bancaire (Stripe)</CardTitle>
+              <CardDescription>Paiement comptant sécurisé par CB via Stripe</CardDescription>
+            </div>
+            <Switch
+              checked={settings.card.enabled}
+              onCheckedChange={v => setSettings(s => ({ ...s, card: { enabled: v } }))}
+            />
+          </div>
+        </CardHeader>
+      </Card>
+
+      {/* Virement */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">🏦 Virement bancaire</CardTitle>
+              <CardDescription>Le client effectue un virement manuel après commande</CardDescription>
+            </div>
+            <Switch
+              checked={settings.transfer.enabled}
+              onCheckedChange={v => updateTransfer("enabled", v)}
+            />
+          </div>
+        </CardHeader>
+        {settings.transfer.enabled && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>Titulaire du compte</Label>
+                <Input value={settings.transfer.accountHolder} onChange={e => updateTransfer("accountHolder", e.target.value)} placeholder="SAS LuniK" />
+              </div>
+              <div className="space-y-2">
+                <Label>Banque</Label>
+                <Input value={settings.transfer.bank} onChange={e => updateTransfer("bank", e.target.value)} placeholder="BNP Paribas" />
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>IBAN</Label>
+                <Input value={settings.transfer.iban} onChange={e => updateTransfer("iban", e.target.value)} placeholder="FR76 XXXX XXXX XXXX XXXX XXXX XXX" />
+              </div>
+              <div className="space-y-2">
+                <Label>BIC</Label>
+                <Input value={settings.transfer.bic} onChange={e => updateTransfer("bic", e.target.value)} placeholder="BNPAFRPP" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Instructions personnalisées</Label>
+              <Textarea
+                value={settings.transfer.instructions}
+                onChange={e => updateTransfer("instructions", e.target.value)}
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      {/* Chèque */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-lg">📝 Chèque</CardTitle>
+              <CardDescription>Le client envoie un chèque par courrier</CardDescription>
+            </div>
+            <Switch
+              checked={settings.check.enabled}
+              onCheckedChange={v => updateCheck("enabled", v)}
+            />
+          </div>
+        </CardHeader>
+        {settings.check.enabled && (
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label>À l'ordre de</Label>
+                <Input value={settings.check.orderTo} onChange={e => updateCheck("orderTo", e.target.value)} placeholder="SAS LuniK" />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label>Adresse d'envoi</Label>
+              <Textarea
+                value={settings.check.sendAddress}
+                onChange={e => updateCheck("sendAddress", e.target.value)}
+                placeholder="123 rue de Paris&#10;75001 Paris"
+                rows={2}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Instructions personnalisées</Label>
+              <Textarea
+                value={settings.check.instructions}
+                onChange={e => updateCheck("instructions", e.target.value)}
+                rows={3}
+              />
+            </div>
+          </CardContent>
+        )}
+      </Card>
+
+      <Button onClick={save} className="w-full">Sauvegarder les paramètres de paiement</Button>
+    </div>
+  );
+}
+
 // ── Main Page ──────────────────────────────────────────
 
 const AdminSettingsPage = () => (
   <div className="space-y-6 font-sans">
     <h1 className="text-2xl font-bold text-foreground">Paramètres</h1>
     <Tabs defaultValue="general" className="space-y-6">
-      <TabsList className="grid w-full grid-cols-5">
+      <TabsList className="grid w-full grid-cols-6">
         <TabsTrigger value="general" className="gap-1.5"><Settings className="h-4 w-4 hidden sm:block" /> Général</TabsTrigger>
         <TabsTrigger value="team" className="gap-1.5"><Users className="h-4 w-4 hidden sm:block" /> Équipe</TabsTrigger>
         <TabsTrigger value="integrations" className="gap-1.5"><Puzzle className="h-4 w-4 hidden sm:block" /> Intégrations</TabsTrigger>
         <TabsTrigger value="api" className="gap-1.5"><Code className="h-4 w-4 hidden sm:block" /> API & Tracking</TabsTrigger>
         <TabsTrigger value="notifications" className="gap-1.5"><Bell className="h-4 w-4 hidden sm:block" /> Notifications</TabsTrigger>
+        <TabsTrigger value="payment" className="gap-1.5"><Shield className="h-4 w-4 hidden sm:block" /> Paiement</TabsTrigger>
       </TabsList>
       <TabsContent value="general"><GeneralTab /></TabsContent>
       <TabsContent value="team"><TeamTab /></TabsContent>
       <TabsContent value="integrations"><IntegrationsTab /></TabsContent>
       <TabsContent value="api"><ApiTrackingTab /></TabsContent>
       <TabsContent value="notifications"><NotificationsTab /></TabsContent>
+      <TabsContent value="payment"><PaymentTab /></TabsContent>
     </Tabs>
   </div>
 );
