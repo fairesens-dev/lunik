@@ -281,7 +281,10 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
         </Button>
       </div>
 
-      {/* RIGHT – Summary */}
+      {/* RIGHT – Summary (mobile: after form, desktop: sticky sidebar) */}
+      <div className="lg:hidden">
+        <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+      </div>
       <div className="hidden lg:block">
         <div className="sticky top-8">
           <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />

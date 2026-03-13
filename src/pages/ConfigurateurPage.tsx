@@ -404,23 +404,23 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* Sticky price bar — contextual button */}
-          <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl p-4 lg:p-6">
+          <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl p-3 sm:p-4 lg:p-6">
             {basePrice === null ? (
               <p className="text-sm text-destructive text-center">Sélectionnez des dimensions valides pour voir le prix.</p>
             ) : (
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <p className="font-display text-2xl lg:text-3xl text-primary font-extrabold leading-none">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="font-display text-xl sm:text-2xl lg:text-3xl text-primary font-extrabold leading-none">
                     {price.toLocaleString("fr-FR")} €
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">
                     soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {settings.pricing.installmentDivisor}× sans frais
                   </p>
                 </div>
                 <Button
                   onClick={stickyButtonAction}
                   variant="gradient"
-                  className="px-8 py-4 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto shadow-lg hover:shadow-xl"
+                  className="px-4 sm:px-8 py-3 sm:py-4 rounded-full tracking-[0.1em] sm:tracking-[0.15em] uppercase text-xs sm:text-sm font-medium h-auto shadow-lg hover:shadow-xl shrink-0"
                 >
                   {stickyButtonLabel}
                 </Button>

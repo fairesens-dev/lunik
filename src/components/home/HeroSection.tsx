@@ -119,7 +119,7 @@ const HeroSection = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8, delay: 1 }}
-          className="absolute bottom-8 right-8 lg:right-16 xl:right-24 z-10 flex items-center gap-6"
+          className="absolute bottom-8 right-8 lg:right-16 xl:right-24 z-10 hidden md:flex items-center gap-6"
         >
           {heroStats.map((stat, i) => (
             <div key={stat.id} className="flex items-center gap-6">

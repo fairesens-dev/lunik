@@ -83,11 +83,11 @@ const CheckoutPage = () => {
                 >
                   {i + 1}
                 </div>
-                <span className={`text-sm ${i + 1 <= step ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                <span className={`text-sm hidden sm:inline ${i + 1 <= step ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                   {label}
                 </span>
               </div>
-              {i < STEPS.length - 1 && <div className="w-16 h-px bg-border mx-4" />}
+              {i < STEPS.length - 1 && <div className="w-8 sm:w-16 h-px bg-border mx-2 sm:mx-4" />}
             </div>
           ))}
         </div>
