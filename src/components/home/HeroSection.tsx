@@ -43,12 +43,13 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
 const HeroSection = () => {
   const { content } = useContent();
   const { homepage } = content;
+  const bannerActive = content.promoBanner.active;
 
   // Use first 2 stats for hero display
   const heroStats = (homepage.statsItems || []).slice(0, 2);
 
   return (
-    <section id="hero" className="relative min-h-[max(60vh,500px)] flex items-center justify-center -mt-20 overflow-hidden">
+    <section id="hero" className="relative min-h-[max(70vh,580px)] flex items-center justify-center -mt-20 overflow-hidden">
       {/* Video background */}
       <video
         autoPlay
@@ -65,13 +66,13 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full flex items-center justify-center min-h-[max(60vh,500px)] pt-32">
+      <div className={`relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full flex items-center justify-center min-h-[max(70vh,580px)] ${bannerActive ? "pt-[180px]" : "pt-[140px]"}`}>
         <div className="flex flex-col items-center text-center">
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, delay: 0.4 }}
-            className="font-display text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-[0.92] tracking-tight mb-8 text-white max-w-5xl"
+            className="font-display text-4xl md:text-5xl lg:text-[3.5rem] xl:text-7xl font-bold leading-[0.92] tracking-tight mb-8 text-white max-w-5xl"
           >
             {homepage.heroTitle.split("\n").map((line, i, arr) => (
               <span key={i}>
