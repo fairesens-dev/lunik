@@ -10,21 +10,21 @@ const GallerySection = () => {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-16 lg:py-20">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
+    <section className="py-20 lg:py-28">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-extrabold mb-4">
-              Ils ont sauté <span className="text-primary">le pas</span>
+            <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
+              Ils ont sauté<br /><span className="text-accent-light">le pas</span>
             </h2>
             <p className="text-muted-foreground text-sm">Quelques réalisations parmi nos clients satisfaits</p>
           </div>
         </AnimatedSection>
 
-        <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+        <div className="columns-1 md:columns-2 lg:columns-3 gap-5 space-y-5">
           {items.map((item, i) => (
-            <AnimatedSection key={item.id} delay={i * 0.1}>
-              <div className={`${heights[i % heights.length]} overflow-hidden rounded-xl break-inside-avoid relative group`}>
+            <AnimatedSection key={item.id} delay={i * 0.08}>
+              <div className={`${heights[i % heights.length]} overflow-hidden rounded-2xl break-inside-avoid relative group`}>
                 <img
                   src={item.src}
                   alt={item.alt}
@@ -32,8 +32,8 @@ const GallerySection = () => {
                   loading="lazy"
                 />
                 {item.caption && (
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/70 to-transparent p-4 pt-8 rounded-b-xl">
-                    <p className="text-white text-sm font-medium">{item.caption}</p>
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-foreground/70 to-transparent p-4 pt-8 rounded-b-2xl">
+                    <p className="text-background text-sm font-medium">{item.caption}</p>
                   </div>
                 )}
               </div>
