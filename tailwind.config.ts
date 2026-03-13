@@ -45,6 +45,16 @@ export default {
           foreground: "hsl(var(--accent-foreground))",
           light: "hsl(var(--accent-light))",
         },
+        terra: {
+          DEFAULT: "hsl(18 33% 57%)",
+          light: "hsl(18 33% 65%)",
+          dark: "hsl(18 33% 45%)",
+        },
+        sage: {
+          DEFAULT: "hsl(120 9% 52%)",
+          light: "hsl(120 9% 65%)",
+          dark: "hsl(120 9% 40%)",
+        },
         popover: {
           DEFAULT: "hsl(var(--popover))",
           foreground: "hsl(var(--popover-foreground))",

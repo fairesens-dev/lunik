@@ -271,7 +271,7 @@ const ContactWidget = () => {
 
   // ── Header ──
   const WidgetHeader = () => (
-    <div className="bg-[#1a4a42] text-white px-4 py-3 rounded-t-2xl flex items-center justify-between shrink-0">
+    <div className="bg-primary text-primary-foreground px-4 py-3 rounded-t-2xl flex items-center justify-between shrink-0">
       <div>
         <p className="text-sm font-semibold">Notre équipe vous répond</p>
         <p className="text-xs opacity-80 flex items-center gap-1.5">
@@ -322,7 +322,7 @@ const ContactWidget = () => {
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
               m.role === "user"
-                ? "bg-[#1a4a42] text-white rounded-br-md"
+                ? "bg-primary text-primary-foreground rounded-br-md"
                 : "bg-secondary text-foreground rounded-bl-md"
             }`}>
               {m.content}
@@ -383,7 +383,7 @@ const ContactWidget = () => {
             )}
             {savData.order_number && (
               <div className="flex justify-end">
-                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                <div className="bg-primary text-primary-foreground px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
                   {savData.order_number}
                 </div>
               </div>
@@ -397,7 +397,7 @@ const ContactWidget = () => {
             )}
             {savData.problem_category && (
               <div className="flex justify-end">
-                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                <div className="bg-primary text-primary-foreground px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
                   {savData.problem_category}
                 </div>
               </div>
@@ -411,7 +411,7 @@ const ContactWidget = () => {
             )}
             {savData.problem_detail && (
               <div className="flex justify-end">
-                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                <div className="bg-primary text-primary-foreground px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
                   {savData.problem_detail}
                 </div>
               </div>
@@ -425,7 +425,7 @@ const ContactWidget = () => {
             )}
             {savData.email && (
               <div className="flex justify-end">
-                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                <div className="bg-primary text-primary-foreground px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
                   {savData.email}
                 </div>
               </div>
@@ -551,7 +551,7 @@ const ContactWidget = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleOpen}
-        className={`group w-14 h-14 rounded-full bg-[#1a4a42] text-white shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow ${
+        className={`group w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow ${
           !hasOpened ? "animate-pulse" : ""
         }`}
         aria-label={open ? "Fermer le chat" : "Ouvrir le chat"}

@@ -198,7 +198,7 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;bac
 .modal-body{padding:24px}
 .modal h2{font-size:1.25rem;font-weight:700;margin-bottom:8px}
 .modal p{font-size:0.875rem;line-height:1.5;opacity:0.8;margin-bottom:16px}
-.modal .btn{display:inline-block;padding:10px 20px;background:#4A5E3A;color:#fff;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;border:none;cursor:pointer}
+.modal .btn{display:inline-block;padding:10px 20px;background:#B8826B;color:#fff;border-radius:8px;text-decoration:none;font-size:0.875rem;font-weight:600;border:none;cursor:pointer}
 .form-field{display:block;width:100%;padding:8px 12px;border:1px solid #ddd;border-radius:6px;margin-bottom:8px;font-size:0.875rem}
 </style></head><body>
 <div class="modal">

@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import logoLunikWhite from "@/assets/logo-lunik-white.png";
+import logoStoreWhite from "@/assets/logo-lunik-store-white.png";
 
 const navGroups = [
   {
@@ -80,15 +80,15 @@ const AdminLayout = () => {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="px-5 py-5">
-        <img src={logoLunikWhite} alt="LuniK" className="h-7" />
-        <span className="ml-2 text-xs bg-gray-700 text-gray-400 px-2 py-0.5 rounded font-sans">Admin</span>
+        <img src={logoStoreWhite} alt="LuniK Store" className="h-7" />
+        <span className="ml-2 text-xs bg-white/10 text-sidebar-foreground/60 px-2 py-0.5 rounded font-sans">Admin</span>
       </div>
-      <div className="border-t border-gray-800 mx-4" />
+      <div className="border-t border-white/10 mx-4" />
 
       <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="px-3 mb-2 text-[11px] font-semibold text-gray-500 tracking-widest font-sans">
+            <p className="px-3 mb-2 text-[11px] font-semibold text-sidebar-foreground/40 tracking-widest font-sans">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -100,15 +100,15 @@ const AdminLayout = () => {
                   className={({ isActive }) =>
                     `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-sans transition-colors ${
                       isActive
-                        ? "bg-gray-700 text-white border-l-[3px] border-[#4A5E3A]"
-                        : "text-gray-400 hover:bg-gray-800 hover:text-white border-l-[3px] border-transparent"
+                        ? "bg-white/15 text-white border-l-[3px] border-accent"
+                        : "text-sidebar-foreground/60 hover:bg-white/10 hover:text-white border-l-[3px] border-transparent"
                     }`
                   }
                 >
                   <item.icon className="w-4 h-4 shrink-0" />
                   <span className="flex-1">{item.label}</span>
                   {item.badge && (
-                    <span className="bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                    <span className="bg-accent text-accent-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                       {item.badge}
                     </span>
                   )}
@@ -121,7 +121,7 @@ const AdminLayout = () => {
         <div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-sans text-gray-400 hover:bg-gray-800 hover:text-white w-full border-l-[3px] border-transparent transition-colors"
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-sans text-sidebar-foreground/60 hover:bg-white/10 hover:text-white w-full border-l-[3px] border-transparent transition-colors"
           >
             <LogOut className="w-4 h-4" />
             <span>Déconnexion</span>
@@ -129,23 +129,23 @@ const AdminLayout = () => {
         </div>
       </nav>
 
-      <div className="border-t border-gray-800 mx-4" />
+      <div className="border-t border-white/10 mx-4" />
       <div className="px-5 py-4 flex items-center gap-3">
         <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-gray-700 text-gray-300 text-xs font-sans">AD</AvatarFallback>
+          <AvatarFallback className="bg-white/15 text-sidebar-foreground text-xs font-sans">AD</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
           <p className="text-sm text-white font-medium truncate font-sans">{admin?.name}</p>
-          <p className="text-xs text-gray-500 truncate font-sans">{admin?.email}</p>
+          <p className="text-xs text-sidebar-foreground/50 truncate font-sans">{admin?.email}</p>
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-background font-sans">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-60 bg-gray-900 flex-col z-40">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-60 bg-sidebar flex-col z-40">
         {sidebarContent}
       </aside>
 
@@ -153,10 +153,10 @@ const AdminLayout = () => {
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
           <div className="absolute inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-60 bg-gray-900 flex flex-col">
+          <aside className="absolute inset-y-0 left-0 w-60 bg-sidebar flex flex-col">
             <button
               onClick={() => setSidebarOpen(false)}
-              className="absolute top-4 right-4 text-gray-400 hover:text-white"
+              className="absolute top-4 right-4 text-sidebar-foreground/60 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
@@ -166,7 +166,7 @@ const AdminLayout = () => {
       )}
 
       {/* Topbar */}
-      <header className="fixed top-0 left-0 lg:left-60 right-0 h-16 bg-white border-b border-gray-200 flex items-center justify-between px-4 lg:px-8 z-30">
+      <header className="fixed top-0 left-0 lg:left-60 right-0 h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:px-8 z-30">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -177,27 +177,27 @@ const AdminLayout = () => {
             <Menu className="w-5 h-5" />
           </Button>
           <div className="flex items-center gap-2 text-sm font-sans">
-            <span className="text-gray-400">Admin</span>
-            <ChevronRight className="w-3 h-3 text-gray-400" />
-            <span className="font-medium text-gray-900">{pageTitle}</span>
+            <span className="text-muted-foreground">Admin</span>
+            <ChevronRight className="w-3 h-3 text-muted-foreground" />
+            <span className="font-medium text-foreground">{pageTitle}</span>
           </div>
         </div>
 
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">
-            <Bell className="w-4 h-4 text-gray-600" />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+            <Bell className="w-4 h-4 text-muted-foreground" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full" />
           </Button>
           <a
             href="/"
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden sm:flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 font-sans"
+            className="hidden sm:flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground font-sans"
           >
             Voir le site <ExternalLink className="w-3 h-3" />
           </a>
           <Avatar className="h-8 w-8 ml-2">
-            <AvatarFallback className="bg-gray-200 text-gray-600 text-xs font-sans">AD</AvatarFallback>
+            <AvatarFallback className="bg-secondary text-foreground text-xs font-sans">AD</AvatarFallback>
           </Avatar>
         </div>
       </header>

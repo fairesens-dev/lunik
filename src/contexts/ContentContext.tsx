@@ -194,7 +194,7 @@ const defaultContent: SiteContent = {
   promoBanner: {
     active: false,
     text: "",
-    bgColor: "#4A5E3A",
+    bgColor: "#7B8E7B",
     textColor: "#FFFFFF",
     ctaText: "En profiter",
     ctaUrl: "/#configurator",
