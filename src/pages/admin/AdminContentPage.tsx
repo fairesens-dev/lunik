@@ -242,7 +242,7 @@ const TabHomepage = () => {
             <Field label="Titre (ligne 2, couleur accent)" value={form.highlightSubtitle} onChange={(v) => set("highlightSubtitle", v)} />
           </div>
           <Field label="Description" value={form.highlightDescription} onChange={(v) => set("highlightDescription", v)} textarea />
-          <Field label="URL image produit" value={form.highlightImage} onChange={(v) => set("highlightImage", v)} helper="Image affichée à droite de la section" />
+          <ImagePicker label="Image produit" value={form.highlightImage} onChange={(v) => set("highlightImage", v)} helper="Image affichée à droite de la section" />
 
           <div className="space-y-3 mt-4">
             <Label className="text-sm font-medium">Points forts</Label>
