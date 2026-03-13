@@ -27,7 +27,7 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
   if (!item) return null;
 
   const total = item.pricing.total - promoDiscount;
-  const installment = Math.round(total / 4);
+  const installment = Math.round(total / 3);
 
   const generateRef = () => "SC-" + Date.now().toString(36).toUpperCase();
 
