@@ -357,7 +357,9 @@ const ConfigurateurPage = () => {
               </div>
             )}
 
-            <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
+            <div className="mt-10">
+              <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
+            </div>
           </div>
 
           {/* Sticky price bar */}

@@ -16,3 +16,6 @@ verify_jwt = false
 
 [functions.generate-store-image]
 verify_jwt = false
+
+[functions.project-store-on-photo]
+verify_jwt = false
