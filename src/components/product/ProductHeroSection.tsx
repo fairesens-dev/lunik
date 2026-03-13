@@ -5,6 +5,7 @@ import { useContent } from "@/contexts/ContentContext";
 const ProductHeroSection = () => {
   const { content } = useContent();
   const { productPage } = content;
+  const heroImage = productPage.heroImage || "/images/store-salon-apero.webp";
 
   return (
     <section className="relative min-h-screen flex -mt-20">
@@ -55,7 +56,7 @@ const ProductHeroSection = () => {
       </div>
       <div className="hidden lg:block w-[45%] relative">
         <img
-          src="/images/store-salon-apero.webp"
+          src={heroImage}
           alt="Amis trinquant sous un store coffre sur une terrasse"
           className="absolute inset-0 w-full h-full object-cover"
           loading="eager"
