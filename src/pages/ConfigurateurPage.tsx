@@ -244,118 +244,100 @@ const ConfigurateurPage = () => {
             )}
 
             {/* 02 Couleurs (Toile + Armature) */}
-            <div className="border-b border-border pb-8 mb-8">
-              <button
-                className="w-full text-left"
-                onClick={() => setActiveStep(activeStep === "02" ? "" : "02")}
-              >
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="text-2xl font-display font-extrabold text-primary/30">02</span>
-                  <span className="text-sm uppercase tracking-[0.15em] font-bold text-foreground">{productPage.stepLabels[1] || "Couleurs"}</span>
-                  {activeStep !== "02" && <span className="ml-auto text-xs text-muted-foreground">{toileColor} · {armatureColor}</span>}
+            {activeStep === "02" && (
+              <div className="space-y-6">
+                {/* Toile sub-section */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Toile</p>
+                  <p className="text-xs text-muted-foreground mb-4">Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
+                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
+                  <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
                 </div>
-              </button>
-              {activeStep === "02" && (
-                <div className="mt-4 pl-10 space-y-6">
-                  {/* Toile sub-section */}
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Toile</p>
-                    <p className="text-xs text-muted-foreground mb-4">Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
-                    <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
-                    <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
-                  </div>
 
-                  <div className="border-t border-border/50" />
+                <div className="border-t border-border/50" />
 
-                  {/* Armature sub-section */}
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Armature</p>
-                    <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
-                    <div className="flex flex-wrap gap-4">
-                      {ARMATURE_COLORS.map((c) => (
-                        <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
-                          <div
-                            className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
-                              armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
-                            }`}
-                            style={{ backgroundColor: c.hex }}
-                          >
-                            {armatureColor === c.name && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
-                              </div>
-                            )}
-                          </div>
-                          <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
-                        </button>
-                      ))}
-                    </div>
+                {/* Armature sub-section */}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Armature</p>
+                  <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
+                  <div className="flex flex-wrap gap-4">
+                    {ARMATURE_COLORS.map((c) => (
+                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
+                        <div
+                          className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
+                            armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
+                          }`}
+                          style={{ backgroundColor: c.hex }}
+                        >
+                          {armatureColor === c.name && (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                      </button>
+                    ))}
                   </div>
                 </div>
-              )}
-            </div>
+
+                <div className="flex gap-3 pt-4">
+                  <Button variant="outline" onClick={goPrev} className="flex-1 rounded-full">← Dimensions</Button>
+                  <Button onClick={goNext} className="flex-1 rounded-full">Suivant — Options →</Button>
+                </div>
+              </div>
+            )}
 
             {/* 03 Options */}
-            <div className="pb-8 mb-4">
-              <button
-                className="w-full text-left"
-                onClick={() => setActiveStep(activeStep === "03" ? "" : "03")}
-              >
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="text-2xl font-display font-extrabold text-primary/30">03</span>
-                  <span className="text-sm uppercase tracking-[0.15em] font-bold text-foreground">{productPage.stepLabels[3] || "Options"}</span>
-                  {activeStep !== "03" && optionsSummary !== "Aucune" && (
-                    <span className="ml-auto text-xs text-primary font-medium">+ {optionsSummary}</span>
-                  )}
-                </div>
-              </button>
-              {activeStep === "03" && (
-                <div className="mt-4 pl-10 space-y-3">
-                  <p className="text-xs text-muted-foreground mb-4">Motorisation SOMFY incluse de série · Personnalisez votre store</p>
-                  {PRICING_OPTIONS.map((opt) => {
-                    const checked = selectedOptions.has(opt.id);
-                    const isReduction = opt.price < 0;
-                    return (
-                      <div
-                        key={opt.id}
-                        className={`border rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden transition-all ${
-                          checked
-                            ? isReduction
-                              ? "border-destructive/50 ring-1 ring-destructive/20 bg-destructive/[0.02]"
-                              : "border-primary ring-1 ring-primary/20 bg-primary/[0.02]"
-                            : opt.highlight
-                              ? "border-primary/50 bg-primary/[0.01]"
-                              : "border-border"
-                        }`}
-                      >
-                        {opt.badge && (
-                          <span className={`absolute -top-0.5 right-3 text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-b-lg ${
-                            isReduction ? "bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"
-                          }`}>
-                            {opt.badge}
-                          </span>
-                        )}
-                        <div className="flex items-center gap-4">
-                          <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
-                          <div className="flex-1">
-                            <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
-                            <p className="text-xs text-muted-foreground">{opt.description}</p>
-                          </div>
-                          <div className="text-right">
-                            <span className={`text-sm font-medium whitespace-nowrap ${isReduction ? "text-green-600" : ""}`}>
-                              {isReduction ? "" : "+"}{opt.price.toLocaleString("fr-FR")} €
-                            </span>
-                          </div>
+            {activeStep === "03" && (
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground mb-4">Motorisation SOMFY incluse de série · Personnalisez votre store</p>
+                {PRICING_OPTIONS.map((opt) => {
+                  const checked = selectedOptions.has(opt.id);
+                  const isReduction = opt.price < 0;
+                  return (
+                    <div
+                      key={opt.id}
+                      className={`border rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden transition-all ${
+                        checked
+                          ? isReduction
+                            ? "border-destructive/50 ring-1 ring-destructive/20 bg-destructive/[0.02]"
+                            : "border-primary ring-1 ring-primary/20 bg-primary/[0.02]"
+                          : opt.highlight
+                            ? "border-primary/50 bg-primary/[0.01]"
+                            : "border-border"
+                      }`}
+                    >
+                      {opt.badge && (
+                        <span className={`absolute -top-0.5 right-3 text-[9px] px-2 py-0.5 uppercase tracking-wider font-bold rounded-b-lg ${
+                          isReduction ? "bg-destructive text-destructive-foreground" : "bg-primary text-primary-foreground"
+                        }`}>
+                          {opt.badge}
+                        </span>
+                      )}
+                      <div className="flex items-center gap-4">
+                        <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium">{opt.icon} {opt.label}</p>
+                          <p className="text-xs text-muted-foreground">{opt.description}</p>
                         </div>
-                        {opt.tip && (
-                          <p className="text-[11px] text-primary/80 pl-14">{opt.tip}</p>
-                        )}
+                        <div className="text-right">
+                          <span className={`text-sm font-medium whitespace-nowrap ${isReduction ? "text-green-600" : ""}`}>
+                            {isReduction ? "" : "+"}{opt.price.toLocaleString("fr-FR")} €
+                          </span>
+                        </div>
                       </div>
-                    );
-                  })}
+                      {opt.tip && (
+                        <p className="text-[11px] text-primary/80 pl-14">{opt.tip}</p>
+                      )}
+                    </div>
+                  );
+                })}
+                <div className="pt-4">
+                  <Button variant="outline" onClick={goPrev} className="w-full rounded-full mb-3">← Couleurs</Button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
           </div>
