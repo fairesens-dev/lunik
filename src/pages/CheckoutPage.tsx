@@ -53,7 +53,7 @@ const CheckoutPage = () => {
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="max-w-[1100px] mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="font-serif text-xl tracking-wider">LUNIK</Link>
+          <Link to="/"><img src={logoLunik} alt="LuniK" className="h-8" /></Link>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <Lock className="w-4 h-4" />
             Commande sécurisée
