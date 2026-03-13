@@ -36,7 +36,7 @@ const ProductFeaturesSection = () => {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-16">
-            Conçu pour durer.<br />
+            <span className="text-accent">Conçu pour durer.</span><br />
             <span className="text-accent-light">Pensé pour vous.</span>
           </h2>
         </AnimatedSection>

@@ -146,22 +146,6 @@ const HeroSection = () => {
             ))}
           </motion.div>
 
-          {/* Glass trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.2 }}
-            className="flex flex-wrap justify-center gap-3 mt-12"
-          >
-            {["🇫🇷 Made in France", "🔧 Garantie 5 ans", "⚡ Motorisation Somfy"].map((badge) => (
-              <span
-                key={badge}
-                className="bg-white/10 backdrop-blur-sm border border-white/10 px-5 py-2.5 rounded-full text-xs text-white/80 font-medium"
-              >
-                {badge}
-              </span>
-            ))}
-          </motion.div>
         </div>
       </div>
 

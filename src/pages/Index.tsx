@@ -53,8 +53,6 @@ const Index = () => {
       <ValuesSection />
       <GallerySection />
       <TestimonialsSection />
-      
-      <FAQSection />
       <ContactCTASection />
       <StickyCTABar />
       <SocialProofToast />
