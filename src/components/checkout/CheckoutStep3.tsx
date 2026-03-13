@@ -20,7 +20,7 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
   const { item, clearCart } = useCart();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [paymentMethod, setPaymentMethod] = useState<"card" | "4x">("card");
+  const [paymentMethod] = useState<"card">("card");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
