@@ -102,7 +102,6 @@ const TabHomepage = () => {
     configuratorSubtitle: content.productPage.configuratorSubtitle,
     stepLabels: [...content.productPage.stepLabels],
     orderConfirmationMessage: content.productPage.orderConfirmationMessage,
-    // New fields
     highlightTitle: content.homepage.highlightTitle,
     highlightSubtitle: content.homepage.highlightSubtitle,
     highlightDescription: content.homepage.highlightDescription,
@@ -113,6 +112,13 @@ const TabHomepage = () => {
     contactCTAImage: content.homepage.contactCTAImage,
     valueCards: [...(content.homepage.valueCards || [])],
     statsItems: [...(content.homepage.statsItems || [])],
+    // Visual fields
+    heroPosterImage: content.homepage.heroPosterImage || "",
+    heroVideoUrl: content.homepage.heroVideoUrl || "",
+    fabricSectionImage: content.homepage.fabricSectionImage || "",
+    // Product page visuals
+    productHeroImage: content.productPage.heroImage || "",
+    productGalleryItems: [...(content.productPage.galleryItems || [])],
   });
 
   const set = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
