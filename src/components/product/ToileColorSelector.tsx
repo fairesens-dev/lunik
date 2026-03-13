@@ -53,9 +53,10 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
   return (
     <>
       <Accordion
-        type="multiple"
-        value={openAccordions}
-        onValueChange={setOpenAccordions}
+        type="single"
+        collapsible
+        value={openAccordion}
+        onValueChange={(val) => setOpenAccordion(val)}
         className="w-full"
       >
         {categorized.map((group) => (

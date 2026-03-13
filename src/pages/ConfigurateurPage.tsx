@@ -140,21 +140,21 @@ const ConfigurateurPage = () => {
             />
           </div>
 
-          {/* 2 boutons en ligne — au-dessus de la fiche technique */}
-          <div className="absolute bottom-[100px] lg:bottom-[140px] left-4 right-4 flex gap-2 z-20">
+          {/* 2 boutons compacts — décalés à droite, au-dessus de la fiche technique */}
+          <div className="absolute bottom-[100px] lg:bottom-[140px] right-4 flex gap-1.5 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
-              className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
+              className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
             >
-              <Camera className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[11px] font-medium text-foreground">Projeter sur ma terrasse</span>
+              <Camera className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-medium text-foreground">Projeter</span>
             </button>
             <button
               onClick={() => setCloseUpOpen(true)}
-              className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
+              className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
             >
-              <ZoomIn className="w-4 h-4 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[11px] font-medium text-foreground">Voir la toile de près</span>
+              <ZoomIn className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-medium text-foreground">Toile de près</span>
             </button>
           </div>
 
