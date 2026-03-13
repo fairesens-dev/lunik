@@ -17,7 +17,7 @@ const Footer = () => {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-20">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-10">
           <div>
-            <img src={logoLunik} alt={g.brandName} className="h-8 brightness-0 invert mb-4" />
+            <img src={logoFullWhite} alt={g.brandName} className="h-12 mb-4" />
             <p className="text-primary-foreground/50 text-sm leading-relaxed max-w-xs">
               L'excellence du store sur mesure, fabriqué en France avec passion et savoir-faire.
             </p>

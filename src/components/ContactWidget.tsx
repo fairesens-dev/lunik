@@ -271,7 +271,7 @@ const ContactWidget = () => {
 
   // ── Header ──
   const WidgetHeader = () => (
-    <div className="bg-[#1a4a42] text-white px-4 py-3 rounded-t-2xl flex items-center justify-between shrink-0">
+    <div className="bg-primary text-primary-foreground px-4 py-3 rounded-t-2xl flex items-center justify-between shrink-0">
       <div>
         <p className="text-sm font-semibold">Notre équipe vous répond</p>
         <p className="text-xs opacity-80 flex items-center gap-1.5">
