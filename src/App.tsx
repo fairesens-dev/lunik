@@ -35,6 +35,9 @@ import AdminAbandonedCartsPage from "./pages/admin/AdminAbandonedCartsPage";
 import AdminTrackingPage from "./pages/admin/AdminTrackingPage";
 import AdminContactsPage from "./pages/admin/AdminContactsPage";
 import AdminContactDetailPage from "./pages/admin/AdminContactDetailPage";
+import AdminCampaignsPage from "./pages/admin/AdminCampaignsPage";
+import AdminCampaignBuilderPage from "./pages/admin/AdminCampaignBuilderPage";
+import AdminCampaignReportPage from "./pages/admin/AdminCampaignReportPage";
 
 const queryClient = new QueryClient();
 
