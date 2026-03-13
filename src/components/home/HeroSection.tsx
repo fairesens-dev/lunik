@@ -43,7 +43,6 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
 const stats = [
   { value: 5000, suffix: "+", label: "Stores installés", decimals: 0 },
   { value: 4.9, suffix: "/5", label: "Trustpilot", decimals: 1 },
-  { value: 173, suffix: "", label: "Coloris Dickson", decimals: 0 },
 ];
 
 const HeroSection = () => {
@@ -51,7 +50,7 @@ const HeroSection = () => {
   const { homepage } = content;
 
   return (
-    <section id="hero" className="relative min-h-[50vh] flex items-center justify-center -mt-20 overflow-hidden">
+    <section id="hero" className="relative min-h-[60vh] flex items-center justify-center -mt-20 overflow-hidden">
       {/* Video background */}
       <video
         autoPlay
@@ -71,14 +70,6 @@ const HeroSection = () => {
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full pt-32 pb-20">
         <div className="flex flex-col items-center text-center">
           {/* Overline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xs uppercase tracking-[0.4em] text-white/60 mb-8 font-sans font-medium"
-          >
-            {homepage.heroOverline}
-          </motion.p>
 
           {/* Giant headline */}
           <motion.h1
@@ -131,17 +122,20 @@ const HeroSection = () => {
             </a>
           </motion.div>
 
-          {/* Stats counters */}
+          {/* Stats - compact inline */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1 }}
-            className="grid grid-cols-3 gap-8 md:gap-16"
+            className="flex items-center gap-6"
           >
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center text-white">
-                <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
-                <p className="text-white/50 text-xs uppercase tracking-[0.15em] mt-1">{stat.label}</p>
+            {stats.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-6">
+                {i > 0 && <span className="w-px h-8 bg-white/20" />}
+                <div className="text-center text-white">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+                  <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mt-0.5">{stat.label}</p>
+                </div>
               </div>
             ))}
           </motion.div>

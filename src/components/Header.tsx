@@ -53,7 +53,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
               src={logoLunik}
               alt={content.global.brandName}
               className={cn(
-                "h-8 transition-all duration-300",
+                "h-10 transition-all duration-300",
                 isTransparent && "brightness-0 invert"
               )}
             />

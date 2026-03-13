@@ -10,14 +10,14 @@ const pills = [
 ];
 
 const MarqueeSection = () => (
-  <section className="py-5 overflow-hidden bg-foreground/5 backdrop-blur-sm border-y border-border">
+  <section className="py-5 overflow-hidden bg-accent border-y border-accent">
     <div className="flex animate-marquee whitespace-nowrap">
       {[0, 1].map((i) => (
         <div key={i} className="flex gap-8 mx-4">
           {pills.map((pill, j) => (
             <span
               key={`${i}-${j}`}
-              className="inline-flex items-center rounded-full px-5 py-2 text-sm uppercase tracking-[0.15em] text-accent font-semibold whitespace-nowrap"
+              className="inline-flex items-center rounded-full px-5 py-2 text-sm uppercase tracking-[0.15em] text-white/90 font-semibold whitespace-nowrap"
             >
               {pill}
             </span>
