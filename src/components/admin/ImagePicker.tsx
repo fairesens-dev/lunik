@@ -39,27 +39,23 @@ const ImagePicker = ({ value, onChange, label, helper }: ImagePickerProps) => {
     setLoading(true);
     const allFiles: BucketFile[] = [];
 
-    // List root files
-    const { data: rootFiles } = await supabase.storage.from(BUCKET).list("", { limit: 200 });
-    if (rootFiles) {
-      for (const f of rootFiles) {
+    const listFolder = async (folder: string) => {
+      const { data } = await supabase.storage.from(BUCKET).list(folder, { limit: 500 });
+      if (!data) return;
+      for (const f of data) {
         if (f.metadata) {
-          allFiles.push({ name: f.name, folder: "", fullPath: f.name, url: getPublicUrl(f.name) });
+          // It's a file
+          const fullPath = folder ? `${folder}/${f.name}` : f.name;
+          allFiles.push({ name: f.name, folder, fullPath, url: getPublicUrl(fullPath) });
+        } else if (f.id === null || !f.metadata) {
+          // It's likely a folder — recurse into it
+          const subFolder = folder ? `${folder}/${f.name}` : f.name;
+          await listFolder(subFolder);
         }
       }
-    }
+    };
 
-    // List TOP PHOTOS subfolder
-    const { data: topFiles } = await supabase.storage.from(BUCKET).list("TOP PHOTOS", { limit: 200 });
-    if (topFiles) {
-      for (const f of topFiles) {
-        if (f.metadata) {
-          const fullPath = `TOP PHOTOS/${f.name}`;
-          allFiles.push({ name: f.name, folder: "TOP PHOTOS", fullPath, url: getPublicUrl(fullPath) });
-        }
-      }
-    }
-
+    await listFolder("");
     setFiles(allFiles);
     setLoading(false);
   };
