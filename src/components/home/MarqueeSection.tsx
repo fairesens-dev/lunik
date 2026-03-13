@@ -17,7 +17,7 @@ const MarqueeSection = () => (
           {pills.map((pill, j) => (
             <span
               key={`${i}-${j}`}
-              className="inline-flex items-center rounded-full px-5 py-2 text-sm uppercase tracking-[0.15em] text-accent font-semibold whitespace-nowrap"
+              className="inline-flex items-center rounded-full px-5 py-2 text-sm uppercase tracking-[0.15em] text-white/90 font-semibold whitespace-nowrap"
             >
               {pill}
             </span>

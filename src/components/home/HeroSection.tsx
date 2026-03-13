@@ -43,7 +43,6 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
 const stats = [
   { value: 5000, suffix: "+", label: "Stores installés", decimals: 0 },
   { value: 4.9, suffix: "/5", label: "Trustpilot", decimals: 1 },
-  { value: 173, suffix: "", label: "Coloris Dickson", decimals: 0 },
 ];
 
 const HeroSection = () => {
