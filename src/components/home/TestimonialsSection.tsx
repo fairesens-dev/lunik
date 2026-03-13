@@ -113,7 +113,7 @@ const TestimonialsSection = () => {
           {items.map((review, i) => (
             <div
               key={review.id || i}
-              className="min-w-[340px] max-w-[400px] flex-shrink-0 snap-start bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-8 flex flex-col backdrop-blur-sm"
+              className="min-w-[340px] max-w-[400px] flex-shrink-0 snap-start bg-card border border-border rounded-2xl p-8 flex flex-col"
             >
               <FilledStars count={review.stars} />
               {review.title && (
