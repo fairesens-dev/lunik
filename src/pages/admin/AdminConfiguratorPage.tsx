@@ -49,7 +49,7 @@ const AdminConfiguratorPage = () => {
           <TabsTrigger value="options">Options</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pricing"><PricingTab settings={settings} onSave={updatePricing} toast={toast} /></TabsContent>
+        <TabsContent value="pricing"><PricingTab settings={settings} onSave={updatePricing} onSaveGrid={updatePriceGrid} toast={toast} /></TabsContent>
         <TabsContent value="dimensions"><DimensionsTab settings={settings} onSave={updateDimensions} toast={toast} /></TabsContent>
         <TabsContent value="toile">
           <ColorsTab
