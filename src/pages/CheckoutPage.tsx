@@ -49,7 +49,7 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="border-b border-border bg-card">
         <div className="max-w-[1100px] mx-auto px-6 py-4 flex items-center justify-between">
@@ -69,7 +69,7 @@ const CheckoutPage = () => {
       </header>
 
       {/* Progress */}
-      <div className="max-w-[1100px] mx-auto px-6 py-6">
+      <div className="max-w-[1100px] mx-auto px-6 py-6 flex-1">
         <div className="flex items-center justify-center gap-0 mb-10">
           {STEPS.map((label, i) => (
             <div key={label} className="flex items-center">
@@ -114,6 +114,28 @@ const CheckoutPage = () => {
           />
         )}
       </div>
+
+      {/* Reassurance footer */}
+      <footer className="border-t border-border bg-card mt-auto">
+        <div className="max-w-[1100px] mx-auto px-6 py-5">
+          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-10 text-xs text-muted-foreground mb-3">
+            <span className="flex items-center gap-1.5">🔒 Paiement 100% sécurisé</span>
+            <span className="flex items-center gap-1.5">🇫🇷 Fabrication française</span>
+            <span className="flex items-center gap-1.5">🚚 Livraison offerte</span>
+            <span className="flex items-center gap-1.5">🔧 Garantie 5 ans</span>
+            <span className="flex items-center gap-1.5">↩️ Satisfait ou remboursé 14j</span>
+          </div>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-muted-foreground/70">
+            <Link to="/conditions-generales-de-vente" className="hover:text-foreground transition-colors">CGV</Link>
+            <span>·</span>
+            <Link to="/mentions-legales" className="hover:text-foreground transition-colors">Mentions légales</Link>
+            <span>·</span>
+            <Link to="/politique-cookies" className="hover:text-foreground transition-colors">Cookies</Link>
+            <span>·</span>
+            <span>© {new Date().getFullYear()} LuniK</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
