@@ -13,6 +13,8 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useConfiguratorSettings, type ColorEntry, type OptionEntry } from "@/contexts/ConfiguratorSettingsContext";
 import { supabase } from "@/integrations/supabase/client";
+import { WIDTH_RANGES, PROJECTIONS, lookupPrice, getDefaultPriceGrid } from "@/lib/pricingTable";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 
 /* ═══════════════════════════════════════════════════════ */
 
