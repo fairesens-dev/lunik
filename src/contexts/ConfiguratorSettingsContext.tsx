@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { parseToileColorLabel } from "@/lib/parseToileColorLabel";
+import { setPriceGrid, getDefaultPriceGrid } from "@/lib/pricingTable";
 
 /* ─── Types ──────────────────────────────────────────── */
 
