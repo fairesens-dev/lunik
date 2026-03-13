@@ -193,7 +193,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* Fiche technique + témoignage — aligned with right sticky bar */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-4 lg:py-6 z-10">
+          <div className="hidden lg:block absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-4 lg:py-6 z-10">
             <div className="flex items-start gap-6">
               {/* Specs */}
               <div className="flex-1 min-w-0">
