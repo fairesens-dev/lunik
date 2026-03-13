@@ -24,9 +24,27 @@ const step1Schema = z.object({
   postalCode: z.string().min(5, "Code postal requis").max(5),
   city: z.string().min(2, "Ville requise"),
   country: z.string().default("France"),
+  differentDelivery: z.boolean().optional(),
+  deliveryAddress: z.string().optional(),
+  deliveryAddress2: z.string().optional(),
+  deliveryPostalCode: z.string().optional(),
+  deliveryCity: z.string().optional(),
+  deliveryCountry: z.string().optional(),
   note: z.string().optional(),
   cgv: z.literal(true, { errorMap: () => ({ message: "Vous devez accepter les CGV" }) }),
   newsletter: z.boolean().optional(),
+}).superRefine((data, ctx) => {
+  if (data.differentDelivery) {
+    if (!data.deliveryAddress || data.deliveryAddress.length < 5) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Adresse requise", path: ["deliveryAddress"] });
+    }
+    if (!data.deliveryPostalCode || data.deliveryPostalCode.length < 5) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Code postal requis", path: ["deliveryPostalCode"] });
+    }
+    if (!data.deliveryCity || data.deliveryCity.length < 2) {
+      ctx.addIssue({ code: z.ZodIssueCode.custom, message: "Ville requise", path: ["deliveryCity"] });
+    }
+  }
 });
 
 export type Step1Data = z.infer<typeof step1Schema>;
@@ -55,6 +73,8 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
     defaultValues: {
       civility: undefined,
       country: "France",
+      deliveryCountry: "France",
+      differentDelivery: false,
       cgv: undefined as unknown as true,
       newsletter: false,
       ...defaultValues,
@@ -62,6 +82,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
   });
 
   const civility = watch("civility");
+  const differentDelivery = watch("differentDelivery");
 
   if (!item) return null;
 
@@ -135,9 +156,9 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
           </div>
         </div>
 
-        {/* Adresse */}
+        {/* Adresse de facturation */}
         <div>
-          <h3 className="font-serif text-xl mb-4">Adresse de livraison</h3>
+          <h3 className="font-serif text-xl mb-4">Adresse de facturation</h3>
           <div className="space-y-4">
             <div>
               <Label htmlFor="address" className="text-xs text-muted-foreground">Adresse</Label>
@@ -165,6 +186,49 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
               <Input id="country" {...register("country")} disabled />
             </div>
           </div>
+        </div>
+
+        {/* Adresse de livraison différente */}
+        <div>
+          <label className="flex items-start gap-3 cursor-pointer">
+            <Checkbox
+              checked={differentDelivery === true}
+              onCheckedChange={(v) => setValue("differentDelivery", v === true)}
+              className="mt-0.5"
+            />
+            <span className="text-sm">Mon adresse de livraison est différente</span>
+          </label>
+
+          {differentDelivery && (
+            <div className="mt-4 space-y-4">
+              <h3 className="font-serif text-xl mb-4">Adresse de livraison</h3>
+              <div>
+                <Label htmlFor="deliveryAddress" className="text-xs text-muted-foreground">Adresse</Label>
+                <Input id="deliveryAddress" {...register("deliveryAddress")} />
+                {errors.deliveryAddress && <p className="text-xs text-destructive mt-1">{errors.deliveryAddress.message}</p>}
+              </div>
+              <div>
+                <Label htmlFor="deliveryAddress2" className="text-xs text-muted-foreground">Adresse ligne 2 (optionnel)</Label>
+                <Input id="deliveryAddress2" {...register("deliveryAddress2")} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="deliveryPostalCode" className="text-xs text-muted-foreground">Code postal</Label>
+                  <Input id="deliveryPostalCode" maxLength={5} {...register("deliveryPostalCode")} />
+                  {errors.deliveryPostalCode && <p className="text-xs text-destructive mt-1">{errors.deliveryPostalCode.message}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="deliveryCity" className="text-xs text-muted-foreground">Ville</Label>
+                  <Input id="deliveryCity" {...register("deliveryCity")} />
+                  {errors.deliveryCity && <p className="text-xs text-destructive mt-1">{errors.deliveryCity.message}</p>}
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="deliveryCountry" className="text-xs text-muted-foreground">Pays</Label>
+                <Input id="deliveryCountry" value="France" disabled />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Note */}
