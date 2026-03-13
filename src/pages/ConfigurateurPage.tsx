@@ -313,7 +313,7 @@ const ConfigurateurPage = () => {
 
                 <div className="pt-4">
                   <Button onClick={goNext} className="w-full rounded-full flex items-center justify-center gap-2">
-                    Couleurs <ChevronRight className="w-4 h-4" />
+                    Choisir mes couleurs <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
