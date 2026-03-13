@@ -11,6 +11,7 @@ interface DynamicProductVisualProps {
   projection: number;
   className?: string;
   compact?: boolean;
+  fillContainer?: boolean;
   onLedToggle?: (led: boolean) => void;
 }
 
