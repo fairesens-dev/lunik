@@ -117,7 +117,7 @@ const TestimonialsSection = () => {
             >
               <FilledStars count={review.stars} />
               {review.title && (
-                <p className="font-bold text-primary-foreground mt-4 mb-1">{review.title}</p>
+                <p className="font-bold text-foreground mt-4 mb-1">{review.title}</p>
               )}
               <p className="text-primary-foreground/70 line-clamp-5 flex-1 mt-3 leading-relaxed">
                 "{review.text}"
