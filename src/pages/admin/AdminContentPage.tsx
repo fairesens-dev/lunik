@@ -155,6 +155,15 @@ const TabHomepage = () => {
   const removeStatItem = (id: string) =>
     set("statsItems", form.statsItems.filter((s: StatItem) => s.id !== id));
 
+  const updateProductGalleryItem = (id: string, data: Partial<ProductGalleryItem>) =>
+    set("productGalleryItems", form.productGalleryItems.map((g: ProductGalleryItem) => g.id === id ? { ...g, ...data } : g));
+
+  const addProductGalleryItem = () =>
+    set("productGalleryItems", [...form.productGalleryItems, { id: genId(), src: "", alt: "", height: "h-72" }]);
+
+  const removeProductGalleryItem = (id: string) =>
+    set("productGalleryItems", form.productGalleryItems.filter((g: ProductGalleryItem) => g.id !== id));
+
   const save = () => {
     updateHomepage({
       heroTitle: form.heroTitle,
@@ -174,14 +183,19 @@ const TabHomepage = () => {
       contactCTAImage: form.contactCTAImage,
       valueCards: form.valueCards,
       statsItems: form.statsItems,
+      heroPosterImage: form.heroPosterImage,
+      heroVideoUrl: form.heroVideoUrl,
+      fabricSectionImage: form.fabricSectionImage,
     });
     updateProductPage({
       configuratorTitle: form.configuratorTitle,
       configuratorSubtitle: form.configuratorSubtitle,
       stepLabels: form.stepLabels,
       orderConfirmationMessage: form.orderConfirmationMessage,
+      heroImage: form.productHeroImage,
+      galleryItems: form.productGalleryItems,
     });
-    toast({ title: "✅ Page d'accueil mise à jour" });
+    toast({ title: "✅ Contenu mis à jour" });
   };
 
   return (
