@@ -43,12 +43,13 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
 const HeroSection = () => {
   const { content } = useContent();
   const { homepage } = content;
+  const bannerActive = content.promoBanner.active;
 
   // Use first 2 stats for hero display
   const heroStats = (homepage.statsItems || []).slice(0, 2);
 
   return (
-    <section id="hero" className="relative min-h-[max(60vh,500px)] flex items-center justify-center -mt-20 overflow-hidden">
+    <section id="hero" className="relative min-h-[max(70vh,580px)] flex items-center justify-center -mt-20 overflow-hidden">
       {/* Video background */}
       <video
         autoPlay
