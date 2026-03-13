@@ -40,6 +40,7 @@ import AdminCampaignBuilderPage from "./pages/admin/AdminCampaignBuilderPage";
 import AdminCampaignReportPage from "./pages/admin/AdminCampaignReportPage";
 import AdminModalsPage from "./pages/admin/AdminModalsPage";
 import AdminModalBuilderPage from "./pages/admin/AdminModalBuilderPage";
+import AdminScoringPage from "./pages/admin/AdminScoringPage";
 
 const queryClient = new QueryClient();
 
