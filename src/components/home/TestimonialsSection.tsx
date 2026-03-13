@@ -74,7 +74,7 @@ const TestimonialsSection = () => {
         <AnimatedSection>
           <div className="flex items-end justify-between mb-12">
             <div>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+              <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight">
                 Ce que nos clients<br /><span className="text-accent-light">en pensent</span>
               </h2>
             </div>
