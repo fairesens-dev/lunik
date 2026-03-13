@@ -19,7 +19,7 @@ import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@
 /* ═══════════════════════════════════════════════════════ */
 
 const AdminConfiguratorPage = () => {
-  const { settings, updatePricing, updateDimensions, reorderToileColors, reorderArmatureColors, updateOption, addOption, removeOption, addToileColor, removeToileColor, updateToileColor, addArmatureColor, removeArmatureColor, updateArmatureColor } = useConfiguratorSettings();
+  const { settings, updatePricing, updateDimensions, reorderToileColors, reorderArmatureColors, updateOption, addOption, removeOption, addToileColor, removeToileColor, updateToileColor, addArmatureColor, removeArmatureColor, updateArmatureColor, updatePriceGrid } = useConfiguratorSettings();
   const { toast } = useToast();
 
   return (
