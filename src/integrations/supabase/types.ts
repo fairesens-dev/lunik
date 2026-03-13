@@ -896,6 +896,9 @@ export type Database = {
         | "purchase"
         | "note"
         | "call"
+        | "chatbot_conversation"
+        | "sav_request"
+        | "callback_request"
       campaign_status: "draft" | "scheduled" | "sent"
       campaign_type: "newsletter" | "automation" | "transactional"
       contact_source:
@@ -905,6 +908,8 @@ export type Database = {
         | "social"
         | "referral"
         | "direct"
+        | "sav_widget"
+        | "callback_widget"
       contact_status:
         | "visitor"
         | "lead"
@@ -1060,6 +1065,9 @@ export const Constants = {
         "purchase",
         "note",
         "call",
+        "chatbot_conversation",
+        "sav_request",
+        "callback_request",
       ],
       campaign_status: ["draft", "scheduled", "sent"],
       campaign_type: ["newsletter", "automation", "transactional"],
@@ -1070,6 +1078,8 @@ export const Constants = {
         "social",
         "referral",
         "direct",
+        "sav_widget",
+        "callback_widget",
       ],
       contact_status: ["visitor", "lead", "mql", "sql", "customer", "churned"],
       modal_frequency: ["always", "once", "once_per_session"],
