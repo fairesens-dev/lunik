@@ -128,7 +128,7 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
                 </div>
               </div>
             </div>
-          </button>
+          </div>
 
           {/* 3x sans frais — disabled */}
           <div
