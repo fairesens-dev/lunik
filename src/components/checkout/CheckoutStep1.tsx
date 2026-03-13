@@ -43,7 +43,7 @@ interface Props {
 const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0 }: Props) => {
   const { item } = useCart();
   const [noteOpen, setNoteOpen] = useState(false);
-
+  const [differentDelivery, setDifferentDelivery] = useState(false);
   const {
     register,
     handleSubmit,
