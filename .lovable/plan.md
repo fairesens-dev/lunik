@@ -1,143 +1,189 @@
 
 
-## Plan : Modernisation complète inspirée de Zohco — Direction éditoriale, teal profond, typographie massive
+## Plan : Rebranding Total LuniK — Direction Solaire & Moderne
 
-### Analyse Zohco — Patterns clés identifiés
+### Tendances 2026 integrées
+- **Warm maximalism** : palettes chaudes (ambre/safran/corail) remplaçant les tons froids/sage
+- **Rounded UI** : `border-radius` généreux partout (boutons, cartes, inputs) — fin de l'ère sharp/brutalist
+- **Micro-interactions** : hover effects plus expressifs, transitions fluides
+- **Gradients subtils** : fonds avec gradients warm, pas aplats
+- **Typography contrast** : titres très gras + body léger, tailles plus grandes
+- **Dark sections inversées** : sections hero/CTA avec fond sombre + accents lumineux
+- **Glass morphism léger** : header translucide avec blur
 
-- **Palette** : Teal profond (#043333) sur fond gris-vert très clair (#E8EDEB), accents teal, pas de couleurs chaudes
-- **Typo** : Headlines massives (80-100px+), font Rethink Sans / Inter Tight, tracking serré
-- **Hero** : Titre géant pleine largeur AU-DESSUS d'une image panoramique (pas de split layout)
-- **Marquee** : Logos partenaires défilants (pas texte)
-- **Values** : Cards avec image + tags/pills cliquables
-- **Features** : Tabs numérotés (01, 02, 03) avec image qui change
-- **Services** : Grille de cards avec image en haut + titre + description
-- **Stats** : Compteurs animés (120M+, 490+, 98.9%)
-- **Témoignages** : Très grandes cards avec photo portrait, slider avec compteur 01/04
-- **CTA** : Section sombre avec images dispersées autour du texte
-- **Boutons** : Style "reveal" avec texte qui double au hover, fond sombre arrondi
-- **Espacement** : Très généreux, sections aérées, beaucoup de blanc
+---
 
 ### 1. Nouvelle palette de couleurs (`src/index.css`)
 
+Remplacement complet des CSS variables :
+
 ```text
-AVANT (ambre/orange)              →  APRÈS (teal/forest)
-──────────────────────────────────────────────────────────
---primary: 35 95% 55% (ambre)     →  174 86% 12% (teal profond #043333)
---accent-light: 25 90% 58%        →  170 50% 25% (teal moyen)
---background: 40 40% 97%          →  150 12% 92% (gris-vert clair #E8EDEB)
---card: 35 35% 95%                →  150 10% 96% (gris presque blanc)
---foreground: 20 15% 12%          →  174 86% 12% (teal profond)
---muted-fg: 25 10% 45%            →  160 8% 45%
---border: 30 25% 88%              →  150 10% 85%
+AVANT (sage/ecru)              →  APRÈS (solaire/ambre)
+─────────────────────────────────────────────────────────
+--primary: 100 24% 30% (sage)  →  35 95% 55% (ambre doré #F5A623)
+--accent-light: 100 18% 55%    →  25 90% 58% (orange chaud #E8742A)
+--background: 37 33% 93%       →  40 40% 97% (crème chaud #FAF7F2)
+--card: 50 20% 97%             →  35 35% 95% (sable clair #F5F0E8)
+--foreground: 0 0% 10%         →  20 15% 12% (brun profond)
+--muted-fg: 0 0% 42%           →  25 10% 45% (brun moyen)
+--border: 30 16% 87%           →  30 25% 88% (sable border)
+--ring: 100 24% 30%            →  35 95% 55% (ambre)
+--destructive: inchangé
 ```
 
-### 2. Typographie (`index.html` + `tailwind.config.ts`)
+Mode dark ajusté avec ambre/orange en accents lumineux sur fond sombre.
 
-- Remplacer Outfit + DM Sans par **Inter Tight** (headlines) + **DM Sans** (body, conservé)
-- Headlines beaucoup plus grandes : `text-6xl md:text-7xl lg:text-8xl`
-- Tracking serré sur les titres : `tracking-tight`
+### 2. Typographie (`tailwind.config.ts` + `index.css`)
 
-### 3. Boutons (`button.tsx`)
+- Headlines : **"Playfair Display"** (plus moderne que Cormorant Garamond, plus de poids)
+- Body : **"DM Sans"** (plus rond et chaleureux qu'Inter)
+- Import Google Fonts dans `index.html`
+- `--radius: 0rem` → `--radius: 0.75rem` (tout arrondi)
 
-- Nouveau style : fond teal profond, `rounded-full`, hover reveal effect
-- Variant "gradient" → fond teal uni `bg-primary text-white` avec hover scale
-- Suppression du gradient ambre
+### 3. Boutons (`src/components/ui/button.tsx`)
 
-### 4. Header (`Header.tsx`)
+- `rounded-md` → `rounded-full` pour les CTA principaux
+- Nouveau variant "gradient" : `bg-gradient-to-r from-amber-500 to-orange-500 text-white`
+- Padding plus généreux, shadow sur hover
+- Suppression de `rounded-none` dans TOUS les composants (Header, Hero, Configurator, Footer, etc.)
 
-- Style Zohco : fond `bg-card` avec border-bottom subtil, pas de glass morphism
-- Logo à gauche, nav centrée, CTA bouton arrondi sombre à droite
-- Plus épuré, espacement plus généreux
+### 4. Header (`src/components/Header.tsx`)
 
-### 5. Hero (`HeroSection.tsx`) — Refonte totale
+- Background : glass morphism `bg-background/80 backdrop-blur-xl`
+- Logo : potentiellement teinter avec les nouvelles couleurs (via CSS filter ou nouveau logo)
+- CTA header : bouton gradient arrondi avec micro-shadow
+- Mobile menu : fond gradient warm au lieu d'aplat
 
-- **Layout** : Titre géant pleine largeur en haut, puis image panoramique en dessous (pas de split 55/45)
-- Titre massif `text-7xl lg:text-8xl xl:text-9xl font-bold tracking-tight`
-- Sous le titre : paragraphe + bouton CTA à gauche, badges trust à droite
-- Image panoramique : `aspect-[21/9] rounded-2xl` avec légère superposition sur le titre
-- Fond : `bg-background` uni, très aéré
+### 5. Hero Section (`src/components/home/HeroSection.tsx`)
 
-### 6. Marquee (`MarqueeSection.tsx`)
+- Fond gauche : gradient radial warm (ambre → crème) au lieu d'aplat
+- Badge "4.9/5 Trustpilot" : pastille arrondie avec fond ambre/10
+- CTA : bouton gradient arrondi + shadow glow ambre
+- Overline : couleur ambre au lieu de sage
+- Trust badges en bas : icônes rondes avec fond ambre clair
 
-- Remplacer le texte défilant par des badges/pills de confiance défilants (Trustpilot, Made in France, Garantie 5 ans, Dickson, Somfy) — même contenu, style pill sur fond transparent avec border
+### 6. Marquee Section (`src/components/home/MarqueeSection.tsx`)
 
-### 7. ProductHighlight → Section "Values" style Zohco
+- Background : `bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500`
+- Texte blanc
 
-- 2 blocs empilés : chaque bloc = image + colonne texte avec tag pills (comme "human-centered", "Eco development")
-- Tags = petites pills `border rounded-full px-3 py-1`
-- Alternance image gauche/droite
+### 7. Product Highlight (`src/components/home/ProductHighlightSection.tsx`)
 
-### 8. ProductFeatures → Tabs numérotés style Zohco
+- Badge "Fabriqué en France" : fond arrondi gradient au lieu de bg-primary/10
+- Bouton CTA gradient arrondi
+- Image : `rounded-2xl` avec shadow
 
-- 3 tabs (Toile, Structure, Motorisation) avec numéros `01.` `02.` `03.`
-- Tab actif = contenu affiché avec image à droite
-- Style : liste verticale de tabs à gauche, grande image à droite
-- Fond sombre `bg-foreground text-background` pour contraste
+### 8. Features Section (`src/components/product/ProductFeaturesSection.tsx`)
 
-### 9. ValuesSection → Services cards grid
+- Icônes dans cercles avec fond ambre/10
+- Cartes avec `rounded-xl` et subtle shadow
 
-- 6 cards en grille 3x2
-- Chaque card : image ronde/carrée en haut, titre, description
-- Fond card blanc, hover lift
+### 9. Fabric Section (`src/components/home/FabricSection.tsx`)
 
-### 10. ConfiguratorCTA → Section stats + CTA
+- Checkmarks : couleur ambre
+- Image : `rounded-2xl`
+- Specs : badges arrondis
 
-- Compteurs animés : "5 000+ stores installés", "4.9/5 Trustpilot", "173 coloris"
-- Grande image d'ambiance + texte + bouton CTA
+### 10. Values Section (`src/components/home/ValuesSection.tsx`)
 
-### 11. Gallery → Garder masonry mais avec `rounded-2xl` plus prononcé
+- Cercles icônes : gradient ambre au lieu de bg-primary/10
+- Cartes avec hover lift effect
 
-### 12. Testimonials → Style Zohco large cards
+### 11. Configurateur (`src/components/product/ConfiguratorSection.tsx`)
 
-- Cards plus grandes avec fond blanc, grande citation
-- Slider avec compteur `01 / 04`
-- Flèches de navigation stylisées
+- Card : `rounded-2xl` avec shadow-lg
+- Badge "Configurateur" : pastille gradient ambre
+- Inputs : `rounded-lg`
+- Options switches : accent ambre
+- Prix : grande typo ambre/orange
+- CTA "Commander" : bouton gradient full-width avec glow
+- Trust badges : pastilles arrondies
 
-### 13. Process → Steps numérotés avec ligne verticale
+### 12. Gallery Section (`src/components/home/GallerySection.tsx`)
 
-- Style minimal : numéro + titre + description en colonne
-- Ligne de connexion teal
+- Images : `rounded-xl` avec overlay gradient warm
+- Caption : fond avec blur + rounded
 
-### 14. FAQ → Plus minimal
+### 13. Testimonials (`src/components/home/TestimonialsSection.tsx`)
 
-- Accordion pleine largeur, pas de border arrondi, juste des séparateurs horizontaux
+- Cartes : `rounded-xl shadow-md`
+- Avatar : cercle avec border ambre
+- Navigation arrows : cercles avec fond gradient
 
-### 15. ContactCTA → Section teal profond
+### 14. Process Section (`src/components/home/ProcessSection.tsx`)
 
-- Fond `bg-primary` (teal), texte blanc
-- 2 boutons : outline blanc + filled blanc
-- Optionnel : petites images dispersées comme Zohco
+- Steps : cercles numérotés avec gradient ambre au lieu d'emojis
+- Ligne de connexion : gradient ambre
+- Texte step : style badge arrondi
 
-### 16. Footer → Minimal teal
+### 15. FAQ Section (`src/components/home/FAQSection.tsx`)
 
-- Fond teal profond, texte clair
-- Layout 4 colonnes plus aéré
+- Accordion : `rounded-xl` avec hover state ambre
 
-### Fichiers modifiés (16 fichiers)
+### 16. Contact CTA (`src/components/home/ContactCTASection.tsx`)
 
-| Fichier | Changement principal |
+- Background : gradient dark → ambre subtil au lieu de gris
+- Boutons arrondis
+
+### 17. Footer (`src/components/Footer.tsx`)
+
+- Background : brun profond chaud au lieu de noir pur
+- Accents ambre pour les liens hover
+- Badge "Fabriqué en France" arrondi avec border ambre
+
+### 18. Contact Widget (`src/components/ContactWidget.tsx`)
+
+- FAB : gradient ambre arrondi avec glow
+- Popup : `rounded-2xl`
+- Header : gradient ambre
+
+### 19. Exit Intent Popup (`src/components/ExitIntentPopup.tsx`)
+
+- Modal : `rounded-2xl`
+- CTA : gradient button
+- Background overlay : teinté chaud
+
+### 20. Promo Banner (`src/components/PromoBanner.tsx`)
+
+- Style : gradient ambre → orange
+
+### 21. Cookie Banner (`src/components/CookieBanner.tsx`)
+
+- Arrondi, bouton accent ambre
+
+---
+
+### Fichiers modifiés (22 fichiers)
+
+| Fichier | Changements |
 |---|---|
-| `index.html` | Font Inter Tight |
-| `src/index.css` | Palette teal complète |
-| `tailwind.config.ts` | fontFamily Inter Tight |
-| `src/components/ui/button.tsx` | Style teal, hover reveal |
-| `src/components/Header.tsx` | Minimal, fond card, CTA sombre |
-| `src/components/home/HeroSection.tsx` | Full-width, titre géant + panoramique |
-| `src/components/home/MarqueeSection.tsx` | Pills trust défilantes |
-| `src/components/home/ProductHighlightSection.tsx` | Values + tag pills |
-| `src/components/product/ProductFeaturesSection.tsx` | Tabs numérotés, fond sombre |
-| `src/components/home/ValuesSection.tsx` | Cards services grille |
-| `src/components/home/ConfiguratorCTASection.tsx` | Stats animés + CTA |
-| `src/components/home/GallerySection.tsx` | Arrondi plus prononcé |
-| `src/components/home/TestimonialsSection.tsx` | Large cards, compteur |
-| `src/components/home/ProcessSection.tsx` | Minimal numéroté |
-| `src/components/home/FAQSection.tsx` | Séparateurs, minimal |
-| `src/components/home/ContactCTASection.tsx` | Fond teal, CTA blanc |
-| `src/components/Footer.tsx` | Teal profond, 4 colonnes |
+| `index.html` | Google Fonts (Playfair Display + DM Sans) |
+| `src/index.css` | Palette complète (CSS variables) + radius |
+| `tailwind.config.ts` | fontFamily, nouveaux keyframes |
+| `src/components/ui/button.tsx` | Nouveau variant "gradient", rounded |
+| `src/components/Header.tsx` | Glass morphism, bouton gradient |
+| `src/components/home/HeroSection.tsx` | Gradient fond, CTA gradient, badges |
+| `src/components/home/MarqueeSection.tsx` | Fond gradient ambre |
+| `src/components/home/ProductHighlightSection.tsx` | Arrondis, badge, CTA |
+| `src/components/home/FabricSection.tsx` | Arrondis, checks ambre |
+| `src/components/home/ValuesSection.tsx` | Icônes gradient, hover lift |
+| `src/components/product/ProductFeaturesSection.tsx` | Cartes arrondies |
+| `src/components/product/ConfiguratorSection.tsx` | Card arrondie, gradient CTA, inputs |
+| `src/components/home/GallerySection.tsx` | Images arrondies |
+| `src/components/home/TestimonialsSection.tsx` | Cartes arrondies, avatars |
+| `src/components/home/ProcessSection.tsx` | Steps numérotés, gradient |
+| `src/components/home/FAQSection.tsx` | Accordion arrondi |
+| `src/components/home/ContactCTASection.tsx` | Gradient fond, boutons |
+| `src/components/Footer.tsx` | Brun chaud, accents ambre |
+| `src/components/ContactWidget.tsx` | FAB gradient, popup arrondie |
+| `src/components/ExitIntentPopup.tsx` | Modal arrondie, CTA gradient |
+| `src/components/PromoBanner.tsx` | Gradient |
+| `src/components/CookieBanner.tsx` | Arrondis |
 
-### Approche
+### Approche d'implémentation
 
-Phase 1 : Fondations (palette, typo, boutons)
-Phase 2 : Layout (Header, Footer)
-Phase 3 : Sections dans l'ordre de la page (Hero → ContactCTA)
+Phase 1 : Fondations (index.html, index.css, tailwind.config.ts, button.tsx) — palette + typo + radius
+Phase 2 : Layout (Header, Footer, Layout, PromoBanner, CookieBanner)
+Phase 3 : Sections home (Hero → Contact CTA, dans l'ordre de la page)
+Phase 4 : Configurateur + widgets (ConfiguratorSection, ContactWidget, ExitIntentPopup)
 

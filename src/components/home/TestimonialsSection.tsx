@@ -22,7 +22,7 @@ function initials(name: string) {
 const FilledStars = ({ count }: { count: number }) => (
   <div className="flex gap-0.5">
     {[1, 2, 3, 4, 5].map(i => (
-      <Star key={i} className={`w-4 h-4 ${i <= count ? "fill-[#00b67a] text-[#00b67a]" : "fill-muted text-muted"}`} />
+      <Star key={i} className={`w-5 h-5 ${i <= count ? "fill-[#00b67a] text-[#00b67a]" : "fill-muted text-muted"}`} />
     ))}
   </div>
 );
@@ -33,6 +33,7 @@ const TestimonialsSection = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [currentIndex, setCurrentIndex] = useState(0);
 
   const fallbackItems = content.homepage.testimonials.filter(t => t.active).map(t => ({
     id: t.name, stars: t.rating ?? 5, title: "", text: t.text,
@@ -46,6 +47,8 @@ const TestimonialsSection = () => {
     if (!el) return;
     setCanScrollLeft(el.scrollLeft > 10);
     setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 10);
+    const cardWidth = el.querySelector("div")?.offsetWidth ?? 400;
+    setCurrentIndex(Math.round(el.scrollLeft / (cardWidth + 24)));
   };
 
   useEffect(() => {
@@ -59,35 +62,42 @@ const TestimonialsSection = () => {
   const scroll = (dir: "left" | "right") => {
     const el = scrollRef.current;
     if (!el) return;
-    const cardWidth = el.querySelector("div")?.offsetWidth ?? 340;
+    const cardWidth = el.querySelector("div")?.offsetWidth ?? 400;
     el.scrollBy({ left: dir === "left" ? -cardWidth - 24 : cardWidth + 24, behavior: "smooth" });
   };
 
   if (loading && items.length === 0) return null;
 
   return (
-    <section className="py-16 lg:py-20 bg-card">
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
+    <section className="py-20 lg:py-28 bg-card">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
-          <div className="flex items-end justify-between mb-10">
-            <h2 className="font-display text-4xl md:text-5xl font-extrabold">
-              Ce que nos clients <span className="text-primary">en pensent</span>
-            </h2>
-            <div className="hidden md:flex gap-2">
-              <button
-                onClick={() => scroll("left")}
-                disabled={!canScrollLeft}
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-colors disabled:opacity-30"
-              >
-                <ChevronLeft className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => scroll("right")}
-                disabled={!canScrollRight}
-                className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-primary/10 hover:border-primary transition-colors disabled:opacity-30"
-              >
-                <ChevronRight className="w-5 h-5" />
-              </button>
+          <div className="flex items-end justify-between mb-12">
+            <div>
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
+                Ce que nos clients<br /><span className="text-accent-light">en pensent</span>
+              </h2>
+            </div>
+            <div className="hidden md:flex items-center gap-4">
+              <span className="text-sm font-mono text-muted-foreground">
+                {String(currentIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
+              </span>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => scroll("left")}
+                  disabled={!canScrollLeft}
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors disabled:opacity-30"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scroll("right")}
+                  disabled={!canScrollRight}
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors disabled:opacity-30"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </AnimatedSection>
@@ -100,27 +110,27 @@ const TestimonialsSection = () => {
           {items.map((review, i) => (
             <div
               key={review.id || i}
-              className="min-w-[300px] max-w-[340px] flex-shrink-0 snap-start bg-background rounded-xl p-6 shadow-md flex flex-col"
+              className="min-w-[340px] max-w-[400px] flex-shrink-0 snap-start bg-background rounded-2xl p-8 flex flex-col"
             >
               <FilledStars count={review.stars} />
               {review.title && (
-                <p className="font-semibold text-foreground mt-3 mb-1 text-sm">{review.title}</p>
+                <p className="font-bold text-foreground mt-4 mb-1">{review.title}</p>
               )}
-              <p className="text-sm text-muted-foreground line-clamp-4 flex-1 mt-2">
+              <p className="text-muted-foreground line-clamp-5 flex-1 mt-3 leading-relaxed">
                 "{review.text}"
               </p>
-              <div className="flex items-center gap-3 mt-4 pt-3 border-t border-border">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-accent-light/20 flex items-center justify-center text-xs font-medium text-primary">
+              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-bold text-foreground">
                   {initials(review.consumer.displayName)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-foreground truncate">{review.consumer.displayName}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{review.consumer.displayName}</p>
                   {review.createdAt && (
-                    <p className="text-[11px] text-muted-foreground">{timeAgo(review.createdAt)}</p>
+                    <p className="text-xs text-muted-foreground">{timeAgo(review.createdAt)}</p>
                   )}
                 </div>
-                <span className="inline-flex items-center gap-1 text-[10px] text-[#00b67a] font-medium whitespace-nowrap">
-                  <CheckCircle2 className="w-3 h-3" /> Vérifié
+                <span className="inline-flex items-center gap-1 text-[11px] text-[#00b67a] font-medium whitespace-nowrap">
+                  <CheckCircle2 className="w-3.5 h-3.5" /> Vérifié
                 </span>
               </div>
             </div>

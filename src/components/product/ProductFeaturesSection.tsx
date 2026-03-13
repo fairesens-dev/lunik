@@ -1,78 +1,97 @@
+import { useState } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
-import { ArrowRight } from "lucide-react";
 
-const rows = [
+const tabs = [
   {
-    label: "TOILE",
-    title: "Toile Orchestra by Dickson — La référence mondiale",
+    num: "01",
+    label: "Toile",
+    title: "Toile Orchestra by Dickson",
     body: "173 coloris en acrylique teint masse avec traitement Cleanguard. Certifiée OEKO-TEX classe II, garantie 10 ans. La référence mondiale de la protection solaire.",
     specs: ["Traitement anti-taches et anti-moisissures", "Résistance UV classement 5/5", "Garantie 5 ans"],
     image: "/images/store-toile-detail.webp",
     imageAlt: "Détail de la toile Dickson du store coffre",
-    reverse: false,
   },
   {
-    label: "STRUCTURE",
-    title: "Armature aluminium — Robustesse et élégance",
-    body: "Profilés aluminium extrudé thermolaqué, traitement anti-corrosion. Notre coffre intégral protège la toile des intempéries quand le store est replié. Aucun entretien nécessaire.",
+    num: "02",
+    label: "Structure",
+    title: "Armature aluminium extrudé",
+    body: "Profilés aluminium extrudé thermolaqué, traitement anti-corrosion. Notre coffre intégral protège la toile des intempéries quand le store est replié.",
     specs: ["Aluminium extrudé haute résistance", "Coffre intégral étanche", "Sans entretien"],
     image: "/images/store-bras-fixations.webp",
     imageAlt: "Détail des fixations aluminium du store coffre",
-    reverse: true,
   },
   {
-    label: "MOTORISATION",
-    title: "Motorisation Somfy io — Confort absolu",
-    body: "Pilotez votre store depuis une télécommande, un interrupteur mural ou votre smartphone via l'application TaHoma de Somfy. Compatible avec les assistants vocaux Google et Alexa.",
+    num: "03",
+    label: "Motorisation",
+    title: "Motorisation Somfy io",
+    body: "Pilotez votre store depuis une télécommande, un interrupteur mural ou votre smartphone via l'application TaHoma de Somfy. Compatible assistants vocaux.",
     specs: ["Application TaHoma iOS & Android", "Compatible Google Home & Alexa", "Détecteur de vent en option"],
     image: "/images/store-led-nuit.webp",
     imageAlt: "Store coffre avec éclairage LED intégré de nuit",
-    reverse: false,
   },
 ];
 
-const ProductFeaturesSection = () => (
-  <section id="features" className="py-16 lg:py-20 bg-card">
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
-      <AnimatedSection>
-        <div className="text-center mb-20">
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight mb-4">
-            Conçu pour durer.
-            <br />
-            <span className="text-primary">Pensé pour vous.</span>
-          </h2>
-          <p className="text-muted-foreground text-sm">Un store coffre haut de gamme où chaque détail compte.</p>
-        </div>
-      </AnimatedSection>
+const ProductFeaturesSection = () => {
+  const [active, setActive] = useState(0);
+  const current = tabs[active];
 
-      <div className="space-y-24">
-        {rows.map((row, i) => (
-          <AnimatedSection key={row.label} delay={i * 0.1}>
-            <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${row.reverse ? "lg:direction-rtl" : ""}`}>
-              <div className={`${row.reverse ? "lg:order-2" : ""}`}>
-                <div className="aspect-[4/3] overflow-hidden rounded-xl shadow-md">
-                  <img src={row.image} alt={row.imageAlt} className="w-full h-full object-cover" loading="lazy" />
+  return (
+    <section id="features" className="py-20 lg:py-28 bg-foreground text-background">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
+        <AnimatedSection>
+          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-16">
+            Conçu pour durer.<br />
+            <span className="text-accent-light">Pensé pour vous.</span>
+          </h2>
+        </AnimatedSection>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
+          {/* Left — tabs */}
+          <div className="space-y-0">
+            {tabs.map((tab, i) => (
+              <button
+                key={tab.num}
+                onClick={() => setActive(i)}
+                className={`w-full text-left border-t border-background/20 py-6 transition-all duration-300 group ${
+                  i === active ? "opacity-100" : "opacity-40 hover:opacity-70"
+                }`}
+              >
+                <div className="flex items-start gap-4">
+                  <span className="text-xs font-mono text-accent-light mt-1">{tab.num}.</span>
+                  <div>
+                    <h3 className="font-display text-xl font-bold mb-1">{tab.label}</h3>
+                    {i === active && (
+                      <div className="animate-fade-in">
+                        <p className="text-background/60 text-sm leading-relaxed mb-4">{tab.body}</p>
+                        <div className="space-y-1.5">
+                          {tab.specs.map((spec) => (
+                            <p key={spec} className="text-xs text-accent-light">→ {spec}</p>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <div className={`${row.reverse ? "lg:order-1" : ""}`}>
-                <p className="text-xs uppercase tracking-[0.3em] text-primary mb-4 font-sans font-medium">{row.label}</p>
-                <h3 className="font-display text-2xl md:text-3xl font-bold mb-4">{row.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed mb-6">{row.body}</p>
-                <div className="space-y-2">
-                  {row.specs.map((spec) => (
-                    <div key={spec} className="flex items-center gap-2 text-sm text-foreground">
-                      <ArrowRight className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                      <span>{spec}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              </button>
+            ))}
+            <div className="border-t border-background/20" />
+          </div>
+
+          {/* Right — image */}
+          <AnimatedSection>
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl sticky top-32">
+              <img
+                src={current.image}
+                alt={current.imageAlt}
+                className="w-full h-full object-cover transition-all duration-500"
+                loading="lazy"
+              />
             </div>
           </AnimatedSection>
-        ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default ProductFeaturesSection;

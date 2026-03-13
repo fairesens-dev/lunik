@@ -9,54 +9,33 @@ const steps = [
 ];
 
 const ProcessSection = () => (
-  <section className="py-16 lg:py-20 bg-card">
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
+  <section className="py-20 lg:py-28">
+    <div className="max-w-[900px] mx-auto px-6">
       <AnimatedSection>
-        <div className="text-center mb-20">
-          <h2 className="font-display text-4xl md:text-5xl font-extrabold leading-tight">
-            De votre canapé à votre terrasse
-            <br />
-            <span className="text-primary">en 5 étapes</span>
-          </h2>
-        </div>
+        <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center mb-20">
+          De votre canapé<br />à votre terrasse
+        </h2>
       </AnimatedSection>
 
-      {/* Desktop horizontal */}
-      <div className="hidden md:flex items-start justify-between gap-4">
-        {steps.map((step, i) => (
-          <AnimatedSection key={step.title} delay={i * 0.1}>
-            <div className="flex-1 text-center relative">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-accent-light text-white flex items-center justify-center text-lg font-bold mx-auto mb-4">
-                {i + 1}
-              </div>
-              <h3 className="font-display text-lg font-semibold mb-2">{step.title}</h3>
-              <p className="text-muted-foreground text-xs leading-relaxed">{step.desc}</p>
-              {i < steps.length - 1 && (
-                <div className="absolute top-6 left-[60%] w-[80%] h-px bg-gradient-to-r from-primary/30 to-accent-light/30" />
-              )}
-            </div>
-          </AnimatedSection>
-        ))}
-      </div>
+      <div className="relative">
+        {/* Vertical line */}
+        <div className="absolute left-[19px] top-0 bottom-0 w-px bg-border hidden md:block" />
 
-      {/* Mobile vertical */}
-      <div className="md:hidden space-y-10">
-        {steps.map((step, i) => (
-          <AnimatedSection key={step.title} delay={i * 0.1}>
-            <div className="flex gap-4">
-              <div className="flex flex-col items-center">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-accent-light text-white flex items-center justify-center text-sm font-bold shrink-0">
+        <div className="space-y-12">
+          {steps.map((step, i) => (
+            <AnimatedSection key={step.title} delay={i * 0.1}>
+              <div className="flex gap-6 items-start">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0 relative z-10">
                   {i + 1}
                 </div>
-                {i < steps.length - 1 && <div className="w-px flex-1 bg-gradient-to-b from-primary/30 to-accent-light/30 mt-2" />}
+                <div className="pt-1">
+                  <h3 className="font-display text-xl font-bold mb-1">{step.title}</h3>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
+                </div>
               </div>
-              <div>
-                <h3 className="font-display text-lg font-semibold mb-1">{step.title}</h3>
-                <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
-              </div>
-            </div>
-          </AnimatedSection>
-        ))}
+            </AnimatedSection>
+          ))}
+        </div>
       </div>
     </div>
   </section>

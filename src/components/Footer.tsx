@@ -13,46 +13,31 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-[hsl(20,15%,12%)] text-[hsl(40,40%,93%)]">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-20">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-20">
+    <footer className="bg-primary text-primary-foreground">
+      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-10">
           <div>
-            <img src={logoLunik} alt={g.brandName} className="h-8 brightness-0 invert mb-2" />
-            <p className="text-[hsl(40,40%,93%)]/60 text-sm leading-relaxed mb-6 max-w-xs">
-              L'excellence du store sur mesure, fabriqué en France avec passion et savoir-faire depuis plus de 20 ans.
+            <img src={logoLunik} alt={g.brandName} className="h-8 brightness-0 invert mb-4" />
+            <p className="text-primary-foreground/50 text-sm leading-relaxed max-w-xs">
+              L'excellence du store sur mesure, fabriqué en France avec passion et savoir-faire.
             </p>
-            <div className="flex gap-4">
-              {socialLinks.map((social) => (
-                <a
-                  key={social.label}
-                  href={social.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="opacity-40 hover:opacity-100 hover:text-primary transition-all text-xs uppercase tracking-widest"
-                >
-                  {social.label}
-                </a>
-              ))}
-            </div>
           </div>
 
           <div>
-            <h4 className="text-xs uppercase tracking-[0.2em] opacity-40 mb-6 font-sans font-medium">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-primary-foreground/40 mb-6 font-sans font-medium">
               Navigation
             </h4>
             <nav className="flex flex-col gap-3">
               {[
-                { label: "Configurateur", href: "/#configurator" },
+                { label: "Accueil", href: "/" },
+                { label: "Configurateur", href: "/configurateur" },
                 { label: "Service Après-Vente", href: "/service-apres-vente" },
                 { label: "Contact", href: "/contact" },
-                { label: "CGV", href: "/conditions-generales-de-vente" },
-                { label: "Mentions Légales", href: "/mentions-legales" },
-                { label: "Politique de cookies", href: "/cookies" },
               ].map((link) => (
                 <Link
                   key={link.href}
                   to={link.href}
-                  className="opacity-60 hover:opacity-100 hover:text-primary transition-all text-sm"
+                  className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm"
                 >
                   {link.label}
                 </Link>
@@ -61,31 +46,60 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="text-xs uppercase tracking-[0.2em] opacity-40 mb-6 font-sans font-medium">
+            <h4 className="text-xs uppercase tracking-[0.2em] text-primary-foreground/40 mb-6 font-sans font-medium">
+              Légal
+            </h4>
+            <nav className="flex flex-col gap-3">
+              {[
+                { label: "CGV", href: "/conditions-generales-de-vente" },
+                { label: "Mentions Légales", href: "/mentions-legales" },
+                { label: "Politique de cookies", href: "/cookies" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className="text-primary-foreground/60 hover:text-primary-foreground transition-colors text-sm"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h4 className="text-xs uppercase tracking-[0.2em] text-primary-foreground/40 mb-6 font-sans font-medium">
               Contact
             </h4>
-            <div className="space-y-3 text-sm opacity-60">
+            <div className="space-y-3 text-sm text-primary-foreground/60">
               <p>{g.email}</p>
               <p>{g.phone}</p>
               <p>Lundi – Vendredi : 9h – 18h</p>
             </div>
-            <div className="mt-8 inline-flex items-center gap-2 border border-primary/30 rounded-full px-4 py-2 text-xs uppercase tracking-widest text-primary">
-              <span>🇫🇷</span>
-              <span>Fabriqué en France</span>
+            <div className="flex gap-4 mt-6">
+              {socialLinks.map((social) => (
+                <a
+                  key={social.label}
+                  href={social.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary-foreground/40 hover:text-primary-foreground transition-colors text-xs uppercase tracking-widest"
+                >
+                  {social.label}
+                </a>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="border-t border-white/10">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-12 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="opacity-30 text-xs">
+      <div className="border-t border-primary-foreground/10">
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-primary-foreground/30 text-xs">
             © {new Date().getFullYear()} {g.brandName}. Tous droits réservés.
           </p>
-          <div className="flex gap-6">
-            <Link to="/conditions-generales-de-vente" className="opacity-30 hover:opacity-60 transition-opacity text-xs">CGV</Link>
-            <Link to="/mentions-legales" className="opacity-30 hover:opacity-60 transition-opacity text-xs">Mentions Légales</Link>
-            <Link to="/cookies" className="opacity-30 hover:opacity-60 transition-opacity text-xs">Cookies</Link>
+          <div className="inline-flex items-center gap-2 text-xs text-primary-foreground/40">
+            <span>🇫🇷</span>
+            <span>Fabriqué en France</span>
           </div>
         </div>
       </div>
