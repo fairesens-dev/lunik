@@ -468,60 +468,101 @@ export type Database = {
       }
       modals: {
         Row: {
+          background_color: string
+          body_text: string | null
           button_text: string | null
           button_url: string | null
+          campaign_id: string | null
           conversions_count: number
           created_at: string
           display_frequency: Database["public"]["Enums"]["modal_frequency"]
+          form_enabled: boolean
+          form_fields: Json
           html_content: string | null
           id: string
           image_url: string | null
           impressions_count: number
           name: string
+          redirect_url: string | null
           show_to: Database["public"]["Enums"]["modal_show_to"]
           status: Database["public"]["Enums"]["modal_status"]
           target_pages: string[] | null
+          text_color: string
+          title: string | null
           trigger_type: Database["public"]["Enums"]["modal_trigger"]
           trigger_value: string | null
           type: Database["public"]["Enums"]["modal_type"]
+          updated_at: string
+          webhook_url: string | null
+          width_size: string
         }
         Insert: {
+          background_color?: string
+          body_text?: string | null
           button_text?: string | null
           button_url?: string | null
+          campaign_id?: string | null
           conversions_count?: number
           created_at?: string
           display_frequency?: Database["public"]["Enums"]["modal_frequency"]
+          form_enabled?: boolean
+          form_fields?: Json
           html_content?: string | null
           id?: string
           image_url?: string | null
           impressions_count?: number
           name: string
+          redirect_url?: string | null
           show_to?: Database["public"]["Enums"]["modal_show_to"]
           status?: Database["public"]["Enums"]["modal_status"]
           target_pages?: string[] | null
+          text_color?: string
+          title?: string | null
           trigger_type?: Database["public"]["Enums"]["modal_trigger"]
           trigger_value?: string | null
           type?: Database["public"]["Enums"]["modal_type"]
+          updated_at?: string
+          webhook_url?: string | null
+          width_size?: string
         }
         Update: {
+          background_color?: string
+          body_text?: string | null
           button_text?: string | null
           button_url?: string | null
+          campaign_id?: string | null
           conversions_count?: number
           created_at?: string
           display_frequency?: Database["public"]["Enums"]["modal_frequency"]
+          form_enabled?: boolean
+          form_fields?: Json
           html_content?: string | null
           id?: string
           image_url?: string | null
           impressions_count?: number
           name?: string
+          redirect_url?: string | null
           show_to?: Database["public"]["Enums"]["modal_show_to"]
           status?: Database["public"]["Enums"]["modal_status"]
           target_pages?: string[] | null
+          text_color?: string
+          title?: string | null
           trigger_type?: Database["public"]["Enums"]["modal_trigger"]
           trigger_value?: string | null
           type?: Database["public"]["Enums"]["modal_type"]
+          updated_at?: string
+          webhook_url?: string | null
+          width_size?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "modals_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       orders: {
         Row: {
