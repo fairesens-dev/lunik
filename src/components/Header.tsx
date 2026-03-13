@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.png";
+import logoLunikWhite from "@/assets/logo-lunik-white.png";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
@@ -23,6 +24,9 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
 
+  const isHomepage = location.pathname === "/";
+  const isTransparent = isHomepage && !scrolled;
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", onScroll);
@@ -39,14 +43,18 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
         className={cn(
           "fixed left-0 right-0 z-50 transition-all duration-500",
           bannerOffset ? "top-[40px]" : "top-0",
-          scrolled
-            ? "bg-card/95 backdrop-blur-md border-b border-border"
-            : "bg-card/80 backdrop-blur-sm"
+          isTransparent
+            ? "bg-transparent"
+            : "bg-card/95 backdrop-blur-md border-b border-border"
         )}
       >
         <div className="max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 flex items-center justify-between h-20">
           <Link to="/">
-            <img src={logoLunik} alt={content.global.brandName} className="h-8" />
+            <img
+              src={isTransparent ? logoLunikWhite : logoLunik}
+              alt={content.global.brandName}
+              className="h-8 transition-all duration-300"
+            />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-10">
@@ -56,7 +64,11 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
                 href={link.href}
                 className={cn(
                   "text-[13px] uppercase tracking-[0.12em] font-medium transition-colors",
-                  location.pathname === link.href
+                  isTransparent
+                    ? location.pathname === link.href
+                      ? "text-white"
+                      : "text-white/70 hover:text-white"
+                    : location.pathname === link.href
                     ? "text-foreground"
                     : "text-muted-foreground hover:text-foreground"
                 )}
@@ -67,13 +79,18 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
           </nav>
 
           <Link to="/configurateur" className="hidden lg:block">
-            <Button className="px-6 py-3 tracking-[0.12em] uppercase text-xs font-medium h-auto">
+            <Button
+              className={cn(
+                "px-6 py-3 tracking-[0.12em] uppercase text-xs font-medium h-auto",
+                isTransparent && "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20"
+              )}
+            >
               Configurer mon store
             </Button>
           </Link>
 
           <button
-            className="lg:hidden p-2"
+            className={cn("lg:hidden p-2", isTransparent && "text-white")}
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-label="Menu"
           >

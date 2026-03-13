@@ -7,13 +7,14 @@ import HeroSection from "@/components/home/HeroSection";
 import MarqueeSection from "@/components/home/MarqueeSection";
 import ProductHighlightSection from "@/components/home/ProductHighlightSection";
 import ProductFeaturesSection from "@/components/product/ProductFeaturesSection";
-
+import ValuesSection from "@/components/home/ValuesSection";
 import ConfiguratorCTASection from "@/components/home/ConfiguratorCTASection";
 import GallerySection from "@/components/home/GallerySection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
 import ProcessSection from "@/components/home/ProcessSection";
 import FAQSection from "@/components/home/FAQSection";
 import ContactCTASection from "@/components/home/ContactCTASection";
+import StickyCTABar from "@/components/home/StickyCTABar";
 import SocialProofToast from "@/components/SocialProofToast";
 import SEOMeta from "@/components/SEOMeta";
 
@@ -51,13 +52,14 @@ const Index = () => {
       <MarqueeSection />
       <ProductHighlightSection />
       <ProductFeaturesSection />
-      
+      <ValuesSection />
       <ConfiguratorCTASection />
       <GallerySection />
       <TestimonialsSection />
       <ProcessSection />
       <FAQSection />
       <ContactCTASection />
+      <StickyCTABar />
       <SocialProofToast />
     </>
   );

@@ -1,37 +1,41 @@
 import AnimatedSection from "@/components/AnimatedSection";
 
 const steps = [
-  { title: "Je configure en ligne", desc: "Sélectionnez vos dimensions et options en temps réel" },
-  { title: "Je valide et commande", desc: "Paiement sécurisé, confirmation immédiate par email" },
-  { title: "Fabrication sur-mesure", desc: "Votre store est fabriqué en France selon vos côtes" },
-  { title: "Livraison à domicile", desc: "Livré sous 4 à 5 semaines, pris en charge par nos transporteurs" },
-  { title: "Je profite !", desc: "Installation possible avec nos poseurs certifiés ou en autonomie" },
+  { title: "Je configure", desc: "Dimensions et options en temps réel" },
+  { title: "Je commande", desc: "Paiement sécurisé, confirmation immédiate" },
+  { title: "Fabrication", desc: "Sur-mesure en France selon vos côtes" },
+  { title: "Livraison", desc: "Chez vous en 4 à 5 semaines" },
+  { title: "Je profite !", desc: "Installation pro ou en autonomie" },
 ];
 
 const ProcessSection = () => (
   <section className="py-20 lg:py-28">
-    <div className="max-w-[900px] mx-auto px-6">
+    <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
       <AnimatedSection>
-        <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-center mb-20">
-          Comment ça marche ?
-        </h2>
+        <div className="text-center mb-16">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
+            Simple & rapide
+          </p>
+          <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">
+            Comment ça marche ?
+          </h2>
+        </div>
       </AnimatedSection>
 
+      {/* Horizontal timeline */}
       <div className="relative">
-        {/* Vertical line */}
-        <div className="absolute left-[19px] top-0 bottom-0 w-px bg-border hidden md:block" />
+        {/* Connecting line — desktop only */}
+        <div className="hidden md:block absolute top-5 left-[10%] right-[10%] h-px bg-border" />
 
-        <div className="space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-8 md:gap-4">
           {steps.map((step, i) => (
             <AnimatedSection key={step.title} delay={i * 0.1}>
-              <div className="flex gap-6 items-start">
-                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0 relative z-10">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-10 h-10 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold shrink-0 relative z-10 mb-4">
                   {i + 1}
                 </div>
-                <div className="pt-1">
-                  <h3 className="font-display text-lg font-semibold mb-1">{step.title}</h3>
-                  <p className="text-muted-foreground text-sm leading-relaxed">{step.desc}</p>
-                </div>
+                <h3 className="font-display text-base font-bold mb-1">{step.title}</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed max-w-[180px]">{step.desc}</p>
               </div>
             </AnimatedSection>
           ))}

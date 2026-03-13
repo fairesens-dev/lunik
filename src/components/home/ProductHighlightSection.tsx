@@ -1,103 +1,88 @@
 import AnimatedSection from "@/components/AnimatedSection";
-import { Button } from "@/components/ui/button";
-import { useContent } from "@/contexts/ContentContext";
-import { ShieldCheck, Sun, Droplets } from "lucide-react";
 
-const blocks = [
+const bentoItems = [
   {
-    overline: "Structure",
-    title: "Coffre intégral,\nprotection maximale",
-    desc: "Notre coffre intégral en aluminium thermolaqué protège la toile et le mécanisme des intempéries. Zéro entretien, durabilité maximale.",
-    features: [
-      { icon: ShieldCheck, text: "Aluminium extrudé anti-corrosion" },
-      { icon: Sun, text: "Coffre étanche, toile protégée" },
-      { icon: Droplets, text: "Sans entretien" },
-    ],
-    image: "/images/store-salon-vide.webp",
-    imageAlt: "Store coffre déployé au-dessus d'un salon de jardin",
-    cta: { label: "Configurer mon store →", href: "/configurateur" },
+    title: "Coffre intégral",
+    desc: "Protection totale de la toile et du mécanisme",
+    image: "/images/store-coffre-ouvert.webp",
+    span: "md:col-span-2 md:row-span-2",
+    height: "h-80 md:h-full",
   },
   {
-    overline: "Toile",
-    title: "Toile Dickson,\nla référence mondiale",
-    desc: "Toile Orchestra by Dickson disponible en 173 coloris. Acrylique teint masse avec traitement Cleanguard anti-salissures. Résistance UV classement 5/5.",
-    features: [
-      { icon: Sun, text: "Protection UV 5/5" },
-      { icon: ShieldCheck, text: "Garantie toile 10 ans" },
-      { icon: Droplets, text: "Traitement Cleanguard" },
-    ],
+    title: "Toile Dickson",
+    desc: "173 coloris, traitement Cleanguard",
     image: "/images/store-toile-detail.webp",
-    imageAlt: "Détail de la toile Dickson du store coffre",
+    span: "",
+    height: "h-64",
+  },
+  {
+    title: "Motorisation Somfy",
+    desc: "Télécommande & capteur vent intégrés",
+    image: "/images/store-bras-fixations.webp",
+    span: "",
+    height: "h-64",
+  },
+  {
+    title: "Éclairage LED",
+    desc: "Ambiance prolongée en soirée",
+    image: "/images/store-led-nuit.webp",
+    span: "",
+    height: "h-64",
+  },
+  {
+    title: "Bras articulés",
+    desc: "Aluminium extrudé haute résistance",
+    image: "/images/store-bras-detail.webp",
+    span: "",
+    height: "h-64",
+  },
+  {
+    title: "100% sur-mesure",
+    desc: "Dimensions exactes, fabriqué pour vous",
+    image: "/images/store-salon-vide.webp",
+    span: "md:col-span-2",
+    height: "h-64 md:h-72",
   },
 ];
 
-const ProductHighlightSection = () => {
-  const { content } = useContent();
+const ProductHighlightSection = () => (
+  <section className="py-20 lg:py-28">
+    <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
+      <AnimatedSection>
+        <div className="text-center mb-16">
+          <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
+            Nos points forts
+          </p>
+          <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">
+            Chaque détail<br />
+            <span className="text-accent-light">a été pensé</span>
+          </h2>
+        </div>
+      </AnimatedSection>
 
-  return (
-    <section className="py-20 lg:py-28">
-      <div className="max-w-[1400px] mx-auto px-6 lg:px-16 space-y-24">
-        {blocks.map((block, idx) => {
-          const reversed = idx % 2 !== 0;
-          return (
-            <div
-              key={block.overline}
-              className={`grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center ${reversed ? "lg:[direction:rtl]" : ""}`}
-            >
-              {/* Image */}
-              <AnimatedSection delay={reversed ? 0.15 : 0}>
-                <div className="aspect-[4/3] overflow-hidden rounded-2xl lg:[direction:ltr]">
-                  <img
-                    src={block.image}
-                    alt={block.imageAlt}
-                    className="w-full h-full object-cover"
-                    loading="lazy"
-                  />
-                </div>
-              </AnimatedSection>
-
-              {/* Content */}
-              <AnimatedSection delay={reversed ? 0 : 0.15}>
-                <div className="space-y-6 lg:[direction:ltr]">
-                  <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium">
-                    {block.overline}
-                  </p>
-                  <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight leading-[1.1]">
-                    {block.title.split("\n").map((line, i) => (
-                      <span key={i}>{i > 0 && <br />}{line}</span>
-                    ))}
-                  </h2>
-                  <p className="text-muted-foreground leading-relaxed max-w-md">
-                    {block.desc}
-                  </p>
-
-                  {/* Feature list */}
-                  <div className="space-y-3 pt-2">
-                    {block.features.map((f) => (
-                      <div key={f.text} className="flex items-center gap-3">
-                        <div className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
-                          <f.icon className="w-4 h-4 text-primary" />
-                        </div>
-                        <span className="text-sm font-medium text-foreground">{f.text}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  {block.cta && (
-                    <a href={block.cta.href}>
-                      <Button className="px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto mt-2">
-                        {block.cta.label}
-                      </Button>
-                    </a>
-                  )}
-                </div>
-              </AnimatedSection>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        {bentoItems.map((item, i) => (
+          <AnimatedSection key={item.title} delay={i * 0.08} className={item.span}>
+            <div className={`relative ${item.height} overflow-hidden rounded-2xl group cursor-pointer`}>
+              <img
+                src={item.image}
+                alt={item.title}
+                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <h3 className="font-display text-lg font-bold text-white mb-1">{item.title}</h3>
+                <p className="text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {item.desc}
+                </p>
+              </div>
             </div>
-          );
-        })}
+          </AnimatedSection>
+        ))}
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 export default ProductHighlightSection;

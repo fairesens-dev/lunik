@@ -7,12 +7,17 @@ const FAQSection = () => {
   const faqs = content.homepage.faqItems.filter(f => f.active);
 
   return (
-    <section className="py-20 lg:py-28 bg-card">
+    <section className="py-20 lg:py-28 bg-background">
       <div className="max-w-3xl mx-auto px-6">
         <AnimatedSection>
-          <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-center mb-16">
-            Questions<br /><span className="text-accent-light">fréquentes</span>
-          </h2>
+          <div className="text-center mb-16">
+            <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
+              Besoin d'aide ?
+            </p>
+            <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
+              Questions<br /><span className="text-accent-light">fréquentes</span>
+            </h2>
+          </div>
         </AnimatedSection>
         <AnimatedSection delay={0.1}>
           <Accordion type="single" collapsible className="w-full">

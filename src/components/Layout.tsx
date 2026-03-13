@@ -1,4 +1,4 @@
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
 import PromoBanner from "./PromoBanner";
@@ -9,6 +9,8 @@ import { useContent } from "@/contexts/ContentContext";
 const Layout = () => {
   const { content } = useContent();
   const bannerActive = content.promoBanner.active;
+  const location = useLocation();
+  const isHomepage = location.pathname === "/";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -18,7 +20,7 @@ const Layout = () => {
         </div>
       )}
       <Header bannerOffset={bannerActive} />
-      <main className={`flex-1 ${bannerActive ? "pt-[calc(5rem+40px)]" : "pt-20"}`}>
+      <main className={`flex-1 ${isHomepage ? "" : bannerActive ? "pt-[calc(5rem+40px)]" : "pt-20"}`}>
         <Outlet />
       </main>
       <Footer />
