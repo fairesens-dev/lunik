@@ -551,7 +551,7 @@ const ContactWidget = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={handleOpen}
-        className={`group w-14 h-14 rounded-full bg-[#1a4a42] text-white shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow ${
+        className={`group w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow ${
           !hasOpened ? "animate-pulse" : ""
         }`}
         aria-label={open ? "Fermer le chat" : "Ouvrir le chat"}
