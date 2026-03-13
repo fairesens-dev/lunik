@@ -72,7 +72,44 @@ serve(async (req) => {
         metadata: { order_number: data.order_number, problem_category: data.problem_category },
       });
 
-      return new Response(JSON.stringify({ success: true }), {
+      // Look up the order by ref and update it
+      let orderFound = false;
+      let orderStatus = "";
+      let orderDate = "";
+
+      const { data: orders } = await supabase
+        .from("orders")
+        .select("id, ref, status, status_history, notes, created_at")
+        .eq("ref", data.order_number)
+        .limit(1);
+
+      if (orders && orders.length > 0) {
+        const order = orders[0];
+        orderFound = true;
+        orderStatus = order.status;
+        orderDate = order.created_at;
+
+        const existingNotes = order.notes || "";
+        const newNote = `\n[SAV ${new Date().toLocaleDateString("fr-FR")}] ${data.problem_category}: ${data.problem_detail} (email: ${data.email})`;
+
+        const existingHistory = Array.isArray(order.status_history) ? order.status_history : [];
+        const newHistoryEntry = {
+          status: "SAV en cours",
+          date: new Date().toISOString(),
+          note: `Demande SAV - ${data.problem_category}`,
+        };
+
+        await supabase
+          .from("orders")
+          .update({
+            notes: existingNotes + newNote,
+            status: "SAV en cours",
+            status_history: [...existingHistory, newHistoryEntry],
+          })
+          .eq("id", order.id);
+      }
+
+      return new Response(JSON.stringify({ success: true, order_found: orderFound, order_status: orderFound ? "SAV en cours" : undefined, order_date: orderDate || undefined }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
