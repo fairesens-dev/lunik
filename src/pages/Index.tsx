@@ -11,7 +11,7 @@ import ValuesSection from "@/components/home/ValuesSection";
 import ConfiguratorCTASection from "@/components/home/ConfiguratorCTASection";
 import GallerySection from "@/components/home/GallerySection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
-import ProcessSection from "@/components/home/ProcessSection";
+
 import FAQSection from "@/components/home/FAQSection";
 import ContactCTASection from "@/components/home/ContactCTASection";
 import StickyCTABar from "@/components/home/StickyCTABar";
