@@ -134,38 +134,22 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
             </div>
           </button>
 
-          {/* 4x sans frais */}
-          <button
-            type="button"
-            onClick={() => setPaymentMethod("4x")}
-            className={`w-full text-left border p-5 transition-colors relative ${
-              paymentMethod === "4x" ? "border-primary bg-primary/5" : "border-border"
-            }`}
+          {/* 3x sans frais — disabled */}
+          <div
+            className="w-full text-left border p-5 relative border-border opacity-60 cursor-not-allowed"
           >
-            <span className="absolute -top-2.5 right-4 bg-primary text-primary-foreground text-[10px] px-2 py-0.5 uppercase tracking-wider font-medium">
-              Populaire 🔥
+            <span className="absolute -top-2.5 right-4 bg-muted text-muted-foreground text-[10px] px-2 py-0.5 uppercase tracking-wider font-medium">
+              Bientôt
             </span>
             <div className="flex items-start gap-4">
               <div className="flex-1">
-                <p className="text-sm font-medium">💳 Payer en 4× sans frais</p>
+                <p className="text-sm font-medium text-muted-foreground">💳 Payer en 3× sans frais</p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Étalez votre paiement sur 4 mois, sans intérêts, sans frais.
+                  Étalez votre paiement sur 3 mois, sans intérêts, sans frais.
                 </p>
-                {/* Installment breakdown */}
-                {paymentMethod === "4x" && (
-                  <div className="mt-3 space-y-1.5 text-xs">
-                    <div className="flex justify-between"><span>Aujourd'hui</span><span className="font-medium">{installment.toLocaleString("fr-FR")} €</span></div>
-                    <div className="flex justify-between"><span>Dans 30 jours</span><span>{installment.toLocaleString("fr-FR")} €</span></div>
-                    <div className="flex justify-between"><span>Dans 60 jours</span><span>{installment.toLocaleString("fr-FR")} €</span></div>
-                    <div className="flex justify-between"><span>Dans 90 jours</span><span>{installment.toLocaleString("fr-FR")} €</span></div>
-                    <div className="flex justify-between border-t border-border pt-1.5 font-medium">
-                      <span>Total</span><span>{total.toLocaleString("fr-FR")} €</span>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
-          </button>
+          </div>
         </div>
 
         {/* Security badges */}
