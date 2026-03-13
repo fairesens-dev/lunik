@@ -18,47 +18,11 @@ import SEOMeta from "@/components/SEOMeta";
 import VisualizeAtHomeDialog from "@/components/product/VisualizeAtHomeDialog";
 import ToileCloseUpDialog from "@/components/product/ToileCloseUpDialog";
 
-/* ── Réassurance par step ────────────────────────── */
-const STEP_TESTIMONIALS = {
-  "01": {
-    trust: "Fabrication française sur-mesure · Garantie 5 ans structure",
-    quote: "« Le store est arrivé exactement aux dimensions, au millimètre. Impressionnant. »",
-    author: "Laurent, Aix-en-Provence",
-    stars: 5,
-  },
-  "02": {
-    trust: "Toile Dickson garantie 10 ans · Résistance UV maximale",
-    quote: "« Après 3 étés, la toile n'a pas bougé d'un ton. Qualité Dickson irréprochable. »",
-    author: "Isabelle, Montpellier",
-    stars: 5,
-  },
-  "03": {
-    trust: "Installation professionnelle · SAV réactif sous 48h",
-    quote: "« Le capteur vent m'a sauvé le store pendant un orage, je recommande vivement. »",
-    author: "Jean-Pierre, Toulouse",
-    stars: 5,
-  },
-} as const;
-
-const StepReassurance = ({ step }: { step: "01" | "02" | "03" }) => {
-  const data = STEP_TESTIMONIALS[step];
-  return (
-    <div className="bg-secondary/50 rounded-xl p-5 mt-8">
-      <div className="flex items-center gap-1 mb-2">
-        {Array.from({ length: data.stars }).map((_, i) => (
-          <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
-        ))}
-      </div>
-      <p className="text-sm text-foreground italic leading-relaxed">{data.quote}</p>
-      <p className="text-xs text-muted-foreground mt-2 font-medium">— {data.author}</p>
-      <div className="border-t border-border/50 mt-3 pt-3">
-        <p className="text-[11px] text-muted-foreground tracking-wide flex items-center gap-1.5">
-          <Shield className="w-3 h-3 text-primary" />
-          {data.trust}
-        </p>
-      </div>
-    </div>
-  );
+/* ── Témoignage pour la fiche technique ────────────────────────── */
+const TESTIMONIAL = {
+  quote: "« Après 3 étés, la toile n'a pas bougé d'un ton. Qualité Dickson irréprochable. »",
+  author: "Isabelle, Montpellier",
+  stars: 5,
 };
 
 const ConfigurateurPage = () => {
@@ -98,10 +62,6 @@ const ConfigurateurPage = () => {
     if (activeStep === "01") setActiveStep("02");
     else if (activeStep === "02") setActiveStep("03");
   };
-  const goPrev = () => {
-    if (activeStep === "03") setActiveStep("02");
-    else if (activeStep === "02") setActiveStep("01");
-  };
 
   const handleOrder = () => {
     const toileObj = TOILE_COLORS.find(c => c.name === toileColor);
@@ -134,6 +94,15 @@ const ConfigurateurPage = () => {
   // Sort options by order field
   const sortedOptions = [...PRICING_OPTIONS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
+  // Contextual sticky bar button label & action
+  const stickyButtonLabel = activeStep === "01"
+    ? "Choisir mes couleurs"
+    : activeStep === "02"
+      ? "Personnaliser les options"
+      : "Commander";
+
+  const stickyButtonAction = activeStep === "03" ? handleOrder : goNext;
+
   return (
     <>
       <SEOMeta
@@ -141,7 +110,7 @@ const ConfigurateurPage = () => {
         description="Configurez votre store banne sur-mesure en ligne. Choisissez dimensions, toile, armature et options. Prix en temps réel."
       />
 
-      {/* Mini header — sans bouton Commander */}
+      {/* Mini header */}
       <header className="sticky top-0 z-50 h-16 bg-background/90 backdrop-blur-xl border-b border-border flex items-center px-4 lg:px-8">
         <div className="flex items-center gap-4 flex-1">
           <Link to="/" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
@@ -160,7 +129,7 @@ const ConfigurateurPage = () => {
 
         {/* LEFT — Visual panel */}
         <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
-          <div className="absolute inset-0 bottom-[88px]">
+          <div className="absolute inset-0 bottom-[140px]">
             <DynamicProductVisual
               toileColor={currentToile}
               armatureColor={currentArmature}
@@ -172,7 +141,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* 2 boutons en ligne — au-dessus de la fiche technique */}
-          <div className="absolute bottom-[108px] left-4 right-4 flex gap-2 z-20">
+          <div className="absolute bottom-[156px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
               className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
@@ -223,21 +192,36 @@ const ConfigurateurPage = () => {
             )}
           </div>
 
-          {/* Fiche technique */}
+          {/* Fiche technique + témoignage */}
           <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-3 z-10">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">Fiche technique — Toile Dickson</p>
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
-              {[
-                { label: "Composition", value: "Acrylique teint masse" },
-                { label: "Poids", value: "290 g/m²" },
-                { label: "Certification", value: "OEKO-TEX classe II" },
-                { label: "Garantie toile", value: "10 ans" },
-              ].map(item => (
-                <div key={item.label} className="bg-background/60 backdrop-blur-sm rounded-lg px-3 py-2">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
-                  <p className="text-xs font-medium text-foreground mt-0.5">{item.value}</p>
+            <div className="flex items-start gap-6">
+              {/* Specs */}
+              <div className="flex-1 min-w-0">
+                <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">Fiche technique — Toile Dickson</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                  {[
+                    { label: "Composition", value: "Acrylique teint masse" },
+                    { label: "Poids", value: "290 g/m²" },
+                    { label: "Certification", value: "OEKO-TEX classe II" },
+                    { label: "Garantie toile", value: "10 ans" },
+                  ].map(item => (
+                    <div key={item.label} className="bg-background/60 backdrop-blur-sm rounded-lg px-3 py-2">
+                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
+                      <p className="text-xs font-medium text-foreground mt-0.5">{item.value}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              </div>
+              {/* Testimonial */}
+              <div className="hidden lg:flex flex-col items-end shrink-0 max-w-[260px] pl-4 border-l border-border/50">
+                <div className="flex items-center gap-0.5 mb-1">
+                  {Array.from({ length: TESTIMONIAL.stars }).map((_, i) => (
+                    <Star key={i} className="w-3 h-3 fill-primary text-primary" />
+                  ))}
+                </div>
+                <p className="text-xs text-foreground italic leading-relaxed text-right">{TESTIMONIAL.quote}</p>
+                <p className="text-[10px] text-muted-foreground mt-1 font-medium">— {TESTIMONIAL.author}</p>
+              </div>
             </div>
           </div>
         </div>
@@ -308,14 +292,6 @@ const ConfigurateurPage = () => {
                 {basePrice !== null && (
                   <p className="text-xs text-primary font-medium">Prix de base : {basePrice.toLocaleString("fr-FR")} € TTC</p>
                 )}
-
-                <StepReassurance step="01" />
-
-                <div className="pt-4">
-                  <Button onClick={goNext} className="w-full rounded-full flex items-center justify-center gap-2">
-                    Choisir mes couleurs <ChevronRight className="w-4 h-4" />
-                  </Button>
-                </div>
               </div>
             )}
 
@@ -334,36 +310,25 @@ const ConfigurateurPage = () => {
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Armature</p>
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid grid-cols-4 gap-3">
                     {ARMATURE_COLORS.map((c) => (
-                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
+                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-1.5 group">
                         <div
-                          className={`w-11 h-4 rounded-lg border-2 relative transition-all ${
-                            armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
+                          className={`w-full aspect-[11/4] rounded-sm border-2 relative transition-all ${
+                            armatureColor === c.name ? "border-primary shadow-md ring-2 ring-primary/30" : "border-border group-hover:border-primary/50"
                           }`}
                           style={{ backgroundColor: c.hex }}
                         >
                           {armatureColor === c.name && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="w-3 h-3 text-primary-foreground drop-shadow" />
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/20 rounded-sm">
+                              <Check className="w-5 h-5 text-white drop-shadow" />
                             </div>
                           )}
                         </div>
-                        <span className="text-[9px] text-muted-foreground text-center leading-tight max-w-[44px]">{c.name}</span>
+                        <span className="text-[9px] text-muted-foreground text-center leading-tight w-full truncate">{c.name}</span>
                       </button>
                     ))}
                   </div>
-                </div>
-
-                <StepReassurance step="02" />
-
-                <div className="flex gap-3 pt-4">
-                  <Button variant="outline" onClick={goPrev} className="flex-1 rounded-full">
-                    Dimensions
-                  </Button>
-                  <Button onClick={goNext} className="flex-1 rounded-full flex items-center justify-center gap-2">
-                    Personnaliser les options <ChevronRight className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
             )}
@@ -430,19 +395,6 @@ const ConfigurateurPage = () => {
                     </div>
                   );
                 })}
-
-                <StepReassurance step="03" />
-
-                <div className="flex gap-3 pt-4">
-                  <Button variant="outline" onClick={goPrev} className="flex-1 rounded-full">
-                    Couleurs
-                  </Button>
-                  {basePrice !== null && (
-                    <Button onClick={handleOrder} variant="gradient" className="flex-1 rounded-full flex items-center justify-center gap-2">
-                      Commander <ChevronRight className="w-4 h-4" />
-                    </Button>
-                  )}
-                </div>
               </div>
             )}
 
@@ -451,7 +403,7 @@ const ConfigurateurPage = () => {
             </div>
           </div>
 
-          {/* Sticky price bar */}
+          {/* Sticky price bar — contextual button */}
           <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl p-4 lg:p-6">
             {basePrice === null ? (
               <p className="text-sm text-destructive text-center">Sélectionnez des dimensions valides pour voir le prix.</p>
@@ -466,11 +418,11 @@ const ConfigurateurPage = () => {
                   </p>
                 </div>
                 <Button
-                  onClick={handleOrder}
+                  onClick={stickyButtonAction}
                   variant="gradient"
                   className="px-8 py-4 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto shadow-lg hover:shadow-xl"
                 >
-                  Commander
+                  {stickyButtonLabel}
                 </Button>
               </div>
             )}
