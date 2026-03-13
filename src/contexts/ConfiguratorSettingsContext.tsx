@@ -263,7 +263,13 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       return { ...s, options };
     }), []);
 
+  const updatePriceGrid = useCallback((grid: (number | null)[][]) => {
+    setPriceGrid(grid);
+    setSettings(s => { upsertSetting("priceGrid", grid); return { ...s, priceGrid: grid }; });
+  }, []);
+
   const resetToDefaults = useCallback(() => {
+    setPriceGrid(DEFAULT_SETTINGS.priceGrid);
     setSettings(DEFAULT_SETTINGS);
     persistAll(DEFAULT_SETTINGS);
   }, []);
