@@ -24,26 +24,39 @@ const STEP_TESTIMONIALS = {
     trust: "Fabrication française sur-mesure · Garantie 5 ans structure",
     quote: "« Le store est arrivé exactement aux dimensions, au millimètre. Impressionnant. »",
     author: "Laurent, Aix-en-Provence",
+    stars: 5,
   },
   "02": {
     trust: "Toile Dickson garantie 10 ans · Résistance UV maximale",
     quote: "« Après 3 étés, la toile n'a pas bougé d'un ton. Qualité Dickson irréprochable. »",
     author: "Isabelle, Montpellier",
+    stars: 5,
   },
   "03": {
     trust: "Installation professionnelle · SAV réactif sous 48h",
     quote: "« Le capteur vent m'a sauvé le store pendant un orage, je recommande vivement. »",
     author: "Jean-Pierre, Toulouse",
+    stars: 5,
   },
 } as const;
 
 const StepReassurance = ({ step }: { step: "01" | "02" | "03" }) => {
   const data = STEP_TESTIMONIALS[step];
   return (
-    <div className="border-l-2 border-primary pl-4 py-2 mt-6">
-      <p className="text-[11px] text-muted-foreground font-medium tracking-wide">{data.trust}</p>
-      <p className="text-[11px] text-foreground/70 italic mt-1.5">{data.quote}</p>
-      <p className="text-[10px] text-muted-foreground mt-0.5">— {data.author}</p>
+    <div className="bg-secondary/50 rounded-xl p-5 mt-8">
+      <div className="flex items-center gap-1 mb-2">
+        {Array.from({ length: data.stars }).map((_, i) => (
+          <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
+        ))}
+      </div>
+      <p className="text-sm text-foreground italic leading-relaxed">{data.quote}</p>
+      <p className="text-xs text-muted-foreground mt-2 font-medium">— {data.author}</p>
+      <div className="border-t border-border/50 mt-3 pt-3">
+        <p className="text-[11px] text-muted-foreground tracking-wide flex items-center gap-1.5">
+          <Shield className="w-3 h-3 text-primary" />
+          {data.trust}
+        </p>
+      </div>
     </div>
   );
 };
