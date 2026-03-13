@@ -105,6 +105,7 @@ interface ConfiguratorSettingsContextType {
   updateOption: (id: string, data: Partial<Omit<OptionEntry, "id">>) => void;
   addOption: (o: OptionEntry) => void;
   removeOption: (id: string) => void;
+  updatePriceGrid: (grid: (number | null)[][]) => void;
   resetToDefaults: () => void;
 }
 
