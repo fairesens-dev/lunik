@@ -21,18 +21,10 @@ serve(async (req) => {
       throw new Error("Missing required fields: amount, ref, customerEmail");
     }
 
-    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
-      apiVersion: "2025-08-27.basil",
-    });
-
-    // Check for existing Stripe customer
-    const customers = await stripe.customers.list({ email: customerEmail, limit: 1 });
-    let customerId: string | undefined;
-    if (customers.data.length > 0) {
-      customerId = customers.data[0].id;
-    }
-
-    const origin = req.headers.get("origin") || "https://lunik.lovable.app";
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
 
     // Validate promo code if provided
     let validatedDiscount = 0;
@@ -46,7 +38,6 @@ serve(async (req) => {
 
       if (promo) {
         validatedDiscount = promoDiscount;
-        // Increment usage
         await supabaseAdmin
           .from("promo_codes")
           .update({ current_uses: (promo.current_uses || 0) + 1 })
@@ -55,59 +46,29 @@ serve(async (req) => {
     }
 
     const finalAmount = Math.max(0, amount - validatedDiscount);
+    const origin = req.headers.get("origin") || "https://lunik.lovable.app";
 
-    // Create Stripe Checkout Session
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : customerEmail,
-      line_items: [
-        {
-          price_data: {
-            currency: "eur",
-            product_data: {
-              name: productName || "Store Coffre Sur-Mesure",
-              description: description || "",
-            },
-            unit_amount: finalAmount * 100, // Convert to cents
-          },
-          quantity: 1,
-        },
-      ],
-      mode: "payment",
-      // TODO: For 4x installments, replace with Alma API or Stripe installments in production
-      payment_method_types: ["card"],
-      success_url: `${origin}/merci?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(customerEmail)}`,
-      cancel_url: `${origin}/checkout`,
-      metadata: {
-        ref,
-        payment_method: paymentMethod || "card",
-      },
-    });
-
-    // Insert order into Supabase with pending status
-    if (orderData) {
-      const supabaseAdmin = createClient(
-        Deno.env.get("SUPABASE_URL") ?? "",
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
-      );
+    // ── Helper: insert order + lead + emails ──
+    const insertOrderAndLead = async (paymentStatus: string) => {
+      if (!orderData) return null;
 
       const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
         ...orderData,
         amount: finalAmount,
         promo_code: promoCode || "",
         promo_discount: validatedDiscount,
-        payment_status: "pending",
-        stripe_payment_intent_id: session.id,
+        payment_status: paymentStatus,
+        payment_method: paymentMethod || "card",
+        stripe_payment_intent_id: "",
         status: "Nouveau",
         status_history: [{ status: "Nouveau", date: new Date().toISOString() }],
       }).select("id").single();
 
       if (insertError) {
         console.error("Order insert error:", insertError);
-        // Don't throw - still redirect to payment
       }
 
-      // Also insert a lead
+      // Insert lead
       const nameParts = (orderData.client_name || "").replace(/^(M\.|Mme)\s*/, "").split(" ");
       const firstName = nameParts[0] || "";
       const lastName = nameParts.slice(1).join(" ") || "";
@@ -126,7 +87,7 @@ serve(async (req) => {
         message: orderData.message || "",
       });
 
-      // Mark abandoned cart as converted if email matches
+      // Mark abandoned cart as converted
       if (orderData?.client_email) {
         await supabaseAdmin
           .from("abandoned_carts")
@@ -135,7 +96,7 @@ serve(async (req) => {
           .eq("converted", false);
       }
 
-      // Send confirmation + admin notification emails
+      // Send emails
       if (insertedOrder?.id) {
         const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
         const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
@@ -155,7 +116,125 @@ serve(async (req) => {
           }
         };
 
-        // Fire and forget - don't block checkout redirect
+        sendEmail("confirmation");
+        sendEmail("admin_new_order");
+      }
+
+      return insertedOrder;
+    };
+
+    // ── Transfer or Check: no Stripe ──
+    if (paymentMethod === "transfer" || paymentMethod === "check") {
+      const paymentStatus = paymentMethod === "transfer" ? "awaiting_transfer" : "awaiting_check";
+      await insertOrderAndLead(paymentStatus);
+
+      return new Response(JSON.stringify({
+        redirect: `/merci?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(customerEmail)}`,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
+    // ── Card: Stripe Checkout ──
+    const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
+      apiVersion: "2025-08-27.basil",
+    });
+
+    const customers = await stripe.customers.list({ email: customerEmail, limit: 1 });
+    let customerId: string | undefined;
+    if (customers.data.length > 0) {
+      customerId = customers.data[0].id;
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      customer_email: customerId ? undefined : customerEmail,
+      line_items: [
+        {
+          price_data: {
+            currency: "eur",
+            product_data: {
+              name: productName || "Store Coffre Sur-Mesure",
+              description: description || "",
+            },
+            unit_amount: finalAmount * 100,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: "payment",
+      payment_method_types: ["card"],
+      success_url: `${origin}/merci?ref=${encodeURIComponent(ref)}&email=${encodeURIComponent(customerEmail)}`,
+      cancel_url: `${origin}/checkout`,
+      metadata: {
+        ref,
+        payment_method: paymentMethod || "card",
+      },
+    });
+
+    // Insert order with Stripe session ID
+    if (orderData) {
+      const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
+        ...orderData,
+        amount: finalAmount,
+        promo_code: promoCode || "",
+        promo_discount: validatedDiscount,
+        payment_status: "pending",
+        stripe_payment_intent_id: session.id,
+        status: "Nouveau",
+        status_history: [{ status: "Nouveau", date: new Date().toISOString() }],
+      }).select("id").single();
+
+      if (insertError) {
+        console.error("Order insert error:", insertError);
+      }
+
+      const nameParts = (orderData.client_name || "").replace(/^(M\.|Mme)\s*/, "").split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
+
+      await supabaseAdmin.from("leads").insert({
+        first_name: firstName,
+        last_name: lastName,
+        email: orderData.client_email,
+        phone: orderData.client_phone || "",
+        width: orderData.width,
+        projection: orderData.projection,
+        toile_color: orderData.toile_color || "",
+        armature_color: orderData.armature_color || "",
+        options: orderData.options || [],
+        postal_code: orderData.client_postal_code || "",
+        message: orderData.message || "",
+      });
+
+      if (orderData?.client_email) {
+        await supabaseAdmin
+          .from("abandoned_carts")
+          .update({ converted: true, converted_order_id: insertedOrder?.id || null })
+          .eq("email", orderData.client_email)
+          .eq("converted", false);
+      }
+
+      if (insertedOrder?.id) {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+        const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+
+        const sendEmail = async (type: string) => {
+          try {
+            await fetch(`${supabaseUrl}/functions/v1/send-order-email`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${serviceRoleKey}`,
+              },
+              body: JSON.stringify({ type, orderId: insertedOrder.id }),
+            });
+          } catch (e) {
+            console.error(`Failed to send ${type} email:`, e);
+          }
+        };
+
         sendEmail("confirmation");
         sendEmail("admin_new_order");
       }
