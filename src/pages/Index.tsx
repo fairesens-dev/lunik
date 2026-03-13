@@ -7,7 +7,7 @@ import HeroSection from "@/components/home/HeroSection";
 import MarqueeSection from "@/components/home/MarqueeSection";
 import ProductHighlightSection from "@/components/home/ProductHighlightSection";
 import ProductFeaturesSection from "@/components/product/ProductFeaturesSection";
-import ValuesSection from "@/components/home/ValuesSection";
+
 import ConfiguratorCTASection from "@/components/home/ConfiguratorCTASection";
 import GallerySection from "@/components/home/GallerySection";
 import TestimonialsSection from "@/components/home/TestimonialsSection";
@@ -51,7 +51,7 @@ const Index = () => {
       <MarqueeSection />
       <ProductHighlightSection />
       <ProductFeaturesSection />
-      <ValuesSection />
+      
       <ConfiguratorCTASection />
       <GallerySection />
       <TestimonialsSection />

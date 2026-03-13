@@ -10,7 +10,7 @@ const FAQSection = () => {
     <section className="py-20 lg:py-28 bg-card">
       <div className="max-w-3xl mx-auto px-6">
         <AnimatedSection>
-          <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-center mb-16">
+          <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight text-center mb-16">
             Questions<br /><span className="text-accent-light">fréquentes</span>
           </h2>
         </AnimatedSection>
@@ -18,7 +18,7 @@ const FAQSection = () => {
           <Accordion type="single" collapsible className="w-full">
             {faqs.map((faq) => (
               <AccordionItem key={faq.id} value={faq.id} className="border-b border-border py-2">
-                <AccordionTrigger className="font-display text-lg font-bold text-left hover:no-underline">
+                <AccordionTrigger className="font-display text-base font-semibold text-left hover:no-underline">
                   {faq.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-muted-foreground leading-relaxed">

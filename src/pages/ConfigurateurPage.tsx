@@ -141,7 +141,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* 2 boutons en ligne — au-dessus de la fiche technique */}
-          <div className="absolute bottom-[156px] left-4 right-4 flex gap-2 z-20">
+          <div className="absolute bottom-[180px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
               className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
@@ -193,7 +193,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* Fiche technique + témoignage */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-3 z-10">
+          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-6 z-10">
             <div className="flex items-start gap-6">
               {/* Specs */}
               <div className="flex-1 min-w-0">
@@ -430,15 +430,6 @@ const ConfigurateurPage = () => {
         </div>
       </div>
 
-      {/* Trust bar */}
-      <div className="bg-secondary/50 border-t border-border py-3">
-        <div className="max-w-5xl mx-auto flex flex-wrap justify-center gap-6 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5"><Lock className="w-3.5 h-3.5" /> Paiement sécurisé</span>
-          <span className="flex items-center gap-1.5"><Truck className="w-3.5 h-3.5" /> Livraison 4-5 semaines</span>
-          <span className="flex items-center gap-1.5"><Shield className="w-3.5 h-3.5" /> Garantie 5 ans</span>
-          <span className="flex items-center gap-1.5">Fabriqué en France</span>
-        </div>
-      </div>
     </>
   );
 };
