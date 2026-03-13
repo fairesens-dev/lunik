@@ -56,7 +56,7 @@ const Index = () => {
       <ConfiguratorCTASection />
       <GallerySection />
       <TestimonialsSection />
-      <ProcessSection />
+      
       <FAQSection />
       <ContactCTASection />
       <StickyCTABar />
