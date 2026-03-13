@@ -11,6 +11,7 @@ interface DynamicProductVisualProps {
   projection: number;
   className?: string;
   compact?: boolean;
+  fillContainer?: boolean;
   onLedToggle?: (led: boolean) => void;
 }
 
@@ -27,6 +28,7 @@ const DynamicProductVisual = ({
   options,
   className,
   compact = false,
+  fillContainer = false,
 }: DynamicProductVisualProps) => {
   const showLed = options.led || options.packConnect;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
@@ -114,9 +116,10 @@ const DynamicProductVisual = ({
     <div
       className={cn(
         "relative w-full overflow-hidden rounded-sm transition-all duration-300",
+        fillContainer ? "h-full" : "",
         className
       )}
-      style={{ aspectRatio: "1.5/2" }}
+      style={fillContainer ? undefined : { aspectRatio: "1.5/2" }}
     >
       {/* Loading skeleton — shown until image is fully loaded */}
       {!isVisible && !error && (

@@ -7,6 +7,7 @@ export type ToileCategory = "unis" | "rayes" | "motifs";
 const RAYES_KEYWORDS = [
   "bs ", "bs_", "bs-", "bloc", "rayé", "rayure", "stripe", "striped",
   "ray ", "ray-", "bayadère", "bayadere", "regatta", "multi ",
+  "sienne", "manosque", "helsinki", "samoa", "ottawa",
 ];
 
 const MOTIFS_KEYWORDS = [
