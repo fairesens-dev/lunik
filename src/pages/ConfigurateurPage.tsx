@@ -110,23 +110,22 @@ const ConfigurateurPage = () => {
       {/* Main layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] min-h-[calc(100vh-64px)]">
 
-        {/* LEFT — Visual panel */}
-        <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] lg:overflow-y-auto p-6 lg:p-10 flex flex-col">
-          <div className="flex-1 flex items-center justify-center">
-            <div className="w-full max-w-2xl">
-              <DynamicProductVisual
-                toileColor={currentToile}
-                armatureColor={currentArmature}
-                options={currentOptions}
-                width={width * 10}
-                projection={projection}
-                className="rounded-lg"
-              />
-            </div>
+        {/* LEFT — Visual panel (no scroll) */}
+        <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
+          {/* Visual fills all available space */}
+          <div className="flex-1 flex items-center justify-center p-6 lg:p-10 pb-28">
+            <DynamicProductVisual
+              toileColor={currentToile}
+              armatureColor={currentArmature}
+              options={currentOptions}
+              width={width * 10}
+              projection={projection}
+              className="rounded-lg w-full h-full object-contain"
+            />
           </div>
 
           {/* Overlay badges */}
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
             <span className="bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 rounded-full text-xs font-medium text-foreground">
               {width} × {projection / 10} cm
             </span>
@@ -143,9 +142,9 @@ const ConfigurateurPage = () => {
             )}
           </div>
 
-          {/* Fiche technique */}
-          <div className="mt-6 border-t border-border/50 pt-4">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-3">Fiche technique — Toile Dickson</p>
+          {/* Fiche technique — fixed at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-3 z-10">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">Fiche technique — Toile Dickson</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {[
                 { label: "Composition", value: "Acrylique teint masse" },
@@ -222,7 +221,7 @@ const ConfigurateurPage = () => {
               )}
             </div>
 
-            {/* 02 Toile */}
+            {/* 02 Couleurs (Toile + Armature) */}
             <div className="border-b border-border pb-8 mb-8">
               <button
                 className="w-full text-left"
@@ -230,72 +229,65 @@ const ConfigurateurPage = () => {
               >
                 <div className="flex items-center gap-3 mb-1">
                   <span className="text-2xl font-display font-extrabold text-primary/30">02</span>
-                  <span className="text-sm uppercase tracking-[0.15em] font-bold text-foreground">{productPage.stepLabels[1] || "Couleur de toile"}</span>
-                  {activeStep !== "02" && <span className="ml-auto text-xs text-muted-foreground">{toileColor}</span>}
+                  <span className="text-sm uppercase tracking-[0.15em] font-bold text-foreground">{productPage.stepLabels[1] || "Couleurs"}</span>
+                  {activeStep !== "02" && <span className="ml-auto text-xs text-muted-foreground">{toileColor} · {armatureColor}</span>}
                 </div>
               </button>
               {activeStep === "02" && (
-                <div className="mt-4 pl-10">
-                  <p className="text-xs text-muted-foreground mb-4">Toile Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
-                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
-                  <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
+                <div className="mt-4 pl-10 space-y-6">
+                  {/* Toile sub-section */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Toile</p>
+                    <p className="text-xs text-muted-foreground mb-4">Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
+                    <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
+                    <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
+                  </div>
+
+                  <div className="border-t border-border/50" />
+
+                  {/* Armature sub-section */}
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Armature</p>
+                    <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
+                    <div className="flex flex-wrap gap-4">
+                      {ARMATURE_COLORS.map((c) => (
+                        <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
+                          <div
+                            className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
+                              armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
+                            }`}
+                            style={{ backgroundColor: c.hex }}
+                          >
+                            {armatureColor === c.name && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* 03 Armature */}
-            <div className="border-b border-border pb-8 mb-8">
+            {/* 03 Options */}
+            <div className="pb-8 mb-4">
               <button
                 className="w-full text-left"
                 onClick={() => setActiveStep(activeStep === "03" ? "" : "03")}
               >
                 <div className="flex items-center gap-3 mb-1">
                   <span className="text-2xl font-display font-extrabold text-primary/30">03</span>
-                  <span className="text-sm uppercase tracking-[0.15em] font-bold text-foreground">{productPage.stepLabels[2] || "Couleur de l'armature"}</span>
-                  {activeStep !== "03" && <span className="ml-auto text-xs text-muted-foreground">{armatureColor}</span>}
-                </div>
-              </button>
-              {activeStep === "03" && (
-                <div className="mt-4 pl-10">
-                  <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
-                  <div className="flex flex-wrap gap-4">
-                    {ARMATURE_COLORS.map((c) => (
-                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
-                        <div
-                          className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
-                            armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
-                          }`}
-                          style={{ backgroundColor: c.hex }}
-                        >
-                          {armatureColor === c.name && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
-                            </div>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* 04 Options */}
-            <div className="pb-8 mb-4">
-              <button
-                className="w-full text-left"
-                onClick={() => setActiveStep(activeStep === "04" ? "" : "04")}
-              >
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="text-2xl font-display font-extrabold text-primary/30">04</span>
                   <span className="text-sm uppercase tracking-[0.15em] font-bold text-foreground">{productPage.stepLabels[3] || "Options"}</span>
-                  {activeStep !== "04" && optionsSummary !== "Aucune" && (
+                  {activeStep !== "03" && optionsSummary !== "Aucune" && (
                     <span className="ml-auto text-xs text-primary font-medium">+ {optionsSummary}</span>
                   )}
                 </div>
               </button>
-              {activeStep === "04" && (
+              {activeStep === "03" && (
                 <div className="mt-4 pl-10 space-y-3">
                   <p className="text-xs text-muted-foreground mb-4">Motorisation SOMFY incluse de série · Personnalisez votre store</p>
                   {PRICING_OPTIONS.map((opt) => {
