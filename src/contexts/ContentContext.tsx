@@ -84,7 +84,6 @@ export interface HomepageContent {
   faqItems: FAQItem[];
   featuredReviews: FeaturedReview[];
   galleryItems: GalleryItem[];
-  // New CMS fields
   highlightFeatures: HighlightFeature[];
   highlightImage: string;
   highlightTitle: string;
@@ -95,6 +94,16 @@ export interface HomepageContent {
   contactCTATitle: string;
   contactCTASubtitle: string;
   contactCTAImage: string;
+  heroPosterImage: string;
+  heroVideoUrl: string;
+  fabricSectionImage: string;
+}
+
+export interface ProductGalleryItem {
+  id: string;
+  src: string;
+  alt: string;
+  height: string;
 }
 
 export interface ProductPageContent {
@@ -106,6 +115,8 @@ export interface ProductPageContent {
   stepLabels: string[];
   orderConfirmationMessage: string;
   faqItems: FAQItem[];
+  heroImage: string;
+  galleryItems: ProductGalleryItem[];
 }
 
 export interface SAVContent {
