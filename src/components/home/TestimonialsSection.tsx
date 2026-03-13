@@ -96,7 +96,7 @@ const TestimonialsSection = () => {
                 <button
                   onClick={() => scroll("right")}
                   disabled={!canScrollRight}
-                  className="w-12 h-12 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors disabled:opacity-20"
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
