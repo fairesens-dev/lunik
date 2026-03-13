@@ -129,7 +129,8 @@ const ConfigurateurPage = () => {
               options={currentOptions}
               width={width * 10}
               projection={projection}
-              className="rounded-lg w-full h-full object-contain"
+              fillContainer
+              className="rounded-lg"
             />
           </div>
 
