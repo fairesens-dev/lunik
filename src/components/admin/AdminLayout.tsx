@@ -26,6 +26,7 @@ const navGroups = [
     items: [
       { to: "/admin/configurateur", icon: Settings2, label: "Configurateur" },
       { to: "/admin/contenu", icon: FileEdit, label: "Contenu" },
+      { to: "/admin/modals", icon: Layers, label: "Modals" },
     ],
   },
   {
