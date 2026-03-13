@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
 import { useCartAbandonment } from "@/hooks/useCartAbandonment";
 import { ArrowLeft, Lock } from "lucide-react";
+import logoLunik from "@/assets/logo-lunik.svg";
 import CheckoutStep1, { type Step1Data } from "@/components/checkout/CheckoutStep1";
 import CheckoutStep2 from "@/components/checkout/CheckoutStep2";
 import CheckoutStep3 from "@/components/checkout/CheckoutStep3";
