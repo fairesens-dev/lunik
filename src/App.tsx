@@ -98,6 +98,7 @@ const App = () => (
                 <Route path="/admin/modals" element={<AdminModalsPage />} />
                 <Route path="/admin/modals/new" element={<AdminModalBuilderPage />} />
                 <Route path="/admin/modals/:id/edit" element={<AdminModalBuilderPage />} />
+                <Route path="/admin/scoring" element={<AdminScoringPage />} />
                 <Route path="/admin/parametres" element={<AdminSettingsPage />} />
               </Route>
             </Route>
