@@ -33,6 +33,7 @@ const navGroups = [
     items: [
       { to: "/admin/marketing", icon: BarChart3, label: "Marketing" },
       { to: "/admin/tracking", icon: Tag, label: "Tracking" },
+      { to: "/admin/campaigns", icon: Mail, label: "Campagnes" },
     ],
   },
   {
