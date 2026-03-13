@@ -128,7 +128,7 @@ const ConfigurateurPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] min-h-[calc(100vh-64px)] bg-white">
 
         {/* LEFT — Visual panel */}
-        <div className="bg-background h-[50vh] lg:h-auto lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
+        <div className="bg-white h-[50vh] lg:h-auto lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
           <div className="absolute inset-0">
             <DynamicProductVisual
               toileColor={currentToile}
