@@ -32,6 +32,7 @@ import AdminMarketingPage from "./pages/admin/AdminMarketingPage";
 import AdminSettingsPage from "./pages/admin/AdminSettingsPage";
 import AdminOrderDetailPage from "./pages/admin/AdminOrderDetailPage";
 import AdminAbandonedCartsPage from "./pages/admin/AdminAbandonedCartsPage";
+import AdminTrackingPage from "./pages/admin/AdminTrackingPage";
 
 const queryClient = new QueryClient();
 
