@@ -45,8 +45,17 @@ const ConfigurateurPage = () => {
   const currentArmature = { hex: selectedArmature?.hex || "#333", label: armatureColor };
   const currentOptions = { motorisation, led, packConnect: pack };
 
-  // Active step tracking
-  const [activeStep, setActiveStep] = useState("01");
+  // Step navigation (not accordion — all config preserved)
+  const [activeStep, setActiveStep] = useState<"01" | "02" | "03">("01");
+
+  const goNext = () => {
+    if (activeStep === "01") setActiveStep("02");
+    else if (activeStep === "02") setActiveStep("03");
+  };
+  const goPrev = () => {
+    if (activeStep === "03") setActiveStep("02");
+    else if (activeStep === "02") setActiveStep("01");
+  };
 
   const handleOrder = () => {
     const toileObj = TOILE_COLORS.find(c => c.name === toileColor);
