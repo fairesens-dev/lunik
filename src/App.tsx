@@ -94,6 +94,9 @@ const App = () => (
                 <Route path="/admin/campaigns/new" element={<AdminCampaignBuilderPage />} />
                 <Route path="/admin/campaigns/:id/edit" element={<AdminCampaignBuilderPage />} />
                 <Route path="/admin/campaigns/:id/report" element={<AdminCampaignReportPage />} />
+                <Route path="/admin/modals" element={<AdminModalsPage />} />
+                <Route path="/admin/modals/new" element={<AdminModalBuilderPage />} />
+                <Route path="/admin/modals/:id/edit" element={<AdminModalBuilderPage />} />
                 <Route path="/admin/parametres" element={<AdminSettingsPage />} />
               </Route>
             </Route>
