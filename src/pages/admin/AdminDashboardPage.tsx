@@ -72,10 +72,10 @@ const AdminDashboardPage = () => {
   }, []);
 
   const kpis = [
-    { label: "Commandes", value: String(orderCount), color: "#4A5E3A" },
-    { label: "Chiffre d'affaires", value: `${totalCA.toLocaleString("fr-FR")} €`, color: "#4A5E3A" },
-    { label: "Leads", value: String(leadCount), color: "#4A5E3A" },
-    { label: "Leads non traités", value: String(unprocessedLeads), color: unprocessedLeads > 0 ? "#dc2626" : "#4A5E3A" },
+    { label: "Commandes", value: String(orderCount), color: "#7B8E7B" },
+    { label: "Chiffre d'affaires", value: `${totalCA.toLocaleString("fr-FR")} €`, color: "#7B8E7B" },
+    { label: "Leads", value: String(leadCount), color: "#7B8E7B" },
+    { label: "Leads non traités", value: String(unprocessedLeads), color: unprocessedLeads > 0 ? "#dc2626" : "#7B8E7B" },
   ];
 
   return (

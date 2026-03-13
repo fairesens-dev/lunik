@@ -320,7 +320,7 @@ const AdminOrderDetailPage = () => {
                   <div className="px-3 py-2">{area} m²</div>
                   <div className="px-3 py-2 bg-gray-50 font-medium border-r">Couleur toile</div>
                   <div className="px-3 py-2 flex items-center gap-2">
-                    {order.toile_color && <span className="w-3 h-3 rounded-full inline-block border" style={{ backgroundColor: order.toile_color === "Sauge" ? "#4A5E3A" : undefined }} />}
+                    {order.toile_color && <span className="w-3 h-3 rounded-full inline-block border" style={{ backgroundColor: order.toile_color === "Sauge" ? "#7B8E7B" : undefined }} />}
                     {order.toile_color || "—"}
                   </div>
                   <div className="px-3 py-2 bg-gray-50 font-medium border-r">Couleur armature</div>

@@ -59,8 +59,8 @@ const TEMPLATES: Record<string, { label: string; html: string }> = {
   newsletter: {
     label: "Newsletter",
     html: `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;">
-  <div style="border-bottom:3px solid #4A5E3A;padding:20px 0;text-align:center;">
-    <h1 style="margin:0;color:#4A5E3A;">Newsletter</h1>
+   <div style="border-bottom:3px solid #7B8E7B;padding:20px 0;text-align:center;">
+     <h1 style="margin:0;color:#7B8E7B;">Newsletter</h1>
   </div>
   <div style="padding:20px;">
     <p>Bonjour {{first_name}},</p>
