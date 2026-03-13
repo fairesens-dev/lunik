@@ -122,17 +122,20 @@ const HeroSection = () => {
             </a>
           </motion.div>
 
-          {/* Stats counters */}
+          {/* Stats - compact inline */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             transition={{ duration: 0.8, delay: 1 }}
-            className="grid grid-cols-3 gap-8 md:gap-16"
+            className="flex items-center gap-6"
           >
-            {stats.map((stat) => (
-              <div key={stat.label} className="text-center text-white">
-                <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
-                <p className="text-white/50 text-xs uppercase tracking-[0.15em] mt-1">{stat.label}</p>
+            {stats.map((stat, i) => (
+              <div key={stat.label} className="flex items-center gap-6">
+                {i > 0 && <span className="w-px h-8 bg-white/20" />}
+                <div className="text-center text-white">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+                  <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mt-0.5">{stat.label}</p>
+                </div>
               </div>
             ))}
           </motion.div>
