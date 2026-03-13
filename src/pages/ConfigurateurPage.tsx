@@ -362,7 +362,7 @@ const ConfigurateurPage = () => {
                     Dimensions
                   </Button>
                   <Button onClick={goNext} className="flex-1 rounded-full flex items-center justify-center gap-2">
-                    Options <ChevronRight className="w-4 h-4" />
+                    Personnaliser les options <ChevronRight className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
