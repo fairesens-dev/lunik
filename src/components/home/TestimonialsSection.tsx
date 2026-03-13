@@ -119,7 +119,7 @@ const TestimonialsSection = () => {
               {review.title && (
                 <p className="font-bold text-foreground mt-4 mb-1">{review.title}</p>
               )}
-              <p className="text-primary-foreground/70 line-clamp-5 flex-1 mt-3 leading-relaxed">
+              <p className="text-muted-foreground line-clamp-5 flex-1 mt-3 leading-relaxed">
                 "{review.text}"
               </p>
               <div className="flex items-center gap-3 mt-6 pt-4 border-t border-primary-foreground/10">
