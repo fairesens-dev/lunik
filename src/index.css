@@ -88,6 +88,15 @@
   }
 }
 
+@layer components {
+  /* Checkout form fields: light gray background */
+  .checkout-inputs input:not([type="checkbox"]):not([type="radio"]),
+  .checkout-inputs textarea,
+  .checkout-inputs select {
+    background-color: #f5f5f4 !important;
+  }
+}
+
 @layer utilities {
   .font-serif-display {
     font-family: 'Inter Tight', sans-serif;
