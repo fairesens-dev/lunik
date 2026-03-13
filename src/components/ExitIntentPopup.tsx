@@ -26,7 +26,7 @@ const ExitIntentPopup = ({
   const { captureEmail } = useCartAbandonment();
 
   const hasConfig = width > 0 && projection > 0;
-  const isProductPage = location.pathname === "/" || location.pathname === "/store-coffre";
+  const isProductPage = location.pathname === "/" || location.pathname === "/configurateur";
 
   const handleMouseLeave = useCallback((e: MouseEvent) => {
     if (e.clientY > 5) return;

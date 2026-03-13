@@ -8,7 +8,7 @@ import logoLunik from "@/assets/logo-lunik.png";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
-  { label: "Configurateur", href: "/#configurator" },
+  { label: "Configurateur", href: "/configurateur" },
   { label: "SAV", href: "/service-apres-vente" },
   { label: "Contact", href: "/contact" },
 ];
@@ -66,11 +66,11 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
             ))}
           </nav>
 
-          <a href="/#configurator" className="hidden lg:block">
+          <Link to="/configurateur" className="hidden lg:block">
             <Button variant="gradient" className="px-6 py-3 rounded-full tracking-[0.15em] uppercase text-xs font-medium h-auto">
               Configurer mon store
             </Button>
-          </a>
+          </Link>
 
           <button
             className="lg:hidden p-2"
@@ -99,11 +99,11 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
               {link.label}
             </a>
           ))}
-          <a href="/#configurator" onClick={() => setMobileOpen(false)}>
+          <Link to="/configurateur" onClick={() => setMobileOpen(false)}>
             <Button variant="gradient" className="px-8 py-4 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto mt-4">
               Configurer mon store
             </Button>
-          </a>
+          </Link>
         </div>
       )}
     </>

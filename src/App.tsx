@@ -18,6 +18,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CookiesPage from "./pages/CookiesPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
+import ConfigurateurPage from "./pages/ConfigurateurPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminResetPasswordPage from "./pages/admin/AdminResetPasswordPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
@@ -48,7 +49,7 @@ const App = () => (
             {/* Public site */}
             <Route element={<Layout />}>
               <Route path="/" element={<Index />} />
-              <Route path="/store-coffre" element={<Navigate to="/#configurator" replace />} />
+              <Route path="/store-coffre" element={<Navigate to="/configurateur" replace />} />
               <Route path="/service-apres-vente" element={<SAVPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/conditions-generales-de-vente" element={<CGVPage />} />
@@ -57,7 +58,8 @@ const App = () => (
               <Route path="/suivi" element={<OrderTrackingPage />} />
             </Route>
 
-            {/* Checkout (no main layout) */}
+            {/* Standalone pages (no main layout) */}
+            <Route path="/configurateur" element={<ConfigurateurPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/merci" element={<ThankYouPage />} />
 
