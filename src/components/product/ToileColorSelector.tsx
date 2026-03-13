@@ -31,12 +31,12 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
     return categorized[0]?.category || "unis";
   }, [categorized, selected]);
 
-  const [openAccordions, setOpenAccordions] = useState<string[]>([selectedCategory]);
+  const [openAccordion, setOpenAccordion] = useState<string>(selectedCategory);
 
-  // If selected color's category isn't open, force it open
+  // If selected color's category changes, switch to it
   useMemo(() => {
-    if (!openAccordions.includes(selectedCategory)) {
-      setOpenAccordions((prev) => [...prev, selectedCategory]);
+    if (openAccordion !== selectedCategory) {
+      setOpenAccordion(selectedCategory);
     }
   }, [selectedCategory]);
 
@@ -53,9 +53,10 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
   return (
     <>
       <Accordion
-        type="multiple"
-        value={openAccordions}
-        onValueChange={setOpenAccordions}
+        type="single"
+        collapsible
+        value={openAccordion}
+        onValueChange={(val) => setOpenAccordion(val)}
         className="w-full"
       >
         {categorized.map((group) => (
