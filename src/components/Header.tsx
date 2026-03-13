@@ -99,11 +99,11 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
               {link.label}
             </a>
           ))}
-          <a href="/#configurator" onClick={() => setMobileOpen(false)}>
+          <Link to="/configurateur" onClick={() => setMobileOpen(false)}>
             <Button variant="gradient" className="px-8 py-4 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto mt-4">
               Configurer mon store
             </Button>
-          </a>
+          </Link>
         </div>
       )}
     </>

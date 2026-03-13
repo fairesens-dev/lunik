@@ -34,11 +34,11 @@ const HeroSection = () => {
           </AnimatedSection>
           <AnimatedSection delay={0.35}>
             <div className="flex flex-wrap gap-4 mb-10">
-              <a href="#configurator">
+              <Link to="/configurateur">
                 <Button variant="gradient" className="px-8 py-5 rounded-full tracking-[0.2em] uppercase text-sm font-medium h-auto shadow-lg hover:shadow-xl">
                   {homepage.heroCTA1}
                 </Button>
-              </a>
+              </Link>
             </div>
           </AnimatedSection>
           <AnimatedSection delay={0.45}>

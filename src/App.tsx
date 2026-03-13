@@ -58,7 +58,8 @@ const App = () => (
               <Route path="/suivi" element={<OrderTrackingPage />} />
             </Route>
 
-            {/* Checkout (no main layout) */}
+            {/* Standalone pages (no main layout) */}
+            <Route path="/configurateur" element={<ConfigurateurPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/merci" element={<ThankYouPage />} />
 
