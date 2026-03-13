@@ -1,189 +1,67 @@
 
 
-## Plan : Rebranding Total LuniK — Direction Solaire & Moderne
+## Plan : Refonte complète du configurateur — Encadrés visuels, navigation, options marketing, réassurance
 
-### Tendances 2026 integrées
-- **Warm maximalism** : palettes chaudes (ambre/safran/corail) remplaçant les tons froids/sage
-- **Rounded UI** : `border-radius` généreux partout (boutons, cartes, inputs) — fin de l'ère sharp/brutalist
-- **Micro-interactions** : hover effects plus expressifs, transitions fluides
-- **Gradients subtils** : fonds avec gradients warm, pas aplats
-- **Typography contrast** : titres très gras + body léger, tailles plus grandes
-- **Dark sections inversées** : sections hero/CTA avec fond sombre + accents lumineux
-- **Glass morphism léger** : header translucide avec blur
+### 1. Colonne gauche — 2 encadrés miniatures + bouton "Visualiser chez moi" remonté
 
----
+Remplacer le bouton "Visualiser chez moi" flottant par **2 miniatures cliquables** en bas à gauche (au-dessus de la fiche technique) :
 
-### 1. Nouvelle palette de couleurs (`src/index.css`)
+- **Miniature 1** : "Projeter sur ma terrasse" — icône Camera, ouvre le `VisualizeAtHomeDialog` existant
+- **Miniature 2** : "Voir la toile de près" — icône Eye/ZoomIn, ouvre un dialog simple affichant soit la `photoUrl` de la toile sélectionnée en plein écran, soit un gros plan IA généré via l'edge function `generate-store-image` avec un prompt close-up
 
-Remplacement complet des CSS variables :
+Les 2 encadrés : `w-[140px] h-[80px]`, fond glass morphism `bg-background/80 backdrop-blur`, border, positionnés en `absolute bottom-[100px] left-4`, dans un `flex gap-2`.
 
-```text
-AVANT (sage/ecru)              →  APRÈS (solaire/ambre)
-─────────────────────────────────────────────────────────
---primary: 100 24% 30% (sage)  →  35 95% 55% (ambre doré #F5A623)
---accent-light: 100 18% 55%    →  25 90% 58% (orange chaud #E8742A)
---background: 37 33% 93%       →  40 40% 97% (crème chaud #FAF7F2)
---card: 50 20% 97%             →  35 35% 95% (sable clair #F5F0E8)
---foreground: 0 0% 10%         →  20 15% 12% (brun profond)
---muted-fg: 0 0% 42%           →  25 10% 45% (brun moyen)
---border: 30 16% 87%           →  30 25% 88% (sable border)
---ring: 100 24% 30%            →  35 95% 55% (ambre)
---destructive: inchangé
-```
+Supprimer l'ancien bouton "Visualiser chez moi" (lignes 138-145).
 
-Mode dark ajusté avec ambre/orange en accents lumineux sur fond sombre.
+### 2. Header — Retirer le bouton "Commander"
 
-### 2. Typographie (`tailwind.config.ts` + `index.css`)
+Supprimer le bloc conditionnel lignes 108-118 (le `{basePrice !== null && (...)}` avec le bouton Commander dans le header). Garder juste le `<div className="flex-1" />` vide à droite.
 
-- Headlines : **"Playfair Display"** (plus moderne que Cormorant Garamond, plus de poids)
-- Body : **"DM Sans"** (plus rond et chaleureux qu'Inter)
-- Import Google Fonts dans `index.html`
-- `--radius: 0rem` → `--radius: 0.75rem` (tout arrondi)
+### 3. Navigation steps — Bouton contextuel unique
 
-### 3. Boutons (`src/components/ui/button.tsx`)
+Remplacer les doubles boutons "Suivant"/"Précédent" dans chaque step par un **seul footer de navigation** sous les step indicators, en dehors du contenu conditionnel :
 
-- `rounded-md` → `rounded-full` pour les CTA principaux
-- Nouveau variant "gradient" : `bg-gradient-to-r from-amber-500 to-orange-500 text-white`
-- Padding plus généreux, shadow sur hover
-- Suppression de `rounded-none` dans TOUS les composants (Header, Hero, Configurator, Footer, etc.)
+- Step 01 : bouton principal "Couleurs →"
+- Step 02 : "← Dimensions" (outline) + "Options →" (primary)
+- Step 03 : "← Couleurs" (outline) + "Commander" (gradient, appelle `handleOrder`)
 
-### 4. Header (`src/components/Header.tsx`)
+Supprimer les boutons Suivant/Précédent actuels à l'intérieur de chaque step (lignes 258-260, 302-305, 354-356).
 
-- Background : glass morphism `bg-background/80 backdrop-blur-xl`
-- Logo : potentiellement teinter avec les nouvelles couleurs (via CSS filter ou nouveau logo)
-- CTA header : bouton gradient arrondi avec micro-shadow
-- Mobile menu : fond gradient warm au lieu d'aplat
+Le bouton "Commander" n'apparaît que sur la step 03 et dans la barre sticky en bas.
 
-### 5. Hero Section (`src/components/home/HeroSection.tsx`)
+### 4. Options — Refonte marketing (sans emoji)
 
-- Fond gauche : gradient radial warm (ambre → crème) au lieu d'aplat
-- Badge "4.9/5 Trustpilot" : pastille arrondie avec fond ambre/10
-- CTA : bouton gradient arrondi + shadow glow ambre
-- Overline : couleur ambre au lieu de sage
-- Trust badges en bas : icônes rondes avec fond ambre clair
+Modifier `src/lib/pricingTable.ts` pour :
 
-### 6. Marquee Section (`src/components/home/MarqueeSection.tsx`)
+- Retirer tous les `icon` emoji, les remplacer par des descriptions textuelles courtes
+- Ajouter des `tip` avec témoignages clients crédibles (prénom, ville)
+- Ajouter `badge: "POPULAIRE"` sur LED coffre, `badge: "COUP DE CŒUR"` sur LED bras, `badge: "RECOMMANDÉ"` sur capteur vent
+- `manoeuvre-manuelle` : pas de badge, pas de highlight, tip d'avertissement neutre
+- Ajouter `highlight: true` sur LED coffre et capteur vent
+- Ajouter un champ `socialProof?: string` (ex: "78% des clients choisissent cette option")
 
-- Background : `bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500`
-- Texte blanc
+Dans `ConfigurateurPage.tsx` step 03 :
+- Réordonner : options premium d'abord (LED coffre, LED bras, capteur vent), pose plafond, radio CSI, manoeuvre manuelle en dernier
+- Les options premium ont un design plus riche : fond gradient léger quand sélectionnées, social proof sous le switch
+- Manoeuvre manuelle : style discret, grisé, pas de mise en valeur
 
-### 7. Product Highlight (`src/components/home/ProductHighlightSection.tsx`)
+### 5. Témoignages et réassurance dans les steps
 
-- Badge "Fabriqué en France" : fond arrondi gradient au lieu de bg-primary/10
-- Bouton CTA gradient arrondi
-- Image : `rounded-2xl` avec shadow
+Ajouter dans chaque step un petit bloc de réassurance contextuel :
 
-### 8. Features Section (`src/components/product/ProductFeaturesSection.tsx`)
+- **Step 01 (Dimensions)** : "Fabrication française sur-mesure · Garantie 5 ans structure" + mini-témoignage
+- **Step 02 (Couleurs)** : "Toile Dickson garantie 10 ans · Résistance UV maximale" + mini-témoignage
+- **Step 03 (Options)** : "Installation professionnelle · SAV réactif" + mini-témoignage
 
-- Icônes dans cercles avec fond ambre/10
-- Cartes avec `rounded-xl` et subtle shadow
+Format : petit encadré `border-l-2 border-primary pl-3` avec texte en italique, prénom et ville.
 
-### 9. Fabric Section (`src/components/home/FabricSection.tsx`)
+### 6. Espacement SaveConfigCTA
 
-- Checkmarks : couleur ambre
-- Image : `rounded-2xl`
-- Specs : badges arrondis
+Conserver le `mt-10` existant. Ajouter un `border-t border-border pt-8` pour mieux séparer.
 
-### 10. Values Section (`src/components/home/ValuesSection.tsx`)
+### Fichiers modifiés
 
-- Cercles icônes : gradient ambre au lieu de bg-primary/10
-- Cartes avec hover lift effect
-
-### 11. Configurateur (`src/components/product/ConfiguratorSection.tsx`)
-
-- Card : `rounded-2xl` avec shadow-lg
-- Badge "Configurateur" : pastille gradient ambre
-- Inputs : `rounded-lg`
-- Options switches : accent ambre
-- Prix : grande typo ambre/orange
-- CTA "Commander" : bouton gradient full-width avec glow
-- Trust badges : pastilles arrondies
-
-### 12. Gallery Section (`src/components/home/GallerySection.tsx`)
-
-- Images : `rounded-xl` avec overlay gradient warm
-- Caption : fond avec blur + rounded
-
-### 13. Testimonials (`src/components/home/TestimonialsSection.tsx`)
-
-- Cartes : `rounded-xl shadow-md`
-- Avatar : cercle avec border ambre
-- Navigation arrows : cercles avec fond gradient
-
-### 14. Process Section (`src/components/home/ProcessSection.tsx`)
-
-- Steps : cercles numérotés avec gradient ambre au lieu d'emojis
-- Ligne de connexion : gradient ambre
-- Texte step : style badge arrondi
-
-### 15. FAQ Section (`src/components/home/FAQSection.tsx`)
-
-- Accordion : `rounded-xl` avec hover state ambre
-
-### 16. Contact CTA (`src/components/home/ContactCTASection.tsx`)
-
-- Background : gradient dark → ambre subtil au lieu de gris
-- Boutons arrondis
-
-### 17. Footer (`src/components/Footer.tsx`)
-
-- Background : brun profond chaud au lieu de noir pur
-- Accents ambre pour les liens hover
-- Badge "Fabriqué en France" arrondi avec border ambre
-
-### 18. Contact Widget (`src/components/ContactWidget.tsx`)
-
-- FAB : gradient ambre arrondi avec glow
-- Popup : `rounded-2xl`
-- Header : gradient ambre
-
-### 19. Exit Intent Popup (`src/components/ExitIntentPopup.tsx`)
-
-- Modal : `rounded-2xl`
-- CTA : gradient button
-- Background overlay : teinté chaud
-
-### 20. Promo Banner (`src/components/PromoBanner.tsx`)
-
-- Style : gradient ambre → orange
-
-### 21. Cookie Banner (`src/components/CookieBanner.tsx`)
-
-- Arrondi, bouton accent ambre
-
----
-
-### Fichiers modifiés (22 fichiers)
-
-| Fichier | Changements |
-|---|---|
-| `index.html` | Google Fonts (Playfair Display + DM Sans) |
-| `src/index.css` | Palette complète (CSS variables) + radius |
-| `tailwind.config.ts` | fontFamily, nouveaux keyframes |
-| `src/components/ui/button.tsx` | Nouveau variant "gradient", rounded |
-| `src/components/Header.tsx` | Glass morphism, bouton gradient |
-| `src/components/home/HeroSection.tsx` | Gradient fond, CTA gradient, badges |
-| `src/components/home/MarqueeSection.tsx` | Fond gradient ambre |
-| `src/components/home/ProductHighlightSection.tsx` | Arrondis, badge, CTA |
-| `src/components/home/FabricSection.tsx` | Arrondis, checks ambre |
-| `src/components/home/ValuesSection.tsx` | Icônes gradient, hover lift |
-| `src/components/product/ProductFeaturesSection.tsx` | Cartes arrondies |
-| `src/components/product/ConfiguratorSection.tsx` | Card arrondie, gradient CTA, inputs |
-| `src/components/home/GallerySection.tsx` | Images arrondies |
-| `src/components/home/TestimonialsSection.tsx` | Cartes arrondies, avatars |
-| `src/components/home/ProcessSection.tsx` | Steps numérotés, gradient |
-| `src/components/home/FAQSection.tsx` | Accordion arrondi |
-| `src/components/home/ContactCTASection.tsx` | Gradient fond, boutons |
-| `src/components/Footer.tsx` | Brun chaud, accents ambre |
-| `src/components/ContactWidget.tsx` | FAB gradient, popup arrondie |
-| `src/components/ExitIntentPopup.tsx` | Modal arrondie, CTA gradient |
-| `src/components/PromoBanner.tsx` | Gradient |
-| `src/components/CookieBanner.tsx` | Arrondis |
-
-### Approche d'implémentation
-
-Phase 1 : Fondations (index.html, index.css, tailwind.config.ts, button.tsx) — palette + typo + radius
-Phase 2 : Layout (Header, Footer, Layout, PromoBanner, CookieBanner)
-Phase 3 : Sections home (Hero → Contact CTA, dans l'ordre de la page)
-Phase 4 : Configurateur + widgets (ConfiguratorSection, ContactWidget, ExitIntentPopup)
+- **`src/pages/ConfigurateurPage.tsx`** : header sans Commander, 2 encadrés miniatures, navigation contextuelle, réassurance par step, options redesignées
+- **`src/lib/pricingTable.ts`** : options sans emoji, badges marketing, social proof, tips témoignages
+- **`src/components/product/ToileCloseUpDialog.tsx`** (nouveau) : dialog plein écran pour voir le motif/matière de la toile sélectionnée
 
