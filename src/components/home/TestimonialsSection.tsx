@@ -69,12 +69,12 @@ const TestimonialsSection = () => {
   if (loading && items.length === 0) return null;
 
   return (
-    <section className="py-20 lg:py-28 bg-primary text-primary-foreground">
+    <section className="py-20 lg:py-28 bg-background text-foreground">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="flex items-end justify-between mb-12">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-primary-foreground/40 font-medium mb-4">
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
                 Avis vérifiés
               </p>
               <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
@@ -82,21 +82,21 @@ const TestimonialsSection = () => {
               </h2>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <span className="text-sm font-mono text-primary-foreground/50">
+              <span className="text-sm font-mono text-muted-foreground">
                 {String(currentIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
               </span>
               <div className="flex gap-2">
                 <button
                   onClick={() => scroll("left")}
                   disabled={!canScrollLeft}
-                  className="w-12 h-12 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors disabled:opacity-20"
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => scroll("right")}
                   disabled={!canScrollRight}
-                  className="w-12 h-12 rounded-full border border-primary-foreground/20 flex items-center justify-center hover:bg-primary-foreground/10 transition-colors disabled:opacity-20"
+                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -113,23 +113,23 @@ const TestimonialsSection = () => {
           {items.map((review, i) => (
             <div
               key={review.id || i}
-              className="min-w-[340px] max-w-[400px] flex-shrink-0 snap-start bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl p-8 flex flex-col backdrop-blur-sm"
+              className="min-w-[340px] max-w-[400px] flex-shrink-0 snap-start bg-card border border-border rounded-2xl p-8 flex flex-col"
             >
               <FilledStars count={review.stars} />
               {review.title && (
-                <p className="font-bold text-primary-foreground mt-4 mb-1">{review.title}</p>
+                <p className="font-bold text-foreground mt-4 mb-1">{review.title}</p>
               )}
-              <p className="text-primary-foreground/70 line-clamp-5 flex-1 mt-3 leading-relaxed">
+              <p className="text-muted-foreground line-clamp-5 flex-1 mt-3 leading-relaxed">
                 "{review.text}"
               </p>
-              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-primary-foreground/10">
-                <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center text-sm font-bold text-primary-foreground">
+              <div className="flex items-center gap-3 mt-6 pt-4 border-t border-border">
+                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-sm font-bold text-foreground">
                   {initials(review.consumer.displayName)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-primary-foreground truncate">{review.consumer.displayName}</p>
+                  <p className="text-sm font-medium text-foreground truncate">{review.consumer.displayName}</p>
                   {review.createdAt && (
-                    <p className="text-xs text-primary-foreground/50">{timeAgo(review.createdAt)}</p>
+                    <p className="text-xs text-muted-foreground">{timeAgo(review.createdAt)}</p>
                   )}
                 </div>
                 <span className="inline-flex items-center gap-1 text-[11px] text-[#00b67a] font-medium whitespace-nowrap">

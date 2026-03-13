@@ -68,7 +68,7 @@ const ValuesSection = () => {
   };
 
   return (
-    <section className="py-20 lg:py-28 bg-primary text-primary-foreground overflow-hidden">
+    <section className="py-16 lg:py-20 bg-primary text-primary-foreground overflow-hidden">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="flex items-end justify-between mb-12">
