@@ -1,133 +1,547 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, X, Phone, Send, Clock } from "lucide-react";
+import { MessageCircle, X, Send, Phone, Wrench, ArrowLeft, Check, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { useContent } from "@/contexts/ContentContext";
-import { supabase } from "@/integrations/supabase/client";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
-type Tab = "menu" | "message" | "callback";
+type Screen = "menu" | "ai_chat" | "sav" | "callback";
+type Msg = { role: "user" | "assistant"; content: string };
 
+// ── Streaming helper ──
+const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/widget-chat`;
+const SAVE_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/widget-save`;
+
+async function streamChat({
+  messages, onDelta, onDone, onError,
+}: { messages: Msg[]; onDelta: (t: string) => void; onDone: () => void; onError: (e: string) => void }) {
+  try {
+    const resp = await fetch(CHAT_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+      },
+      body: JSON.stringify({ messages }),
+    });
+
+    if (!resp.ok) {
+      const err = await resp.json().catch(() => ({ error: "Erreur réseau" }));
+      onError(err.error || "Erreur du service");
+      return;
+    }
+    if (!resp.body) { onError("Pas de réponse"); return; }
+
+    const reader = resp.body.getReader();
+    const decoder = new TextDecoder();
+    let buf = "";
+    let done = false;
+
+    while (!done) {
+      const { done: d, value } = await reader.read();
+      if (d) break;
+      buf += decoder.decode(value, { stream: true });
+      let nl: number;
+      while ((nl = buf.indexOf("\n")) !== -1) {
+        let line = buf.slice(0, nl);
+        buf = buf.slice(nl + 1);
+        if (line.endsWith("\r")) line = line.slice(0, -1);
+        if (line.startsWith(":") || line.trim() === "") continue;
+        if (!line.startsWith("data: ")) continue;
+        const json = line.slice(6).trim();
+        if (json === "[DONE]") { done = true; break; }
+        try {
+          const parsed = JSON.parse(json);
+          const c = parsed.choices?.[0]?.delta?.content;
+          if (c) onDelta(c);
+        } catch { buf = line + "\n" + buf; break; }
+      }
+    }
+    onDone();
+  } catch { onError("Erreur de connexion"); }
+}
+
+async function saveWidgetData(action: string, data: Record<string, unknown>) {
+  await fetch(SAVE_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+    },
+    body: JSON.stringify({ action, data }),
+  });
+}
+
+// ── Typing dots ──
+const TypingDots = () => (
+  <div className="flex items-center gap-1 px-3 py-2">
+    {[0, 1, 2].map(i => (
+      <motion.span key={i} className="w-2 h-2 rounded-full bg-muted-foreground/40"
+        animate={{ opacity: [0.3, 1, 0.3] }}
+        transition={{ duration: 1, repeat: Infinity, delay: i * 0.2 }} />
+    ))}
+  </div>
+);
+
+// ── Main component ──
 const ContactWidget = () => {
   const [open, setOpen] = useState(false);
-  const [tab, setTab] = useState<Tab>("menu");
-  const [sending, setSending] = useState(false);
-  const [sent, setSent] = useState(false);
-  const { content } = useContent();
+  const [screen, setScreen] = useState<Screen>("menu");
   const { toast } = useToast();
 
-  const [msgForm, setMsgForm] = useState({ name: "", email: "", message: "" });
-  const [callbackPhone, setCallbackPhone] = useState("");
+  // Pulse animation - stop after first open
+  const [hasOpened, setHasOpened] = useState(() => sessionStorage.getItem("widget_opened") === "true");
+
+  // AI Chat state
+  const [chatMessages, setChatMessages] = useState<Msg[]>(() => {
+    try { return JSON.parse(sessionStorage.getItem("chatbot_session") || "[]"); } catch { return []; }
+  });
+  const [chatInput, setChatInput] = useState("");
+  const [isStreaming, setIsStreaming] = useState(false);
+  const chatEndRef = useRef<HTMLDivElement>(null);
+  const userMsgCount = chatMessages.filter(m => m.role === "user").length;
+
+  // SAV state
+  const [savStep, setSavStep] = useState(0);
+  const [savData, setSavData] = useState({ order_number: "", problem_category: "", problem_detail: "", email: "", phone: "" });
+  const [savInput, setSavInput] = useState("");
+  const [savDone, setSavDone] = useState(false);
+  const savEndRef = useRef<HTMLDivElement>(null);
+
+  // Callback state
+  const [cbForm, setCbForm] = useState({ first_name: "", phone: "", city: "" });
+  const [cbRgpd, setCbRgpd] = useState(false);
+  const [cbSending, setCbSending] = useState(false);
+  const [cbDone, setCbDone] = useState(false);
+
+  // Persist chat
+  useEffect(() => {
+    if (chatMessages.length > 0) sessionStorage.setItem("chatbot_session", JSON.stringify(chatMessages));
+  }, [chatMessages]);
+
+  // Auto scroll chat
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages, isStreaming]);
+  useEffect(() => { savEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [savStep]);
+
+  // ESC to close
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape" && open) setOpen(false); };
+    window.addEventListener("keydown", h);
+    return () => window.removeEventListener("keydown", h);
+  }, [open]);
+
+  const handleOpen = () => {
+    setOpen(!open);
+    if (!hasOpened) { setHasOpened(true); sessionStorage.setItem("widget_opened", "true"); }
+  };
+
+  // ── AI Chat send ──
+  const sendChat = useCallback(async () => {
+    const text = chatInput.trim();
+    if (!text || isStreaming) return;
+    if (userMsgCount >= 20) return;
+
+    const userMsg: Msg = { role: "user", content: text };
+    const newMessages = [...chatMessages, userMsg];
+    setChatMessages(newMessages);
+    setChatInput("");
+    setIsStreaming(true);
+
+    let assistantSoFar = "";
+    const upsert = (chunk: string) => {
+      assistantSoFar += chunk;
+      setChatMessages(prev => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant") {
+          return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
+        }
+        return [...prev, { role: "assistant", content: assistantSoFar }];
+      });
+    };
+
+    await streamChat({
+      messages: newMessages,
+      onDelta: upsert,
+      onDone: () => setIsStreaming(false),
+      onError: (err) => {
+        setIsStreaming(false);
+        toast({ title: "Erreur", description: err, variant: "destructive" });
+      },
+    });
+  }, [chatInput, chatMessages, isStreaming, userMsgCount, toast]);
+
+  // ── SAV flow ──
+  const savQuestions = [
+    "Quel est le numéro de votre commande ?",
+    "Quel est le problème rencontré ?",
+    "", // conditional Q3
+    "Quel est votre email de commande ?",
+    "Quel est votre numéro de téléphone ?",
+  ];
+
+  const savCategories = ["Produit non reçu", "Produit endommagé", "Produit non conforme", "Problème de paiement", "Autre"];
+
+  const getQ3Text = () => {
+    const cat = savData.problem_category;
+    if (cat === "Produit non reçu") return "Quel est le transporteur indiqué dans votre email de confirmation ?";
+    if (cat === "Produit endommagé" || cat === "Produit non conforme") return "Pouvez-vous décrire le problème en détail ?";
+    if (cat === "Problème de paiement") return "Le paiement a-t-il été débité de votre compte ?";
+    return "Décrivez votre problème";
+  };
+
+  const handleSavSubmit = (value: string) => {
+    if (savStep === 0) {
+      setSavData(p => ({ ...p, order_number: value }));
+      setSavStep(1);
+    } else if (savStep === 2) {
+      setSavData(p => ({ ...p, problem_detail: value }));
+      setSavStep(3);
+    } else if (savStep === 3) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        toast({ title: "Email invalide", variant: "destructive" });
+        return;
+      }
+      setSavData(p => ({ ...p, email: value }));
+      setSavStep(4);
+    } else if (savStep === 4) {
+      setSavData(p => ({ ...p, phone: value }));
+      completeSav({ ...savData, phone: value });
+    }
+    setSavInput("");
+  };
+
+  const handleSavCategory = (cat: string) => {
+    setSavData(p => ({ ...p, problem_category: cat }));
+    if (cat === "Problème de paiement") {
+      setSavStep(2); // will show Oui/Non buttons
+    } else {
+      setSavStep(2);
+    }
+  };
+
+  const completeSav = async (finalData: typeof savData) => {
+    try {
+      await saveWidgetData("sav", finalData);
+      setSavDone(true);
+    } catch {
+      toast({ title: "Erreur d'envoi", variant: "destructive" });
+    }
+  };
+
+  // ── Callback submit ──
+  const handleCallback = async () => {
+    const phoneRegex = /^(?:(?:\+33|0033|0)[1-9])(?:[\s.-]?\d{2}){4}$/;
+    if (!phoneRegex.test(cbForm.phone.replace(/\s/g, ""))) {
+      toast({ title: "Numéro de téléphone invalide", variant: "destructive" });
+      return;
+    }
+    setCbSending(true);
+    try {
+      await saveWidgetData("callback", { ...cbForm });
+      setCbDone(true);
+    } catch {
+      toast({ title: "Erreur d'envoi", variant: "destructive" });
+    } finally { setCbSending(false); }
+  };
+
+  // Save transcript on close
+  const handleClose = () => {
+    setOpen(false);
+    if (chatMessages.length > 1) {
+      const email = localStorage.getItem("contact_email") || undefined;
+      saveWidgetData("chat_transcript", { transcript: chatMessages, email });
+    }
+  };
+
+  const resetScreen = (s: Screen) => {
+    setScreen(s);
+    if (s === "sav") { setSavStep(0); setSavData({ order_number: "", problem_category: "", problem_detail: "", email: "", phone: "" }); setSavDone(false); setSavInput(""); }
+    if (s === "callback") { setCbForm({ first_name: "", phone: "", city: "" }); setCbRgpd(false); setCbDone(false); }
+  };
 
   const isOnline = (() => {
     const now = new Date();
-    const day = now.getDay();
-    const hour = now.getHours();
-    return day >= 1 && day <= 5 && hour >= 9 && hour < 18;
+    const d = now.getDay(), h = now.getHours();
+    return d >= 1 && d <= 5 && h >= 9 && h < 18;
   })();
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-    try {
-      await supabase.from("contact_messages" as any).insert({
-        first_name: msgForm.name.split(" ")[0] || msgForm.name,
-        last_name: msgForm.name.split(" ").slice(1).join(" ") || "-",
-        email: msgForm.email, message: msgForm.message, subject: "Widget contact",
-      } as any);
-      setSent(true);
-    } catch {
-      toast({ title: "Erreur", description: "Impossible d'envoyer.", variant: "destructive" });
-    } finally { setSending(false); }
-  };
+  // ── Header ──
+  const WidgetHeader = () => (
+    <div className="bg-[#1a4a42] text-white px-4 py-3 rounded-t-2xl flex items-center justify-between shrink-0">
+      <div>
+        <p className="text-sm font-semibold">Notre équipe vous répond</p>
+        <p className="text-xs opacity-80 flex items-center gap-1.5">
+          <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-400" : "bg-red-400"}`} />
+          {isOnline ? "En ligne" : "Disponible demain 9h"}
+        </p>
+      </div>
+      <button onClick={handleClose} aria-label="Fermer le widget" className="hover:bg-white/10 rounded-full p-1 transition-colors">
+        <X className="w-4 h-4" />
+      </button>
+    </div>
+  );
 
-  const handleCallback = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSending(true);
-    try {
-      await supabase.from("contact_messages" as any).insert({
-        first_name: "Rappel", last_name: "demandé", email: "rappel@widget.local",
-        phone: callbackPhone, message: `Demande de rappel au ${callbackPhone}`, subject: "Demande de rappel",
-      } as any);
-      setSent(true);
-    } catch {
-      toast({ title: "Erreur", variant: "destructive" });
-    } finally { setSending(false); }
-  };
+  const BackButton = ({ to }: { to: Screen }) => (
+    <button onClick={() => resetScreen(to)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
+      <ArrowLeft className="w-3 h-3" /> Retour
+    </button>
+  );
 
-  const reset = () => { setTab("menu"); setSent(false); setMsgForm({ name: "", email: "", message: "" }); setCallbackPhone(""); };
+  // ── SCREENS ──
+
+  const MenuScreen = () => (
+    <div className="p-4 space-y-2">
+      {[
+        { icon: <MessageCircle className="w-5 h-5" />, title: "Poser une question", sub: "Notre IA répond instantanément", target: "ai_chat" as Screen },
+        { icon: <Wrench className="w-5 h-5" />, title: "Service après-vente", sub: "Un problème avec votre commande ?", target: "sav" as Screen },
+        { icon: <Phone className="w-5 h-5" />, title: "Être rappelé", sub: "Laissez vos coordonnées", target: "callback" as Screen },
+      ].map(item => (
+        <button key={item.target} onClick={() => resetScreen(item.target)}
+          className="w-full flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-secondary/50 transition-colors text-left">
+          <div className="text-primary shrink-0">{item.icon}</div>
+          <div><p className="text-sm font-medium">{item.title}</p><p className="text-xs text-muted-foreground">{item.sub}</p></div>
+        </button>
+      ))}
+    </div>
+  );
+
+  const AIChatScreen = () => (
+    <div className="flex flex-col h-full">
+      <div className="px-4 pt-2"><BackButton to="menu" /></div>
+      <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
+        {chatMessages.length === 0 && (
+          <div className="text-center py-6">
+            <p className="text-sm text-muted-foreground">👋 Bonjour ! Comment puis-je vous aider ?</p>
+          </div>
+        )}
+        {chatMessages.map((m, i) => (
+          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+            <div className={`max-w-[80%] px-3 py-2 rounded-2xl text-sm ${
+              m.role === "user"
+                ? "bg-[#1a4a42] text-white rounded-br-md"
+                : "bg-secondary text-foreground rounded-bl-md"
+            }`}>
+              {m.content}
+              {m.role === "assistant" && /rappel|contacter|rappeler/i.test(m.content) && (
+                <button onClick={() => resetScreen("callback")}
+                  className="mt-2 text-xs text-primary underline block">📞 Demander un rappel</button>
+              )}
+            </div>
+          </div>
+        ))}
+        {isStreaming && chatMessages[chatMessages.length - 1]?.role !== "assistant" && <TypingDots />}
+        {userMsgCount >= 20 && (
+          <div className="text-center py-3 space-y-2">
+            <p className="text-xs text-muted-foreground">Vous souhaitez parler à un humain ?</p>
+            <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("callback")}>
+              📞 Demander un rappel
+            </Button>
+          </div>
+        )}
+        <div ref={chatEndRef} />
+      </div>
+      {userMsgCount < 20 && (
+        <form onSubmit={(e) => { e.preventDefault(); sendChat(); }}
+          className="px-4 py-3 border-t border-border flex gap-2 shrink-0">
+          <Input value={chatInput} onChange={e => setChatInput(e.target.value)}
+            placeholder="Votre question..." className="rounded-full h-9 text-sm flex-1"
+            disabled={isStreaming} aria-label="Message" />
+          <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0" disabled={isStreaming || !chatInput.trim()}>
+            <Send className="w-4 h-4" />
+          </Button>
+        </form>
+      )}
+    </div>
+  );
+
+  const SAVScreen = () => (
+    <div className="flex flex-col h-full">
+      <div className="px-4 pt-2"><BackButton to="menu" /></div>
+      <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
+        {savDone ? (
+          <div className="text-center py-6 space-y-3">
+            <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+              <Check className="w-6 h-6 text-green-600" />
+            </div>
+            <p className="text-sm font-medium">Demande SAV enregistrée !</p>
+            <p className="text-xs text-muted-foreground">Notre équipe revient vers vous dans les meilleurs délais.</p>
+            <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("menu")}>Nouvelle question</Button>
+          </div>
+        ) : (
+          <>
+            {/* Render conversation so far */}
+            {savStep >= 0 && (
+              <div className="flex justify-start">
+                <div className="bg-secondary text-foreground px-3 py-2 rounded-2xl rounded-bl-md text-sm max-w-[80%]">
+                  {savQuestions[0]}
+                </div>
+              </div>
+            )}
+            {savData.order_number && (
+              <div className="flex justify-end">
+                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                  {savData.order_number}
+                </div>
+              </div>
+            )}
+            {savStep >= 1 && (
+              <div className="flex justify-start">
+                <div className="bg-secondary text-foreground px-3 py-2 rounded-2xl rounded-bl-md text-sm max-w-[80%]">
+                  {savQuestions[1]}
+                </div>
+              </div>
+            )}
+            {savData.problem_category && (
+              <div className="flex justify-end">
+                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                  {savData.problem_category}
+                </div>
+              </div>
+            )}
+            {savStep >= 2 && savData.problem_category && (
+              <div className="flex justify-start">
+                <div className="bg-secondary text-foreground px-3 py-2 rounded-2xl rounded-bl-md text-sm max-w-[80%]">
+                  {getQ3Text()}
+                </div>
+              </div>
+            )}
+            {savData.problem_detail && (
+              <div className="flex justify-end">
+                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                  {savData.problem_detail}
+                </div>
+              </div>
+            )}
+            {savStep >= 3 && (
+              <div className="flex justify-start">
+                <div className="bg-secondary text-foreground px-3 py-2 rounded-2xl rounded-bl-md text-sm max-w-[80%]">
+                  {savQuestions[3]}
+                </div>
+              </div>
+            )}
+            {savData.email && (
+              <div className="flex justify-end">
+                <div className="bg-[#1a4a42] text-white px-3 py-2 rounded-2xl rounded-br-md text-sm max-w-[80%]">
+                  {savData.email}
+                </div>
+              </div>
+            )}
+            {savStep >= 4 && (
+              <div className="flex justify-start">
+                <div className="bg-secondary text-foreground px-3 py-2 rounded-2xl rounded-bl-md text-sm max-w-[80%]">
+                  {savQuestions[4]} <span className="text-xs opacity-60">(optionnel)</span>
+                </div>
+              </div>
+            )}
+            <div ref={savEndRef} />
+          </>
+        )}
+      </div>
+      {/* Input area */}
+      {!savDone && (
+        <div className="px-4 py-3 border-t border-border shrink-0">
+          {savStep === 1 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {savCategories.map(cat => (
+                <button key={cat} onClick={() => handleSavCategory(cat)}
+                  className="px-3 py-1.5 text-xs rounded-full border border-border hover:bg-secondary transition-colors">
+                  {cat}
+                </button>
+              ))}
+            </div>
+          ) : savStep === 2 && savData.problem_category === "Problème de paiement" ? (
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" className="text-xs flex-1" onClick={() => { setSavData(p => ({ ...p, problem_detail: "Oui, le paiement a été débité" })); setSavStep(3); }}>Oui</Button>
+              <Button size="sm" variant="outline" className="text-xs flex-1" onClick={() => { setSavData(p => ({ ...p, problem_detail: "Non, le paiement n'a pas été débité" })); setSavStep(3); }}>Non</Button>
+            </div>
+          ) : savStep === 4 ? (
+            <div className="flex gap-2">
+              <form onSubmit={(e) => { e.preventDefault(); handleSavSubmit(savInput); }} className="flex-1 flex gap-2">
+                <Input value={savInput} onChange={e => setSavInput(e.target.value)} placeholder="06 XX XX XX XX" type="tel" className="rounded-full h-9 text-sm" />
+                <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0"><Send className="w-4 h-4" /></Button>
+              </form>
+              <Button size="sm" variant="ghost" className="text-xs" onClick={() => completeSav(savData)}>Passer</Button>
+            </div>
+          ) : (
+            <form onSubmit={(e) => { e.preventDefault(); handleSavSubmit(savInput); }} className="flex gap-2">
+              <Input value={savInput} onChange={e => setSavInput(e.target.value)}
+                placeholder={savStep === 3 ? "email@exemple.com" : "Votre réponse..."}
+                type={savStep === 3 ? "email" : "text"}
+                className="rounded-full h-9 text-sm flex-1" required />
+              <Button type="submit" size="icon" className="rounded-full h-9 w-9 shrink-0"><Send className="w-4 h-4" /></Button>
+            </form>
+          )}
+        </div>
+      )}
+    </div>
+  );
+
+  const CallbackScreen = () => (
+    <div className="p-4 flex flex-col h-full overflow-y-auto">
+      <BackButton to="menu" />
+      {cbDone ? (
+        <div className="text-center py-6 space-y-3 flex-1 flex flex-col justify-center">
+          <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+            <Check className="w-6 h-6 text-green-600" />
+          </div>
+          <p className="text-sm font-medium">Demande enregistrée !</p>
+          <p className="text-xs text-muted-foreground">Merci {cbForm.first_name}, nous vous rappelons au {cbForm.phone} dès que possible.</p>
+          <Button size="sm" variant="outline" className="text-xs" onClick={handleClose}>Fermer</Button>
+        </div>
+      ) : (
+        <>
+          <div className="mb-4">
+            <p className="text-sm font-medium">📞 Être rappelé par notre équipe</p>
+            <p className="text-xs text-muted-foreground mt-1">Remplissez ce formulaire et nous vous recontactons.</p>
+          </div>
+          <div className="space-y-3 flex-1">
+            <Input placeholder="Prénom *" value={cbForm.first_name} onChange={e => setCbForm(p => ({ ...p, first_name: e.target.value }))}
+              className="rounded-lg h-9 text-sm" required aria-label="Prénom" />
+            <Input placeholder="Numéro de téléphone *" type="tel" value={cbForm.phone}
+              onChange={e => setCbForm(p => ({ ...p, phone: e.target.value }))}
+              className="rounded-lg h-9 text-sm" required aria-label="Téléphone" />
+            <Input placeholder="Ville *" value={cbForm.city} onChange={e => setCbForm(p => ({ ...p, city: e.target.value }))}
+              className="rounded-lg h-9 text-sm" required aria-label="Ville" />
+            <div className="flex items-start gap-2">
+              <Checkbox id="rgpd" checked={cbRgpd} onCheckedChange={(v) => setCbRgpd(v === true)} className="mt-0.5" />
+              <label htmlFor="rgpd" className="text-xs text-muted-foreground leading-tight cursor-pointer">
+                J'accepte que mes données soient traitées pour me recontacter.{" "}
+                <a href="/mentions-legales" target="_blank" className="underline">En savoir plus</a>
+              </label>
+            </div>
+            <Button onClick={handleCallback} className="w-full text-sm" size="sm"
+              disabled={!cbForm.first_name || !cbForm.phone || !cbForm.city || !cbRgpd || cbSending}>
+              {cbSending ? <><Loader2 className="w-4 h-4 animate-spin mr-1" /> Envoi...</> : "Demander à être rappelé"}
+            </Button>
+          </div>
+        </>
+      )}
+    </div>
+  );
 
   return (
     <div className="fixed bottom-6 right-6 z-50 print:hidden">
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.85, y: 20 }}
+            initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.85, y: 20 }}
-            transition={{ type: "spring", damping: 25 }}
-            className="mb-3 w-[280px] bg-background border border-border rounded-2xl shadow-xl overflow-hidden"
+            exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            className="mb-3 w-[360px] max-sm:fixed max-sm:inset-0 max-sm:w-full max-sm:h-full max-sm:mb-0 bg-background border border-border rounded-2xl max-sm:rounded-none shadow-2xl overflow-hidden flex flex-col"
+            style={{ maxHeight: "min(520px, calc(100vh - 100px))" }}
+            role="dialog" aria-label="Widget de contact"
           >
-            <div className="bg-gradient-to-r from-primary to-accent-light text-white px-4 py-3 rounded-t-2xl flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">Notre équipe vous répond</p>
-                <p className="text-xs opacity-80 flex items-center gap-1">
-                  <span className={`w-2 h-2 rounded-full ${isOnline ? "bg-green-400" : "bg-red-400"}`} />
-                  {isOnline ? "En ligne" : "Disponible demain 9h"}
-                </p>
-              </div>
-              <button onClick={() => { setOpen(false); reset(); }}>
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="p-4">
-              {sent ? (
-                <div className="text-center py-4 space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mx-auto">
-                    <Send className="w-5 h-5 text-primary" />
-                  </div>
-                  <p className="text-sm font-medium">Message envoyé !</p>
-                  <p className="text-xs text-muted-foreground">Nous vous répondons sous 30 minutes.</p>
-                  <Button variant="outline" size="sm" className="text-xs mt-2" onClick={reset}>Retour</Button>
-                </div>
-              ) : tab === "menu" ? (
-                <div className="space-y-2">
-                  <button className="w-full flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-secondary transition-colors text-left" onClick={() => window.location.href = `tel:${content.global.phone?.replace(/\s/g, "")}`}>
-                    <Phone className="w-4 h-4 text-primary shrink-0" />
-                    <div><p className="text-sm font-medium">Nous appeler</p><p className="text-xs text-muted-foreground">{content.global.phone}</p></div>
-                  </button>
-                  <button className="w-full flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-secondary transition-colors text-left" onClick={() => setTab("message")}>
-                    <MessageCircle className="w-4 h-4 text-primary shrink-0" />
-                    <div><p className="text-sm font-medium">Envoyer un message</p><p className="text-xs text-muted-foreground">Réponse sous 30 min</p></div>
-                  </button>
-                  <button className="w-full flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-secondary transition-colors text-left" onClick={() => setTab("callback")}>
-                    <Clock className="w-4 h-4 text-primary shrink-0" />
-                    <div><p className="text-sm font-medium">Rappel sous 30min</p><p className="text-xs text-muted-foreground">Nous vous rappelons</p></div>
-                  </button>
-                </div>
-              ) : tab === "message" ? (
-                <form onSubmit={handleSendMessage} className="space-y-3">
-                  <Input placeholder="Votre nom" value={msgForm.name} onChange={(e) => setMsgForm(p => ({ ...p, name: e.target.value }))} required className="rounded-lg h-9 text-sm" />
-                  <Input placeholder="Email" type="email" value={msgForm.email} onChange={(e) => setMsgForm(p => ({ ...p, email: e.target.value }))} required className="rounded-lg h-9 text-sm" />
-                  <Textarea placeholder="Votre message..." value={msgForm.message} onChange={(e) => setMsgForm(p => ({ ...p, message: e.target.value }))} required className="rounded-lg min-h-[80px] text-sm resize-none" />
-                  <div className="flex gap-2">
-                    <Button type="button" variant="outline" size="sm" className="text-xs" onClick={() => setTab("menu")}>← Retour</Button>
-                    <Button type="submit" size="sm" className="flex-1 text-xs" disabled={sending}>{sending ? "Envoi..." : "Envoyer"}</Button>
-                  </div>
-                </form>
-              ) : (
-                <form onSubmit={handleCallback} className="space-y-3">
-                  <p className="text-sm text-muted-foreground">Entrez votre numéro, nous vous rappelons sous 30 minutes.</p>
-                  <Input placeholder="06 XX XX XX XX" type="tel" value={callbackPhone} onChange={(e) => setCallbackPhone(e.target.value)} required className="rounded-lg h-9 text-sm" />
-                  <div className="flex gap-2">
-                    <Button type="button" variant="outline" size="sm" className="text-xs" onClick={() => setTab("menu")}>← Retour</Button>
-                    <Button type="submit" size="sm" className="flex-1 text-xs" disabled={sending}>{sending ? "Envoi..." : "Je souhaite être rappelé(e)"}</Button>
-                  </div>
-                </form>
-              )}
+            <WidgetHeader />
+            <div className="flex-1 overflow-hidden flex flex-col min-h-0">
+              {screen === "menu" && <MenuScreen />}
+              {screen === "ai_chat" && <AIChatScreen />}
+              {screen === "sav" && <SAVScreen />}
+              {screen === "callback" && <CallbackScreen />}
             </div>
           </motion.div>
         )}
@@ -136,8 +550,11 @@ const ContactWidget = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={() => { setOpen(!open); if (!open) reset(); }}
-        className="group w-14 h-14 rounded-full bg-gradient-to-r from-primary to-accent-light text-white shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow"
+        onClick={handleOpen}
+        className={`group w-14 h-14 rounded-full bg-[#1a4a42] text-white shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow ${
+          !hasOpened ? "animate-pulse" : ""
+        }`}
+        aria-label={open ? "Fermer le chat" : "Ouvrir le chat"}
       >
         {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </motion.button>

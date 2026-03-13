@@ -19,3 +19,9 @@ verify_jwt = false
 
 [functions.project-store-on-photo]
 verify_jwt = false
+
+[functions.widget-chat]
+verify_jwt = false
+
+[functions.widget-save]
+verify_jwt = false
