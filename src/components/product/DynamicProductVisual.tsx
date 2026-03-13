@@ -163,9 +163,6 @@ const DynamicProductVisual = ({
           </div>
         </div>
       )}
-          </div>
-        </div>
-      )}
 
       {/* LED indicator */}
       {showLed && isVisible && (
