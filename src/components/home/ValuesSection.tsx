@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import AnimatedSection from "@/components/AnimatedSection";
+import { Button } from "@/components/ui/button";
 import { Banknote, ShieldCheck, Truck, Sun, Droplets, Palette, ChevronLeft, ChevronRight } from "lucide-react";
 
 const values = [
@@ -39,6 +41,49 @@ const values = [
     desc: "Toile Orchestra by Dickson disponible en 173 coloris pour s'adapter à tous les styles.",
     image: "/images/store-toile-detail.webp",
   },
+];
+
+function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffix: string; decimals?: number }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          const duration = 2000;
+          const startTime = performance.now();
+          const animate = (now: number) => {
+            const progress = Math.min((now - startTime) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setCount(eased * value);
+            if (progress < 1) requestAnimationFrame(animate);
+          };
+          requestAnimationFrame(animate);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.5 }
+    );
+    if (ref.current) observer.observe(ref.current);
+    return () => observer.disconnect();
+  }, [value]);
+
+  return (
+    <div ref={ref}>
+      <span className="font-display text-4xl md:text-5xl font-bold tracking-tight">
+        {decimals > 0 ? count.toFixed(decimals) : Math.floor(count).toLocaleString("fr-FR")}
+        {suffix}
+      </span>
+    </div>
+  );
+}
+
+const stats = [
+  { value: 5000, suffix: "+", label: "Stores installés en France", decimals: 0 },
+  { value: 4.9, suffix: "/5", label: "Note moyenne Trustpilot", decimals: 1 },
+  { value: 173, suffix: "", label: "Coloris Dickson disponibles", decimals: 0 },
+  { value: 5, suffix: " ans", label: "De garantie pièces & main d'œuvre", decimals: 0 },
 ];
 
 const ValuesSection = () => {
@@ -104,7 +149,7 @@ const ValuesSection = () => {
           className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-6 px-6 pb-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {values.map((v, i) => (
+          {values.map((v) => (
             <div
               key={v.title}
               className="min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl overflow-hidden group"
@@ -129,6 +174,27 @@ const ValuesSection = () => {
             </div>
           ))}
         </div>
+
+        {/* Stats + CTA */}
+        <AnimatedSection delay={0.1}>
+          <div className="mt-16 pt-16 border-t border-primary-foreground/10">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+              {stats.map((stat) => (
+                <div key={stat.label} className="space-y-2">
+                  <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+                  <p className="text-primary-foreground/50 text-sm">{stat.label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="text-center">
+              <Link to="/configurateur">
+                <Button className="px-12 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto bg-accent hover:bg-accent/90 text-accent-foreground">
+                  Configurer mon store →
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </AnimatedSection>
       </div>
     </section>
   );

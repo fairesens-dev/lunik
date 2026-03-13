@@ -1,47 +1,36 @@
 import AnimatedSection from "@/components/AnimatedSection";
+import { ShieldCheck, Palette, Smartphone, Lightbulb, Move, Ruler } from "lucide-react";
 
-const bentoItems = [
+const features = [
   {
+    icon: ShieldCheck,
     title: "Coffre intégral",
-    desc: "Protection totale de la toile et du mécanisme",
-    image: "/images/store-coffre-ouvert.webp",
-    span: "md:col-span-2 md:row-span-2",
-    height: "h-80 md:h-full",
+    desc: "Protection totale de la toile et du mécanisme quand le store est replié. Étanchéité garantie.",
   },
   {
+    icon: Palette,
     title: "Toile Dickson",
-    desc: "173 coloris, traitement Cleanguard",
-    image: "/images/store-toile-detail.webp",
-    span: "",
-    height: "h-64",
+    desc: "173 coloris en acrylique teint masse avec traitement Cleanguard. Certifiée OEKO-TEX classe II.",
   },
   {
+    icon: Smartphone,
     title: "Motorisation Somfy",
-    desc: "Télécommande & capteur vent intégrés",
-    image: "/images/store-bras-fixations.webp",
-    span: "",
-    height: "h-64",
+    desc: "Pilotage télécommande, smartphone ou assistants vocaux. Capteur vent en option.",
   },
   {
+    icon: Lightbulb,
     title: "Éclairage LED",
-    desc: "Ambiance prolongée en soirée",
-    image: "/images/store-led-nuit.webp",
-    span: "",
-    height: "h-64",
+    desc: "Bandeau LED intégré au coffre pour prolonger vos soirées en terrasse avec une lumière douce.",
   },
   {
+    icon: Move,
     title: "Bras articulés",
-    desc: "Aluminium extrudé haute résistance",
-    image: "/images/store-bras-detail.webp",
-    span: "",
-    height: "h-64",
+    desc: "Aluminium extrudé haute résistance, thermolaqué anti-corrosion. Tension parfaite de la toile.",
   },
   {
+    icon: Ruler,
     title: "100% sur-mesure",
-    desc: "Dimensions exactes, fabriqué pour vous",
-    image: "/images/store-salon-vide.webp",
-    span: "md:col-span-2",
-    height: "h-64 md:h-72",
+    desc: "Dimensions exactes au centimètre près, fabriqué spécialement pour votre terrasse.",
   },
 ];
 
@@ -49,34 +38,29 @@ const ProductHighlightSection = () => (
   <section className="py-20 lg:py-28">
     <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
       <AnimatedSection>
-        <div className="text-center mb-16">
+        <div className="max-w-2xl mb-16">
           <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
             Nos points forts
           </p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">
+          <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight mb-6">
             Chaque détail<br />
             <span className="text-accent-light">a été pensé</span>
           </h2>
+          <p className="text-muted-foreground text-base leading-relaxed">
+            Notre store coffre intégral combine les meilleurs matériaux du marché — toile Dickson, aluminium extrudé, motorisation Somfy — dans un produit 100% fabriqué en France et conçu pour durer.
+          </p>
         </div>
       </AnimatedSection>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {bentoItems.map((item, i) => (
-          <AnimatedSection key={item.title} delay={i * 0.08} className={item.span}>
-            <div className={`relative ${item.height} overflow-hidden rounded-2xl group cursor-pointer`}>
-              <img
-                src={item.image}
-                alt={item.title}
-                className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h3 className="font-display text-lg font-bold text-white mb-1">{item.title}</h3>
-                <p className="text-white/70 text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  {item.desc}
-                </p>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {features.map((feature, i) => (
+          <AnimatedSection key={feature.title} delay={i * 0.06}>
+            <div className="p-8 rounded-2xl bg-card border border-border hover:border-accent/30 transition-colors duration-300 h-full">
+              <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-5">
+                <feature.icon className="w-6 h-6 text-primary" />
               </div>
+              <h3 className="font-display text-lg font-bold mb-2">{feature.title}</h3>
+              <p className="text-muted-foreground text-sm leading-relaxed">{feature.desc}</p>
             </div>
           </AnimatedSection>
         ))}

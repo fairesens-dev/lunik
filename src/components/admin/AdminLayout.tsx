@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import logoStoreWhite from "@/assets/logo-lunik-store-white.png";
+import logoLunik from "@/assets/logo-lunik.svg";
 
 const navGroups = [
   {
@@ -79,16 +79,16 @@ const AdminLayout = () => {
 
   const sidebarContent = (
     <div className="flex flex-col h-full">
-      <div className="px-5 py-5">
-        <img src={logoStoreWhite} alt="LuniK Store" className="h-7" />
-        <span className="ml-2 text-xs bg-white/10 text-sidebar-foreground/60 px-2 py-0.5 rounded font-sans">Admin</span>
+      <div className="px-5 py-6 flex items-center gap-3">
+        <img src={logoLunik} alt="LuniK" className="h-7 brightness-0 invert" />
+        <span className="text-[10px] bg-white/10 text-white/50 px-2 py-0.5 rounded-md font-sans uppercase tracking-wider">Admin</span>
       </div>
-      <div className="border-t border-white/10 mx-4" />
+      <div className="border-t border-white/[0.06] mx-5" />
 
-      <nav className="flex-1 px-3 py-4 space-y-5 overflow-y-auto">
+      <nav className="flex-1 px-3 py-5 space-y-6 overflow-y-auto">
         {navGroups.map((group) => (
           <div key={group.label}>
-            <p className="px-3 mb-2 text-[11px] font-semibold text-sidebar-foreground/40 tracking-widest font-sans">
+            <p className="px-3 mb-2.5 text-[10px] font-semibold text-white/30 tracking-[0.15em] font-sans">
               {group.label}
             </p>
             <div className="space-y-0.5">
@@ -98,17 +98,17 @@ const AdminLayout = () => {
                   to={item.to}
                   onClick={() => setSidebarOpen(false)}
                   className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2 rounded-md text-sm font-sans transition-colors ${
+                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-sans transition-all duration-200 ${
                       isActive
-                        ? "bg-white/15 text-white border-l-[3px] border-accent"
-                        : "text-sidebar-foreground/60 hover:bg-white/10 hover:text-white border-l-[3px] border-transparent"
+                        ? "bg-white/[0.12] text-white font-medium"
+                        : "text-white/50 hover:bg-white/[0.06] hover:text-white/80"
                     }`
                   }
                 >
-                  <item.icon className="w-4 h-4 shrink-0" />
+                  <item.icon className="w-[18px] h-[18px] shrink-0" />
                   <span className="flex-1">{item.label}</span>
                   {item.badge && (
-                    <span className="bg-accent text-accent-foreground text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+                    <span className="bg-accent text-accent-foreground text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">
                       {item.badge}
                     </span>
                   )}
@@ -121,42 +121,42 @@ const AdminLayout = () => {
         <div>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 px-3 py-2 rounded-md text-sm font-sans text-sidebar-foreground/60 hover:bg-white/10 hover:text-white w-full border-l-[3px] border-transparent transition-colors"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-sans text-white/50 hover:bg-white/[0.06] hover:text-white/80 w-full transition-all duration-200"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-[18px] h-[18px]" />
             <span>Déconnexion</span>
           </button>
         </div>
       </nav>
 
-      <div className="border-t border-white/10 mx-4" />
+      <div className="border-t border-white/[0.06] mx-5" />
       <div className="px-5 py-4 flex items-center gap-3">
-        <Avatar className="h-8 w-8">
-          <AvatarFallback className="bg-white/15 text-sidebar-foreground text-xs font-sans">AD</AvatarFallback>
+        <Avatar className="h-9 w-9">
+          <AvatarFallback className="bg-white/[0.08] text-white/70 text-xs font-sans">AD</AvatarFallback>
         </Avatar>
         <div className="min-w-0">
-          <p className="text-sm text-white font-medium truncate font-sans">{admin?.name}</p>
-          <p className="text-xs text-sidebar-foreground/50 truncate font-sans">{admin?.email}</p>
+          <p className="text-[13px] text-white font-medium truncate font-sans">{admin?.name}</p>
+          <p className="text-[11px] text-white/40 truncate font-sans">{admin?.email}</p>
         </div>
       </div>
     </div>
   );
 
   return (
-    <div className="min-h-screen bg-background font-sans">
+    <div className="min-h-screen bg-muted/40 font-sans">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-60 bg-sidebar flex-col z-40">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[260px] bg-[#1a1a2e] flex-col z-40">
         {sidebarContent}
       </aside>
 
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute inset-y-0 left-0 w-60 bg-sidebar flex flex-col">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSidebarOpen(false)} />
+          <aside className="absolute inset-y-0 left-0 w-[260px] bg-[#1a1a2e] flex flex-col">
             <button
               onClick={() => setSidebarOpen(false)}
-              className="absolute top-4 right-4 text-sidebar-foreground/60 hover:text-white"
+              className="absolute top-5 right-4 text-white/40 hover:text-white"
             >
               <X className="w-5 h-5" />
             </button>
@@ -166,7 +166,7 @@ const AdminLayout = () => {
       )}
 
       {/* Topbar */}
-      <header className="fixed top-0 left-0 lg:left-60 right-0 h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:px-8 z-30">
+      <header className="fixed top-0 left-0 lg:left-[260px] right-0 h-16 bg-background shadow-sm flex items-center justify-between px-4 lg:px-8 z-30">
         <div className="flex items-center gap-3">
           <Button
             variant="ghost"
@@ -178,7 +178,7 @@ const AdminLayout = () => {
           </Button>
           <div className="flex items-center gap-2 text-sm font-sans">
             <span className="text-muted-foreground">Admin</span>
-            <ChevronRight className="w-3 h-3 text-muted-foreground" />
+            <ChevronRight className="w-3 h-3 text-muted-foreground/50" />
             <span className="font-medium text-foreground">{pageTitle}</span>
           </div>
         </div>
@@ -203,7 +203,7 @@ const AdminLayout = () => {
       </header>
 
       {/* Main Content */}
-      <main className="lg:ml-60 mt-16 p-4 lg:p-8 min-h-[calc(100vh-4rem)]">
+      <main className="lg:ml-[260px] mt-16 p-4 lg:p-8 min-h-[calc(100vh-4rem)]">
         <Outlet />
       </main>
     </div>
