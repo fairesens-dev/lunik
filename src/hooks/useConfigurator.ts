@@ -5,9 +5,10 @@ import {
   getValidProjections,
   isValidWidth,
   getWidthRangeLabel,
-  PRICING_OPTIONS,
+  PRICING_OPTIONS as FALLBACK_PRICING_OPTIONS,
   MIN_WIDTH_CM,
   MAX_WIDTH_CM,
+  type PricingOption,
 } from "@/lib/pricingTable";
 
 export function useConfigurator() {
@@ -18,6 +19,26 @@ export function useConfigurator() {
 
   const TOILE_COLORS_COMPAT = useMemo(() => activeToileColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors, photoUrl: c.photoUrl })), [activeToileColors]);
   const ARMATURE_COLORS_COMPAT = useMemo(() => activeArmatureColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors })), [activeArmatureColors]);
+
+  // Use admin options if available, otherwise fallback to hardcoded
+  const RESOLVED_OPTIONS: PricingOption[] = useMemo(() => {
+    if (settings.options && settings.options.length > 0) {
+      return settings.options
+        .filter(o => o.active)
+        .map((o, i) => ({
+          id: o.id,
+          label: o.label,
+          description: o.description,
+          price: o.price,
+          highlight: o.highlight,
+          badge: o.savingsLabel || undefined,
+          tip: undefined,
+          socialProof: undefined,
+          order: i + 1,
+        }));
+    }
+    return FALLBACK_PRICING_OPTIONS;
+  }, [settings.options]);
 
   // Dimensions — width in cm, projection in mm
   const [widthCm, setWidthCm] = useState(350);
@@ -48,7 +69,7 @@ export function useConfigurator() {
   // Base price from grid
   const basePrice = useMemo(() => lookupPrice(widthMm, projectionMm), [widthMm, projectionMm]);
 
-  // Ensure selectedOptions is always a Set (guards against HMR/state restoration issues)
+  // Ensure selectedOptions is always a Set
   const safeSelectedOptions = useMemo(
     () => (selectedOptions instanceof Set ? selectedOptions : new Set<string>()),
     [selectedOptions]
@@ -57,11 +78,11 @@ export function useConfigurator() {
   // Options total
   const optionsTotal = useMemo(() => {
     let total = 0;
-    for (const opt of PRICING_OPTIONS) {
+    for (const opt of RESOLVED_OPTIONS) {
       if (safeSelectedOptions.has(opt.id)) total += opt.price;
     }
     return total;
-  }, [safeSelectedOptions]);
+  }, [safeSelectedOptions, RESOLVED_OPTIONS]);
 
   // Final price
   const price = useMemo(() => (basePrice ?? 0) + optionsTotal, [basePrice, optionsTotal]);
@@ -83,9 +104,9 @@ export function useConfigurator() {
 
   // Options summary string
   const optionsSummary = useMemo(() => {
-    const parts = PRICING_OPTIONS.filter(o => safeSelectedOptions.has(o.id)).map(o => o.label);
+    const parts = RESOLVED_OPTIONS.filter(o => safeSelectedOptions.has(o.id)).map(o => o.label);
     return parts.join(" + ") || "Aucune";
-  }, [safeSelectedOptions]);
+  }, [safeSelectedOptions, RESOLVED_OPTIONS]);
 
   // Compat: motorisation/led/pack booleans for DynamicProductVisual
   const motorisation = !safeSelectedOptions.has("manoeuvre-manuelle");
@@ -123,7 +144,7 @@ export function useConfigurator() {
     // Data
     TOILE_COLORS: TOILE_COLORS_COMPAT,
     ARMATURE_COLORS: ARMATURE_COLORS_COMPAT,
-    PRICING_OPTIONS,
+    PRICING_OPTIONS: RESOLVED_OPTIONS,
     settings,
   };
 }

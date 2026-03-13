@@ -2,46 +2,12 @@ import { useRef, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import AnimatedSection from "@/components/AnimatedSection";
 import { Button } from "@/components/ui/button";
-import { Banknote, ShieldCheck, Truck, Sun, Droplets, Palette, ChevronLeft, ChevronRight } from "lucide-react";
+import { useContent } from "@/contexts/ContentContext";
+import { Banknote, ShieldCheck, Truck, Sun, Droplets, Palette, ChevronLeft, ChevronRight, Lightbulb, Smartphone } from "lucide-react";
 
-const values = [
-  {
-    icon: Banknote,
-    title: "Le juste prix",
-    desc: "Vente directe 100% sur internet, sans intermédiaire. Vous payez le produit, pas les frais de vitrine.",
-    image: "/images/store-salon-apero.webp",
-  },
-  {
-    icon: Truck,
-    title: "Livré chez vous",
-    desc: "Livraison offerte par transporteur spécialisé. Dans les 4 à 5 semaines suivant votre commande.",
-    image: "/images/store-terrasse-work.webp",
-  },
-  {
-    icon: ShieldCheck,
-    title: "5 ans de garantie",
-    desc: "Tous nos stores sont garantis 5 ans pièces et main d'œuvre. Nos produits sont 100% réparables.",
-    image: "/images/store-coffre-ouvert.webp",
-  },
-  {
-    icon: Sun,
-    title: "Protection UV 5/5",
-    desc: "Toile Dickson acrylique teint masse avec traitement Cleanguard anti-salissures.",
-    image: "/images/store-led-toile.webp",
-  },
-  {
-    icon: Droplets,
-    title: "Résistance intempéries",
-    desc: "Toile certifiée OEKO-TEX classe II, résistante aux intempéries et aux déchirures.",
-    image: "/images/store-bras-detail.webp",
-  },
-  {
-    icon: Palette,
-    title: "173 coloris",
-    desc: "Toile Orchestra by Dickson disponible en 173 coloris pour s'adapter à tous les styles.",
-    image: "/images/store-toile-detail.webp",
-  },
-];
+const ICON_MAP: Record<string, React.FC<{ className?: string }>> = {
+  Banknote, ShieldCheck, Truck, Sun, Droplets, Palette, Lightbulb, Smartphone,
+};
 
 function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffix: string; decimals?: number }) {
   const [count, setCount] = useState(0);
@@ -79,14 +45,10 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
   );
 }
 
-const stats = [
-  { value: 5000, suffix: "+", label: "Stores installés en France", decimals: 0 },
-  { value: 4.9, suffix: "/5", label: "Note moyenne Trustpilot", decimals: 1 },
-  { value: 173, suffix: "", label: "Coloris Dickson disponibles", decimals: 0 },
-  { value: 5, suffix: " ans", label: "De garantie pièces & main d'œuvre", decimals: 0 },
-];
-
 const ValuesSection = () => {
+  const { content } = useContent();
+  const { valueCards, statsItems } = content.homepage;
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(true);
@@ -149,38 +111,41 @@ const ValuesSection = () => {
           className="flex gap-6 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-6 px-6 pb-4"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
-          {values.map((v) => (
-            <div
-              key={v.title}
-              className="min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl overflow-hidden group"
-            >
-              <div className="aspect-[3/2] overflow-hidden">
-                <img
-                  src={v.image}
-                  alt={v.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  loading="lazy"
-                />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center">
-                    <v.icon className="w-5 h-5 text-primary-foreground/80" />
-                  </div>
-                  <h3 className="font-display text-lg font-bold">{v.title}</h3>
+          {valueCards.map((v) => {
+            const Icon = ICON_MAP[v.icon] || Banknote;
+            return (
+              <div
+                key={v.id}
+                className="min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl overflow-hidden group"
+              >
+                <div className="aspect-[3/2] overflow-hidden">
+                  <img
+                    src={v.image}
+                    alt={v.title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
                 </div>
-                <p className="text-primary-foreground/60 text-sm leading-relaxed">{v.desc}</p>
+                <div className="p-6">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-primary-foreground/80" />
+                    </div>
+                    <h3 className="font-display text-lg font-bold">{v.title}</h3>
+                  </div>
+                  <p className="text-primary-foreground/60 text-sm leading-relaxed">{v.desc}</p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Stats + CTA */}
         <AnimatedSection delay={0.1}>
           <div className="mt-16 pt-16 border-t border-primary-foreground/10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
-              {stats.map((stat) => (
-                <div key={stat.label} className="space-y-2">
+              {statsItems.map((stat) => (
+                <div key={stat.id} className="space-y-2">
                   <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
                   <p className="text-primary-foreground/50 text-sm">{stat.label}</p>
                 </div>

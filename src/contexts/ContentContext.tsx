@@ -32,8 +32,31 @@ export interface GalleryItem {
   id: string;
   src: string;
   alt: string;
-  caption: string; // e.g. "Patrick, Strasbourg (67)"
+  caption: string;
   active: boolean;
+}
+
+export interface HighlightFeature {
+  id: string;
+  icon: string; // lucide icon name
+  title: string;
+  desc: string;
+}
+
+export interface ValueCard {
+  id: string;
+  icon: string;
+  title: string;
+  desc: string;
+  image: string;
+}
+
+export interface StatItem {
+  id: string;
+  value: number;
+  suffix: string;
+  label: string;
+  decimals: number;
 }
 
 export interface GlobalContent {
@@ -61,6 +84,17 @@ export interface HomepageContent {
   faqItems: FAQItem[];
   featuredReviews: FeaturedReview[];
   galleryItems: GalleryItem[];
+  // New CMS fields
+  highlightFeatures: HighlightFeature[];
+  highlightImage: string;
+  highlightTitle: string;
+  highlightSubtitle: string;
+  highlightDescription: string;
+  valueCards: ValueCard[];
+  statsItems: StatItem[];
+  contactCTATitle: string;
+  contactCTASubtitle: string;
+  contactCTAImage: string;
 }
 
 export interface ProductPageContent {
@@ -102,48 +136,35 @@ export interface SiteContent {
 // ── Defaults ───────────────────────────────────────────
 
 const defaultGalleryItems: GalleryItem[] = [
-  {
-    id: "g1",
-    src: "/images/real-montagne-cepe.webp",
-    alt: "Store coffre 530×400 cm toile Cèpe avec vue montagne",
-    caption: "Jean-Pierre, Chamonix (74)",
-    active: true,
-  },
-  {
-    id: "g2",
-    src: "/images/real-vin-apero.webp",
-    alt: "Apéro sous le store avec télécommande Somfy",
-    caption: "Marie, Lyon (69)",
-    active: true,
-  },
-  {
-    id: "g3",
-    src: "/images/real-bordeaux.webp",
-    alt: "Store coffre 592×350 cm toile Bordeaux sur terrasse bois",
-    caption: "Thomas, Bordeaux (33)",
-    active: true,
-  },
-  {
-    id: "g4",
-    src: "/images/real-paris-6eme.webp",
-    alt: "Store blanc naturel posé au 6ème étage à Paris",
-    caption: "Sophie, Paris (75)",
-    active: true,
-  },
-  {
-    id: "g5",
-    src: "/images/real-bardage-noir.webp",
-    alt: "Store anthracite toile Jais sur bardage moderne",
-    caption: "Lucas, Strasbourg (67)",
-    active: true,
-  },
-  {
-    id: "g6",
-    src: "/images/real-lecture-piscine.webp",
-    alt: "Détente au bord de la piscine sous le store",
-    caption: "Anne, Aix-en-Provence (13)",
-    active: true,
-  },
+  { id: "g1", src: "/images/real-montagne-cepe.webp", alt: "Store coffre 530×400 cm toile Cèpe avec vue montagne", caption: "Jean-Pierre, Chamonix (74)", active: true },
+  { id: "g2", src: "/images/real-vin-apero.webp", alt: "Apéro sous le store avec télécommande Somfy", caption: "Marie, Lyon (69)", active: true },
+  { id: "g3", src: "/images/real-bordeaux.webp", alt: "Store coffre 592×350 cm toile Bordeaux sur terrasse bois", caption: "Thomas, Bordeaux (33)", active: true },
+  { id: "g4", src: "/images/real-paris-6eme.webp", alt: "Store blanc naturel posé au 6ème étage à Paris", caption: "Sophie, Paris (75)", active: true },
+  { id: "g5", src: "/images/real-bardage-noir.webp", alt: "Store anthracite toile Jais sur bardage moderne", caption: "Lucas, Strasbourg (67)", active: true },
+  { id: "g6", src: "/images/real-lecture-piscine.webp", alt: "Détente au bord de la piscine sous le store", caption: "Anne, Aix-en-Provence (13)", active: true },
+];
+
+const defaultHighlightFeatures: HighlightFeature[] = [
+  { id: "hf1", icon: "ShieldCheck", title: "Coffre intégral", desc: "Protection totale de la toile et du mécanisme quand le store est replié. Étanchéité garantie." },
+  { id: "hf2", icon: "Palette", title: "Toile Dickson", desc: "173 coloris en acrylique teint masse avec traitement Cleanguard. Certifiée OEKO-TEX classe II." },
+  { id: "hf3", icon: "Smartphone", title: "Motorisation Somfy", desc: "Pilotage télécommande, smartphone ou assistants vocaux. Capteur vent en option." },
+  { id: "hf4", icon: "Lightbulb", title: "Éclairage LED", desc: "Bandeau LED intégré au coffre pour prolonger vos soirées en terrasse avec une lumière douce." },
+];
+
+const defaultValueCards: ValueCard[] = [
+  { id: "v1", icon: "Banknote", title: "Le juste prix", desc: "Vente directe 100% sur internet, sans intermédiaire. Vous payez le produit, pas les frais de vitrine.", image: "/images/store-salon-apero.webp" },
+  { id: "v2", icon: "Truck", title: "Livré chez vous", desc: "Livraison offerte par transporteur spécialisé. Dans les 4 à 5 semaines suivant votre commande.", image: "/images/store-terrasse-work.webp" },
+  { id: "v3", icon: "ShieldCheck", title: "5 ans de garantie", desc: "Tous nos stores sont garantis 5 ans pièces et main d'œuvre. Nos produits sont 100% réparables.", image: "/images/store-coffre-ouvert.webp" },
+  { id: "v4", icon: "Sun", title: "Protection UV 5/5", desc: "Toile Dickson acrylique teint masse avec traitement Cleanguard anti-salissures.", image: "/images/store-led-toile.webp" },
+  { id: "v5", icon: "Droplets", title: "Résistance intempéries", desc: "Toile certifiée OEKO-TEX classe II, résistante aux intempéries et aux déchirures.", image: "/images/store-bras-detail.webp" },
+  { id: "v6", icon: "Palette", title: "173 coloris", desc: "Toile Orchestra by Dickson disponible en 173 coloris pour s'adapter à tous les styles.", image: "/images/store-toile-detail.webp" },
+];
+
+const defaultStatsItems: StatItem[] = [
+  { id: "s1", value: 5000, suffix: "+", label: "Stores installés en France", decimals: 0 },
+  { id: "s2", value: 4.9, suffix: "/5", label: "Note moyenne Trustpilot", decimals: 1 },
+  { id: "s3", value: 173, suffix: "", label: "Coloris Dickson disponibles", decimals: 0 },
+  { id: "s4", value: 5, suffix: " ans", label: "De garantie pièces & main d'œuvre", decimals: 0 },
 ];
 
 const defaultContent: SiteContent = {
@@ -161,18 +182,26 @@ const defaultContent: SiteContent = {
   },
   homepage: {
     heroTitle: "Vivez dehors,\nsans compromis.",
-    heroSubtitle:
-      "Nos stores bannes et coffres sont conçus sur-mesure, fabriqués en France, et livrés chez vous en 4 à 5 semaines.",
+    heroSubtitle: "Nos stores bannes et coffres sont conçus sur-mesure, fabriqués en France, et livrés chez vous en 4 à 5 semaines.",
     heroOverline: "Protection solaire sur-mesure · Fabrication française",
     heroCTA1: "Configurer mon store",
-    marqueeText:
-      "FABRIQUÉ EN FRANCE · SUR-MESURE · LIVRAISON 4-5 SEMAINES · GARANTIE 5 ANS · MOTORISATION SOMFY · TOILE DICKSON · MADE IN FRANCE · ",
+    marqueeText: "Trustpilot 4.9/5 · Fabriqué en France · Garantie 5 ans · Toile Dickson · Motorisation Somfy · Éclairage LED · Livraison 4-5 semaines · 100% Sur-Mesure",
     productSectionTitle: "Le Store Coffre\nrepensé de A à Z",
     productSectionSubtitle: "Un seul produit. Le meilleur de sa catégorie.",
     testimonials: [],
     faqItems: [],
     featuredReviews: [],
     galleryItems: defaultGalleryItems,
+    highlightFeatures: defaultHighlightFeatures,
+    highlightImage: "/images/store-vue-ensemble.webp",
+    highlightTitle: "Chaque détail",
+    highlightSubtitle: "a été pensé",
+    highlightDescription: "Notre store coffre intégral combine les meilleurs matériaux du marché — toile Dickson, aluminium extrudé, motorisation Somfy — dans un produit 100% fabriqué en France et conçu pour durer.",
+    valueCards: defaultValueCards,
+    statsItems: defaultStatsItems,
+    contactCTATitle: "Une question avant de configurer ?",
+    contactCTASubtitle: "Notre équipe est disponible du lundi au vendredi, de 9h à 18h.",
+    contactCTAImage: "/images/real-sunset-terrasse.webp",
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
@@ -206,9 +235,7 @@ const defaultContent: SiteContent = {
 interface ContentContextValue {
   content: SiteContent;
   updateGlobal: (data: Partial<GlobalContent>) => void;
-  updateHomepage: (
-    data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>,
-  ) => void;
+  updateHomepage: (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => void;
   updateProductPage: (data: Partial<Omit<ProductPageContent, "faqItems">>) => void;
   updateSAV: (data: Partial<Omit<SAVContent, "faqItems">>) => void;
   updatePromoBanner: (data: Partial<PromoBannerContent>) => void;
@@ -229,7 +256,6 @@ async function upsertContent(id: string, data: unknown) {
 export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [content, setContent] = useState<SiteContent>(defaultContent);
 
-  // Load from Supabase on mount
   useEffect(() => {
     (async () => {
       const { data: rows } = (await supabase.from("site_content" as any).select("id, data")) as any;

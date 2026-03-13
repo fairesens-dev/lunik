@@ -40,14 +40,12 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
   );
 }
 
-const stats = [
-  { value: 5000, suffix: "+", label: "Stores installés", decimals: 0 },
-  { value: 4.9, suffix: "/5", label: "Trustpilot", decimals: 1 },
-];
-
 const HeroSection = () => {
   const { content } = useContent();
   const { homepage } = content;
+
+  // Use first 2 stats for hero display
+  const heroStats = (homepage.statsItems || []).slice(0, 2);
 
   return (
     <section id="hero" className="relative min-h-[60vh] flex items-center justify-center -mt-20 overflow-hidden">
@@ -69,8 +67,6 @@ const HeroSection = () => {
       {/* Content */}
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full flex items-center justify-center min-h-[60vh] pt-20">
         <div className="flex flex-col items-center text-center">
-
-          {/* Giant headline */}
           <motion.h1
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,16 +76,11 @@ const HeroSection = () => {
             {homepage.heroTitle.split("\n").map((line, i, arr) => (
               <span key={i}>
                 {i > 0 && <br />}
-                {i === arr.length - 1 ? (
-                  <span className="text-white/50">{line}</span>
-                ) : (
-                  line
-                )}
+                {i === arr.length - 1 ? <span className="text-white/50">{line}</span> : line}
               </span>
             ))}
           </motion.h1>
 
-          {/* Subtitle */}
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -99,7 +90,6 @@ const HeroSection = () => {
             {homepage.heroSubtitle}
           </motion.p>
 
-          {/* CTAs */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -120,27 +110,28 @@ const HeroSection = () => {
               </Button>
             </a>
           </motion.div>
-
         </div>
       </div>
 
       {/* Stats - absolute bottom right */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.8, delay: 1 }}
-        className="absolute bottom-8 right-8 lg:right-16 xl:right-24 z-10 flex items-center gap-6"
-      >
-        {stats.map((stat, i) => (
-          <div key={stat.label} className="flex items-center gap-6">
-            {i > 0 && <span className="w-px h-8 bg-white/20" />}
-            <div className="text-center text-white">
-              <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
-              <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mt-0.5">{stat.label}</p>
+      {heroStats.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 1 }}
+          className="absolute bottom-8 right-8 lg:right-16 xl:right-24 z-10 flex items-center gap-6"
+        >
+          {heroStats.map((stat, i) => (
+            <div key={stat.id} className="flex items-center gap-6">
+              {i > 0 && <span className="w-px h-8 bg-white/20" />}
+              <div className="text-center text-white">
+                <AnimatedCounter value={stat.value} suffix={stat.suffix} decimals={stat.decimals} />
+                <p className="text-white/40 text-[10px] uppercase tracking-[0.2em] mt-0.5">{stat.label}</p>
+              </div>
             </div>
-          </div>
-        ))}
-      </motion.div>
+          ))}
+        </motion.div>
+      )}
 
       {/* Scroll indicator */}
       <motion.div
