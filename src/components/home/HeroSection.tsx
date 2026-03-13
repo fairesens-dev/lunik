@@ -67,9 +67,8 @@ const HeroSection = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/40 to-black/70" />
 
       {/* Content */}
-      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full pt-32 pb-20">
+      <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full flex items-center justify-center min-h-[60vh] pt-20">
         <div className="flex flex-col items-center text-center">
-          {/* Overline */}
 
           {/* Giant headline */}
           <motion.h1
