@@ -88,6 +88,10 @@ const App = () => (
                 <Route path="/admin/tracking" element={<AdminTrackingPage />} />
                 <Route path="/admin/contacts" element={<AdminContactsPage />} />
                 <Route path="/admin/contacts/:id" element={<AdminContactDetailPage />} />
+                <Route path="/admin/campaigns" element={<AdminCampaignsPage />} />
+                <Route path="/admin/campaigns/new" element={<AdminCampaignBuilderPage />} />
+                <Route path="/admin/campaigns/:id/edit" element={<AdminCampaignBuilderPage />} />
+                <Route path="/admin/campaigns/:id/report" element={<AdminCampaignReportPage />} />
                 <Route path="/admin/parametres" element={<AdminSettingsPage />} />
               </Route>
             </Route>

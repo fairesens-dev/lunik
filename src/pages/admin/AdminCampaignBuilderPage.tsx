@@ -107,8 +107,8 @@ const AdminCampaignBuilderPage = () => {
   const [previewText, setPreviewText] = useState("");
 
   // Step 2
-  const [statusFilters, setStatusFilters] = useState<string[]>([]);
-  const [sourceFilters, setSourceFilters] = useState<string[]>([]);
+  const [statusFilters, setStatusFilters] = useState<ContactStatus[]>([]);
+  const [sourceFilters, setSourceFilters] = useState<ContactSource[]>([]);
   const [audienceCount, setAudienceCount] = useState(0);
   const [manualEmails, setManualEmails] = useState("");
 
