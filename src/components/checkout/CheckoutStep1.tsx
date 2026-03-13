@@ -87,7 +87,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
   if (!item) return null;
 
   return (
-    <form onSubmit={handleSubmit(onNext)} className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8">
+    <form onSubmit={handleSubmit(onNext)} className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-8">
       {/* LEFT – Form */}
       <div className="space-y-8">
         {/* Coordonnées */}
