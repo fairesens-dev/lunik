@@ -83,8 +83,10 @@ const MERGE_TAGS = [
   { tag: "{{unsubscribe_link}}", label: "Lien désinscription" },
 ];
 
-const contactStatuses = ["visitor", "lead", "mql", "sql", "customer", "churned"];
-const contactSources = ["organic", "paid", "email", "social", "referral", "direct"];
+const contactStatuses = ["visitor", "lead", "mql", "sql", "customer", "churned"] as const;
+const contactSources = ["organic", "paid", "email", "social", "referral", "direct"] as const;
+type ContactStatus = (typeof contactStatuses)[number];
+type ContactSource = (typeof contactSources)[number];
 
 const AdminCampaignBuilderPage = () => {
   const navigate = useNavigate();
