@@ -66,11 +66,11 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
             ))}
           </nav>
 
-          <a href="/#configurator" className="hidden lg:block">
+          <Link to="/configurateur" className="hidden lg:block">
             <Button variant="gradient" className="px-6 py-3 rounded-full tracking-[0.15em] uppercase text-xs font-medium h-auto">
               Configurer mon store
             </Button>
-          </a>
+          </Link>
 
           <button
             className="lg:hidden p-2"
