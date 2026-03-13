@@ -110,23 +110,22 @@ const ConfigurateurPage = () => {
       {/* Main layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] min-h-[calc(100vh-64px)]">
 
-        {/* LEFT — Visual panel */}
-        <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] lg:overflow-y-auto p-6 lg:p-10 flex flex-col">
-          <div className="flex-1 flex items-center justify-center">
-            <div className="w-full max-w-2xl">
-              <DynamicProductVisual
-                toileColor={currentToile}
-                armatureColor={currentArmature}
-                options={currentOptions}
-                width={width * 10}
-                projection={projection}
-                className="rounded-lg"
-              />
-            </div>
+        {/* LEFT — Visual panel (no scroll) */}
+        <div className="bg-secondary/30 lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
+          {/* Visual fills all available space */}
+          <div className="flex-1 flex items-center justify-center p-6 lg:p-10 pb-28">
+            <DynamicProductVisual
+              toileColor={currentToile}
+              armatureColor={currentArmature}
+              options={currentOptions}
+              width={width * 10}
+              projection={projection}
+              className="rounded-lg w-full h-full object-contain"
+            />
           </div>
 
           {/* Overlay badges */}
-          <div className="flex flex-wrap gap-2 mt-4">
+          <div className="absolute top-4 left-4 flex flex-wrap gap-2 z-10">
             <span className="bg-background/80 backdrop-blur-sm border border-border px-3 py-1.5 rounded-full text-xs font-medium text-foreground">
               {width} × {projection / 10} cm
             </span>
@@ -143,9 +142,9 @@ const ConfigurateurPage = () => {
             )}
           </div>
 
-          {/* Fiche technique */}
-          <div className="mt-6 border-t border-border/50 pt-4">
-            <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-3">Fiche technique — Toile Dickson</p>
+          {/* Fiche technique — fixed at bottom */}
+          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-3 z-10">
+            <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">Fiche technique — Toile Dickson</p>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
               {[
                 { label: "Composition", value: "Acrylique teint masse" },
