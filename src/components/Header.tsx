@@ -8,7 +8,7 @@ import logoLunik from "@/assets/logo-lunik.png";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
-  { label: "Configurateur", href: "/#configurator" },
+  { label: "Configurateur", href: "/configurateur" },
   { label: "SAV", href: "/service-apres-vente" },
   { label: "Contact", href: "/contact" },
 ];
