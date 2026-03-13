@@ -35,6 +35,9 @@ import AdminAbandonedCartsPage from "./pages/admin/AdminAbandonedCartsPage";
 import AdminTrackingPage from "./pages/admin/AdminTrackingPage";
 import AdminContactsPage from "./pages/admin/AdminContactsPage";
 import AdminContactDetailPage from "./pages/admin/AdminContactDetailPage";
+import AdminCampaignsPage from "./pages/admin/AdminCampaignsPage";
+import AdminCampaignBuilderPage from "./pages/admin/AdminCampaignBuilderPage";
+import AdminCampaignReportPage from "./pages/admin/AdminCampaignReportPage";
 
 const queryClient = new QueryClient();
 
@@ -85,6 +88,10 @@ const App = () => (
                 <Route path="/admin/tracking" element={<AdminTrackingPage />} />
                 <Route path="/admin/contacts" element={<AdminContactsPage />} />
                 <Route path="/admin/contacts/:id" element={<AdminContactDetailPage />} />
+                <Route path="/admin/campaigns" element={<AdminCampaignsPage />} />
+                <Route path="/admin/campaigns/new" element={<AdminCampaignBuilderPage />} />
+                <Route path="/admin/campaigns/:id/edit" element={<AdminCampaignBuilderPage />} />
+                <Route path="/admin/campaigns/:id/report" element={<AdminCampaignReportPage />} />
                 <Route path="/admin/parametres" element={<AdminSettingsPage />} />
               </Route>
             </Route>
