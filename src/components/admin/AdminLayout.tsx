@@ -18,6 +18,7 @@ const navGroups = [
       { to: "/admin/commandes", icon: Package, label: "Commandes" },
       { to: "/admin/paniers-abandonnes", icon: ShoppingCart, label: "Paniers abandonnés" },
       { to: "/admin/leads", icon: MessageSquare, label: "Leads", badge: 3 },
+      { to: "/admin/contacts", icon: Users, label: "Contacts" },
     ],
   },
   {
