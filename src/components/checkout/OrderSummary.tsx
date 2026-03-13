@@ -3,6 +3,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Mail, Check } from "lucide-react";
+import { toast } from "sonner";
 import type { CartItem } from "@/contexts/CartContext";
 
 interface OrderSummaryProps {
@@ -22,6 +24,10 @@ const OrderSummary = ({ item, deliveryOption = "standard", compact = false, prom
   const [promoInput, setPromoInput] = useState(promoCode);
   const [promoError, setPromoError] = useState("");
   const [promoLoading, setPromoLoading] = useState(false);
+
+  const [saveEmail, setSaveEmail] = useState("");
+  const [saveSending, setSaveSending] = useState(false);
+  const [saveSent, setSaveSent] = useState(false);
 
   const applyPromo = async () => {
     setPromoLoading(true);
@@ -55,6 +61,26 @@ const OrderSummary = ({ item, deliveryOption = "standard", compact = false, prom
       setPromoError("Erreur de validation");
     } finally {
       setPromoLoading(false);
+    }
+  };
+
+  const handleSaveQuote = async () => {
+    if (!saveEmail || !saveEmail.includes("@")) return;
+    setSaveSending(true);
+    try {
+      const { error } = await supabase.functions.invoke("send-config-email", {
+        body: {
+          email: saveEmail,
+          cart: { configuration: cfg, pricing },
+        },
+      });
+      if (error) throw error;
+      setSaveSent(true);
+      toast.success("Devis envoyé à " + saveEmail);
+    } catch {
+      toast.error("Erreur lors de l'envoi");
+    } finally {
+      setSaveSending(false);
     }
   };
 
@@ -166,6 +192,41 @@ const OrderSummary = ({ item, deliveryOption = "standard", compact = false, prom
             </div>
           )}
           {promoError && <p className="text-xs text-destructive mt-1">{promoError}</p>}
+        </div>
+      )}
+
+      {/* Save quote by email */}
+      {!compact && (
+        <div className="mt-4 pt-4 border-t border-border">
+          <div className="flex items-center gap-2 mb-2">
+            <Mail className="w-3.5 h-3.5 text-muted-foreground" />
+            <p className="text-xs font-medium">Recevoir mon devis par email</p>
+          </div>
+          {saveSent ? (
+            <div className="flex items-center gap-2 text-sm text-primary">
+              <Check className="w-4 h-4" />
+              Devis envoyé !
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <Input
+                type="email"
+                placeholder="mon@email.com"
+                value={saveEmail}
+                onChange={(e) => setSaveEmail(e.target.value)}
+                className="h-9 text-sm"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                disabled={saveSending || !saveEmail.includes("@")}
+                onClick={handleSaveQuote}
+              >
+                {saveSending ? "…" : "Envoyer"}
+              </Button>
+            </div>
+          )}
         </div>
       )}
 
