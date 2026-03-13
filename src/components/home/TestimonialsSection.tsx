@@ -82,7 +82,7 @@ const TestimonialsSection = () => {
               </h2>
             </div>
             <div className="hidden md:flex items-center gap-4">
-              <span className="text-sm font-mono text-primary-foreground/50">
+              <span className="text-sm font-mono text-muted-foreground">
                 {String(currentIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
               </span>
               <div className="flex gap-2">
