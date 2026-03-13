@@ -339,7 +339,7 @@ const TabHomepage = () => {
         <CardContent className="space-y-4">
           <Field label="Titre" value={form.contactCTATitle} onChange={(v) => set("contactCTATitle", v)} />
           <Field label="Sous-titre" value={form.contactCTASubtitle} onChange={(v) => set("contactCTASubtitle", v)} />
-          <Field label="URL image de fond" value={form.contactCTAImage} onChange={(v) => set("contactCTAImage", v)} />
+          <ImagePicker label="Image de fond" value={form.contactCTAImage} onChange={(v) => set("contactCTAImage", v)} />
         </CardContent>
       </Card>
 
