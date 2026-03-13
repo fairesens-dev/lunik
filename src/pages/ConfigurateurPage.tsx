@@ -15,6 +15,7 @@ import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.png";
 import { useEffect, useState } from "react";
 import SEOMeta from "@/components/SEOMeta";
+import VisualizeAtHomeDialog from "@/components/product/VisualizeAtHomeDialog";
 
 const ConfigurateurPage = () => {
   const configurator = useConfigurator();
