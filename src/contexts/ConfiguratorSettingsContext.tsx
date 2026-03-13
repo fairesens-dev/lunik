@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { parseToileColorLabel } from "@/lib/parseToileColorLabel";
+import { setPriceGrid, getDefaultPriceGrid } from "@/lib/pricingTable";
 
 /* ─── Types ──────────────────────────────────────────── */
 
@@ -51,6 +52,7 @@ export interface ConfiguratorSettings {
   toileColors: ColorEntry[];
   armatureColors: ColorEntry[];
   options: OptionEntry[];
+  priceGrid: (number | null)[][];
 }
 
 /* ─── Defaults ───────────────────────────────────────── */
@@ -64,6 +66,7 @@ export const DEFAULT_SETTINGS: ConfiguratorSettings = {
   toileColors: [], // Loaded dynamically from the toile-colors bucket
   armatureColors: [],
   options: [],
+  priceGrid: getDefaultPriceGrid(),
 };
 
 /* ─── Supabase helpers ───────────────────────────────── */
@@ -102,6 +105,7 @@ interface ConfiguratorSettingsContextType {
   updateOption: (id: string, data: Partial<Omit<OptionEntry, "id">>) => void;
   addOption: (o: OptionEntry) => void;
   removeOption: (id: string) => void;
+  updatePriceGrid: (grid: (number | null)[][]) => void;
   resetToDefaults: () => void;
 }
 
@@ -166,12 +170,16 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
         }
       }
 
+      const loadedGrid = map.priceGrid ?? DEFAULT_SETTINGS.priceGrid;
+      setPriceGrid(loadedGrid);
+
       setSettings({
         pricing: map.pricing ?? DEFAULT_SETTINGS.pricing,
         dimensions: map.dimensions ?? DEFAULT_SETTINGS.dimensions,
         toileColors,
         armatureColors: map.armatureColors ?? DEFAULT_SETTINGS.armatureColors,
         options: map.options ?? DEFAULT_SETTINGS.options,
+        priceGrid: loadedGrid,
       });
     })();
   }, []);
@@ -255,7 +263,13 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       return { ...s, options };
     }), []);
 
+  const updatePriceGrid = useCallback((grid: (number | null)[][]) => {
+    setPriceGrid(grid);
+    setSettings(s => { upsertSetting("priceGrid", grid); return { ...s, priceGrid: grid }; });
+  }, []);
+
   const resetToDefaults = useCallback(() => {
+    setPriceGrid(DEFAULT_SETTINGS.priceGrid);
     setSettings(DEFAULT_SETTINGS);
     persistAll(DEFAULT_SETTINGS);
   }, []);
@@ -265,7 +279,7 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       settings, updatePricing, updateDimensions,
       updateToileColor, addToileColor, removeToileColor, reorderToileColors,
       updateArmatureColor, addArmatureColor, removeArmatureColor, reorderArmatureColors,
-      updateOption, addOption, removeOption, resetToDefaults,
+      updateOption, addOption, removeOption, updatePriceGrid, resetToDefaults,
     }}>
       {children}
     </ConfiguratorSettingsContext.Provider>

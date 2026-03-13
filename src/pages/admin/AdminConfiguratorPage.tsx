@@ -13,11 +13,13 @@ import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useConfiguratorSettings, type ColorEntry, type OptionEntry } from "@/contexts/ConfiguratorSettingsContext";
 import { supabase } from "@/integrations/supabase/client";
+import { WIDTH_RANGES, PROJECTIONS, lookupPrice, getDefaultPriceGrid } from "@/lib/pricingTable";
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 
 /* ═══════════════════════════════════════════════════════ */
 
 const AdminConfiguratorPage = () => {
-  const { settings, updatePricing, updateDimensions, reorderToileColors, reorderArmatureColors, updateOption, addOption, removeOption, addToileColor, removeToileColor, updateToileColor, addArmatureColor, removeArmatureColor, updateArmatureColor } = useConfiguratorSettings();
+  const { settings, updatePricing, updateDimensions, reorderToileColors, reorderArmatureColors, updateOption, addOption, removeOption, addToileColor, removeToileColor, updateToileColor, addArmatureColor, removeArmatureColor, updateArmatureColor, updatePriceGrid } = useConfiguratorSettings();
   const { toast } = useToast();
 
   return (
@@ -47,7 +49,7 @@ const AdminConfiguratorPage = () => {
           <TabsTrigger value="options">Options</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pricing"><PricingTab settings={settings} onSave={updatePricing} toast={toast} /></TabsContent>
+        <TabsContent value="pricing"><PricingTab settings={settings} onSave={updatePricing} onSaveGrid={updatePriceGrid} toast={toast} /></TabsContent>
         <TabsContent value="dimensions"><DimensionsTab settings={settings} onSave={updateDimensions} toast={toast} /></TabsContent>
         <TabsContent value="toile">
           <ColorsTab
@@ -85,72 +87,130 @@ const AdminConfiguratorPage = () => {
 export default AdminConfiguratorPage;
 
 /* ═══════════════════════════════════════════════════════
-   TAB 1 — TARIFICATION
+   TAB 1 — TARIFICATION (matrice de prix)
    ═══════════════════════════════════════════════════════ */
 
-function PricingTab({ settings, onSave, toast }: { settings: any; onSave: any; toast: any }) {
-  const [baseRate, setBaseRate] = useState(settings.pricing.baseRate);
-  const [minPrice, setMinPrice] = useState(settings.pricing.minPrice);
+function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; onSave: any; onSaveGrid: (grid: (number | null)[][]) => void; toast: any }) {
+  const [grid, setGrid] = useState<(number | null)[][]>(settings.priceGrid ?? getDefaultPriceGrid());
   const [divisor, setDivisor] = useState(settings.pricing.installmentDivisor);
-  const [simW, setSimW] = useState(350);
-  const [simP, setSimP] = useState(250);
+  const [dirty, setDirty] = useState(false);
 
-  const surface = parseFloat(((simW / 100) * (simP / 100)).toFixed(2));
-  const simPrice = Math.max(minPrice, Math.round(surface * baseRate));
-  const installment = Math.round(simPrice / (divisor || 1));
+  // Sync when settings load from DB
+  useEffect(() => {
+    if (settings.priceGrid) setGrid(settings.priceGrid.map((r: any[]) => [...r]));
+  }, [settings.priceGrid]);
+
+  const updateCell = (wi: number, pi: number, value: string) => {
+    const next = grid.map(r => [...r]);
+    if (value === "" || value === "-") {
+      next[wi][pi] = null;
+    } else {
+      const num = parseInt(value, 10);
+      if (!isNaN(num)) next[wi][pi] = num;
+    }
+    setGrid(next);
+    setDirty(true);
+  };
+
+  const toggleCell = (wi: number, pi: number) => {
+    const next = grid.map(r => [...r]);
+    const defaults = getDefaultPriceGrid();
+    if (next[wi][pi] === null) {
+      next[wi][pi] = defaults[wi][pi] ?? 3000;
+    } else {
+      next[wi][pi] = null;
+    }
+    setGrid(next);
+    setDirty(true);
+  };
+
+  const resetGrid = () => {
+    setGrid(getDefaultPriceGrid());
+    setDirty(true);
+  };
+
+  const saveAll = () => {
+    onSaveGrid(grid);
+    onSave({ ...settings.pricing, installmentDivisor: divisor });
+    setDirty(false);
+    toast({ title: "✅ Grille tarifaire sauvegardée" });
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Formule de calcul du prix</CardTitle>
-        <CardDescription>Prix = MAX(prix minimum, surface m² × tarif/m²)</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Left — inputs */}
-          <div className="space-y-5">
-            <div>
-              <Label>Tarif au m² (€)</Label>
-              <Input type="number" value={baseRate} onChange={e => setBaseRate(Number(e.target.value))} className="mt-1" />
-              <p className="text-xs text-gray-400 mt-1">Utilisé pour calculer le prix en fonction des dimensions</p>
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Grille tarifaire 2026</CardTitle>
+          <CardDescription>Prix TTC par combinaison largeur × avancée — motorisation SOMFY incluse. Cliquez sur une cellule grisée pour l'activer.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[140px] font-semibold">Largeur ↓ / Avancée →</TableHead>
+                  {PROJECTIONS.map(p => (
+                    <TableHead key={p} className="text-center font-semibold min-w-[100px]">{p / 100} cm</TableHead>
+                  ))}
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {WIDTH_RANGES.map((range, wi) => (
+                  <TableRow key={range.label}>
+                    <TableCell className="font-medium text-sm whitespace-nowrap">{range.label}</TableCell>
+                    {PROJECTIONS.map((_, pi) => {
+                      const val = grid[wi]?.[pi];
+                      const isNull = val === null;
+                      return (
+                        <TableCell key={pi} className="p-1">
+                          {isNull ? (
+                            <button
+                              onClick={() => toggleCell(wi, pi)}
+                              className="w-full h-10 rounded-md bg-muted/50 border border-dashed border-muted-foreground/20 text-xs text-muted-foreground hover:bg-muted hover:border-muted-foreground/40 transition-colors"
+                              title="Cliquer pour activer cette combinaison"
+                            >
+                              —
+                            </button>
+                          ) : (
+                            <div className="relative group">
+                              <Input
+                                type="number"
+                                value={val ?? ""}
+                                onChange={e => updateCell(wi, pi, e.target.value)}
+                                className="h-10 text-center text-sm font-mono pr-7"
+                                min={0}
+                              />
+                              <button
+                                onClick={() => toggleCell(wi, pi)}
+                                className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive transition-opacity"
+                                title="Désactiver cette combinaison"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          )}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+
+          <div className="flex items-center gap-4 mt-6 pt-4 border-t">
+            <div className="flex-1">
+              <Label className="text-sm">Paiement en N× sans frais</Label>
+              <Input type="number" min={1} max={6} value={divisor} onChange={e => { setDivisor(Number(e.target.value)); setDirty(true); }} className="mt-1 w-24" />
             </div>
-            <div>
-              <Label>Prix minimum (€)</Label>
-              <Input type="number" value={minPrice} onChange={e => setMinPrice(Number(e.target.value))} className="mt-1" />
-              <p className="text-xs text-gray-400 mt-1">Plancher tarifaire — aucune commande ne peut être inférieure à ce montant</p>
-            </div>
-            <div>
-              <Label>Paiement en N fois sans frais</Label>
-              <Input type="number" min={1} max={6} value={divisor} onChange={e => setDivisor(Number(e.target.value))} className="mt-1" />
-              <p className="text-xs text-gray-400 mt-1">Diviseur affiché sous le prix total (ex: 3 → affiche « Soit X €/mois en 3× »)</p>
-            </div>
-            <Button onClick={() => { onSave({ baseRate, minPrice, installmentDivisor: divisor }); toast({ title: "✅ Tarification mise à jour" }); }}>
+            <Button variant="outline" onClick={resetGrid}>Réinitialiser les prix par défaut</Button>
+            <Button onClick={saveAll} disabled={!dirty}>
               <Save className="w-4 h-4 mr-2" /> Sauvegarder
             </Button>
           </div>
-
-          {/* Right — simulator */}
-          <Card className="bg-gray-50 border-dashed">
-            <CardHeader><CardTitle className="text-base">Simulateur de prix</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label className="text-xs">Largeur : {simW} cm</Label>
-                <Slider value={[simW]} min={settings.dimensions.width.min} max={settings.dimensions.width.max} step={1} onValueChange={([v]) => setSimW(v)} className="mt-2" />
-              </div>
-              <div>
-                <Label className="text-xs">Avancée : {simP} cm</Label>
-                <Slider value={[simP]} min={settings.dimensions.projection.min} max={settings.dimensions.projection.max} step={1} onValueChange={([v]) => setSimP(v)} className="mt-2" />
-              </div>
-              <div className="pt-3 border-t space-y-1">
-                <p className="text-sm text-gray-600">Surface : <strong>{surface} m²</strong></p>
-                <p className="text-xl font-bold">{simPrice.toLocaleString("fr-FR")} €</p>
-                <p className="text-xs text-gray-500">Soit {installment.toLocaleString("fr-FR")} €/mois en {divisor}× sans frais</p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }
 
