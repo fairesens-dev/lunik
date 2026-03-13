@@ -4,8 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
-import logoLunik from "@/assets/logo-lunik.png";
-import logoLunikWhite from "@/assets/logo-lunik-white.png";
+import logoLunik from "@/assets/logo-lunik.svg";
 
 const navLinks = [
   { label: "Accueil", href: "/" },
@@ -51,9 +50,12 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
         <div className="max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 flex items-center justify-between h-20">
           <Link to="/">
             <img
-              src={isTransparent ? logoLunikWhite : logoLunik}
+              src={logoLunik}
               alt={content.global.brandName}
-              className="h-8 transition-all duration-300"
+              className={cn(
+                "h-8 transition-all duration-300",
+                isTransparent && "brightness-0 invert"
+              )}
             />
           </Link>
 

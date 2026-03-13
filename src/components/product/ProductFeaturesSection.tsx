@@ -1,7 +1,6 @@
-import { useState } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
 
-const tabs = [
+const features = [
   {
     num: "01",
     label: "Toile",
@@ -32,9 +31,6 @@ const tabs = [
 ];
 
 const ProductFeaturesSection = () => {
-  const [active, setActive] = useState(0);
-  const current = tabs[active];
-
   return (
     <section id="features" className="py-20 lg:py-24 bg-foreground text-background">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
@@ -45,49 +41,33 @@ const ProductFeaturesSection = () => {
           </h2>
         </AnimatedSection>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
-          {/* Left — tabs */}
-          <div className="space-y-0">
-            {tabs.map((tab, i) => (
-              <button
-                key={tab.num}
-                onClick={() => setActive(i)}
-                className={`w-full text-left border-t border-background/20 py-6 transition-all duration-300 group ${
-                  i === active ? "opacity-100" : "opacity-40 hover:opacity-70"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <span className="text-xs font-mono text-accent-light mt-1">{tab.num}.</span>
-                  <div>
-                    <h3 className="font-display text-lg font-semibold mb-1">{tab.label}</h3>
-                    {i === active && (
-                      <div className="animate-fade-in">
-                        <p className="text-background/60 text-sm leading-relaxed mb-4">{tab.body}</p>
-                        <div className="space-y-1.5">
-                          {tab.specs.map((spec) => (
-                            <p key={spec} className="text-xs text-accent-light">→ {spec}</p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {features.map((feature, i) => (
+            <AnimatedSection key={feature.num} delay={i * 0.1}>
+              <div className="group">
+                <div className="aspect-[4/3] overflow-hidden rounded-2xl mb-6">
+                  <img
+                    src={feature.image}
+                    alt={feature.imageAlt}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs font-mono text-accent-light">{feature.num}.</span>
+                    <h3 className="font-display text-xl font-semibold">{feature.title}</h3>
+                  </div>
+                  <p className="text-background/60 text-sm leading-relaxed">{feature.body}</p>
+                  <div className="space-y-1.5 pt-2">
+                    {feature.specs.map((spec) => (
+                      <p key={spec} className="text-xs text-accent-light">→ {spec}</p>
+                    ))}
                   </div>
                 </div>
-              </button>
-            ))}
-            <div className="border-t border-background/20" />
-          </div>
-
-          {/* Right — image */}
-          <AnimatedSection>
-            <div className="aspect-[4/3] overflow-hidden rounded-2xl sticky top-32">
-              <img
-                src={current.image}
-                alt={current.imageAlt}
-                className="w-full h-full object-cover transition-all duration-500"
-                loading="lazy"
-              />
-            </div>
-          </AnimatedSection>
+              </div>
+            </AnimatedSection>
+          ))}
         </div>
       </div>
     </section>

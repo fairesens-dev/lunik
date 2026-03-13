@@ -4,6 +4,7 @@ import { useTrustpilot } from "@/hooks/useTrustpilot";
 import { useContent } from "@/contexts/ContentContext";
 import { Star, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 
+// utils
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
   const days = Math.floor(diff / 86400000);
@@ -69,7 +70,7 @@ const TestimonialsSection = () => {
   if (loading && items.length === 0) return null;
 
   return (
-    <section className="py-20 lg:py-28 bg-background text-foreground">
+    <section className="pt-6 pb-20 lg:pt-6 lg:pb-28 bg-background text-foreground">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="flex items-end justify-between mb-12">

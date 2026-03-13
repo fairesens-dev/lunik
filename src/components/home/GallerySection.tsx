@@ -10,7 +10,7 @@ const GallerySection = () => {
   if (items.length === 0) return null;
 
   return (
-    <section className="py-20 lg:py-28">
+    <section className="pt-20 pb-6 lg:pt-28 lg:pb-6">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="text-center mb-16">
