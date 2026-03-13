@@ -18,6 +18,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CookiesPage from "./pages/CookiesPage";
 import OrderTrackingPage from "./pages/OrderTrackingPage";
+import ConfigurateurPage from "./pages/ConfigurateurPage";
 import AdminLoginPage from "./pages/admin/AdminLoginPage";
 import AdminResetPasswordPage from "./pages/admin/AdminResetPasswordPage";
 import ProtectedRoute from "./components/admin/ProtectedRoute";
