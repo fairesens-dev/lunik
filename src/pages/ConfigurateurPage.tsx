@@ -128,8 +128,8 @@ const ConfigurateurPage = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[60%_40%] min-h-[calc(100vh-64px)]">
 
         {/* LEFT — Visual panel */}
-        <div className="bg-background lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
-          <div className="absolute inset-0 bottom-0">
+        <div className="bg-background h-[50vh] lg:h-auto lg:sticky lg:top-16 lg:h-[calc(100vh-64px)] overflow-hidden relative flex flex-col">
+          <div className="absolute inset-0">
             <DynamicProductVisual
               toileColor={currentToile}
               armatureColor={currentArmature}
@@ -141,7 +141,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* 2 boutons en ligne — au-dessus de la fiche technique */}
-          <div className="absolute bottom-[140px] left-4 right-4 flex gap-2 z-20">
+          <div className="absolute bottom-[100px] lg:bottom-[140px] left-4 right-4 flex gap-2 z-20">
             <button
               onClick={() => setVisualizeOpen(true)}
               className="flex-1 h-[44px] bg-background/80 backdrop-blur-sm border border-border rounded-xl flex items-center justify-center gap-2 shadow-md hover:bg-background hover:shadow-lg transition-all group"
@@ -193,7 +193,7 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* Fiche technique + témoignage — aligned with right sticky bar */}
-          <div className="absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-4 lg:py-6 z-10">
+          <div className="hidden lg:block absolute bottom-0 left-0 right-0 bg-background/80 backdrop-blur-xl border-t border-border/50 px-6 lg:px-10 py-4 lg:py-6 z-10">
             <div className="flex items-start gap-6">
               {/* Specs */}
               <div className="flex-1 min-w-0">
@@ -404,23 +404,23 @@ const ConfigurateurPage = () => {
           </div>
 
           {/* Sticky price bar — contextual button */}
-          <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl p-4 lg:p-6">
+          <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl p-3 sm:p-4 lg:p-6">
             {basePrice === null ? (
               <p className="text-sm text-destructive text-center">Sélectionnez des dimensions valides pour voir le prix.</p>
             ) : (
-              <div className="flex items-center gap-4">
-                <div className="flex-1">
-                  <p className="font-display text-2xl lg:text-3xl text-primary font-extrabold leading-none">
+              <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex-1 min-w-0">
+                  <p className="font-display text-xl sm:text-2xl lg:text-3xl text-primary font-extrabold leading-none">
                     {price.toLocaleString("fr-FR")} €
                   </p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">
                     soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {settings.pricing.installmentDivisor}× sans frais
                   </p>
                 </div>
                 <Button
                   onClick={stickyButtonAction}
                   variant="gradient"
-                  className="px-8 py-4 rounded-full tracking-[0.15em] uppercase text-sm font-medium h-auto shadow-lg hover:shadow-xl"
+                  className="px-4 sm:px-8 py-3 sm:py-4 rounded-full tracking-[0.1em] sm:tracking-[0.15em] uppercase text-xs sm:text-sm font-medium h-auto shadow-lg hover:shadow-xl shrink-0"
                 >
                   {stickyButtonLabel}
                 </Button>

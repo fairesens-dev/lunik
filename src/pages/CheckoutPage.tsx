@@ -54,7 +54,7 @@ const CheckoutPage = () => {
       <header className="border-b border-border bg-card">
         <div className="max-w-[1100px] mx-auto px-6 py-4 flex items-center justify-between">
           <Link to="/"><img src={logoLunik} alt="LuniK" className="h-8" /></Link>
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
             <Lock className="w-4 h-4" />
             Commande sécurisée
           </div>
@@ -83,11 +83,11 @@ const CheckoutPage = () => {
                 >
                   {i + 1}
                 </div>
-                <span className={`text-sm ${i + 1 <= step ? "text-foreground font-medium" : "text-muted-foreground"}`}>
+                <span className={`text-sm hidden sm:inline ${i + 1 <= step ? "text-foreground font-medium" : "text-muted-foreground"}`}>
                   {label}
                 </span>
               </div>
-              {i < STEPS.length - 1 && <div className="w-16 h-px bg-border mx-4" />}
+              {i < STEPS.length - 1 && <div className="w-8 sm:w-16 h-px bg-border mx-2 sm:mx-4" />}
             </div>
           ))}
         </div>
