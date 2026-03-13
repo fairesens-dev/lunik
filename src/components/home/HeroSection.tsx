@@ -51,7 +51,7 @@ const HeroSection = () => {
   const { homepage } = content;
 
   return (
-    <section id="hero" className="relative min-h-[50vh] flex items-center justify-center -mt-20 overflow-hidden">
+    <section id="hero" className="relative min-h-[60vh] flex items-center justify-center -mt-20 overflow-hidden">
       {/* Video background */}
       <video
         autoPlay
