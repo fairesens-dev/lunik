@@ -135,36 +135,47 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
           </div>
         </div>
 
-        {/* Adresse */}
+        {/* Adresse de livraison différente */}
         <div>
-          <h3 className="font-serif text-xl mb-4">Adresse de livraison</h3>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="address" className="text-xs text-muted-foreground">Adresse</Label>
-              <Input id="address" {...register("address")} />
-              {errors.address && <p className="text-xs text-destructive mt-1">{errors.address.message}</p>}
-            </div>
-            <div>
-              <Label htmlFor="address2" className="text-xs text-muted-foreground">Adresse ligne 2 (optionnel)</Label>
-              <Input id="address2" {...register("address2")} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
+          <label className="flex items-start gap-3 cursor-pointer">
+            <Checkbox
+              checked={differentDelivery}
+              onCheckedChange={(v) => setDifferentDelivery(v === true)}
+              className="mt-0.5"
+            />
+            <span className="text-sm">Mon adresse de livraison est différente de mon adresse de facturation</span>
+          </label>
+
+          {differentDelivery && (
+            <div className="mt-4 space-y-4">
+              <h3 className="font-serif text-xl mb-4">Adresse de livraison</h3>
               <div>
-                <Label htmlFor="postalCode" className="text-xs text-muted-foreground">Code postal</Label>
-                <Input id="postalCode" maxLength={5} {...register("postalCode")} />
-                {errors.postalCode && <p className="text-xs text-destructive mt-1">{errors.postalCode.message}</p>}
+                <Label htmlFor="address" className="text-xs text-muted-foreground">Adresse</Label>
+                <Input id="address" {...register("address")} />
+                {errors.address && <p className="text-xs text-destructive mt-1">{errors.address.message}</p>}
               </div>
               <div>
-                <Label htmlFor="city" className="text-xs text-muted-foreground">Ville</Label>
-                <Input id="city" {...register("city")} />
-                {errors.city && <p className="text-xs text-destructive mt-1">{errors.city.message}</p>}
+                <Label htmlFor="address2" className="text-xs text-muted-foreground">Adresse ligne 2 (optionnel)</Label>
+                <Input id="address2" {...register("address2")} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="postalCode" className="text-xs text-muted-foreground">Code postal</Label>
+                  <Input id="postalCode" maxLength={5} {...register("postalCode")} />
+                  {errors.postalCode && <p className="text-xs text-destructive mt-1">{errors.postalCode.message}</p>}
+                </div>
+                <div>
+                  <Label htmlFor="city" className="text-xs text-muted-foreground">Ville</Label>
+                  <Input id="city" {...register("city")} />
+                  {errors.city && <p className="text-xs text-destructive mt-1">{errors.city.message}</p>}
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="country" className="text-xs text-muted-foreground">Pays</Label>
+                <Input id="country" {...register("country")} disabled />
               </div>
             </div>
-            <div>
-              <Label htmlFor="country" className="text-xs text-muted-foreground">Pays</Label>
-              <Input id="country" {...register("country")} disabled />
-            </div>
-          </div>
+          )}
         </div>
 
         {/* Note */}
