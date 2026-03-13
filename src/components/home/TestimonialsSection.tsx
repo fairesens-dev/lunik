@@ -74,7 +74,7 @@ const TestimonialsSection = () => {
         <AnimatedSection>
           <div className="flex items-end justify-between mb-12">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-primary-foreground/40 font-medium mb-4">
+              <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
                 Avis vérifiés
               </p>
               <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight">
