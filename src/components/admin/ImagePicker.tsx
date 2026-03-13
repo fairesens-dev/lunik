@@ -61,7 +61,7 @@ const ImagePicker = ({ value, onChange, label, helper }: ImagePickerProps) => {
   };
 
   useEffect(() => {
-    if (open && files.length === 0) loadFiles();
+    if (open) loadFiles();
   }, [open]);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
