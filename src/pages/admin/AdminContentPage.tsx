@@ -8,10 +8,11 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useContent, type Testimonial, type FAQItem, type GalleryItem, type HighlightFeature, type ValueCard, type StatItem } from "@/contexts/ContentContext";
+import { useContent, type Testimonial, type FAQItem, type GalleryItem, type HighlightFeature, type ValueCard, type StatItem, type ProductGalleryItem } from "@/contexts/ContentContext";
 import { ExternalLink, Trash2, ArrowUp, ArrowDown, Plus, Upload, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import ImagePicker from "@/components/admin/ImagePicker";
 
 const genId = () => Math.random().toString(36).slice(2, 10);
 
@@ -101,7 +102,6 @@ const TabHomepage = () => {
     configuratorSubtitle: content.productPage.configuratorSubtitle,
     stepLabels: [...content.productPage.stepLabels],
     orderConfirmationMessage: content.productPage.orderConfirmationMessage,
-    // New fields
     highlightTitle: content.homepage.highlightTitle,
     highlightSubtitle: content.homepage.highlightSubtitle,
     highlightDescription: content.homepage.highlightDescription,
@@ -112,6 +112,13 @@ const TabHomepage = () => {
     contactCTAImage: content.homepage.contactCTAImage,
     valueCards: [...(content.homepage.valueCards || [])],
     statsItems: [...(content.homepage.statsItems || [])],
+    // Visual fields
+    heroPosterImage: content.homepage.heroPosterImage || "",
+    heroVideoUrl: content.homepage.heroVideoUrl || "",
+    fabricSectionImage: content.homepage.fabricSectionImage || "",
+    // Product page visuals
+    productHeroImage: content.productPage.heroImage || "",
+    productGalleryItems: [...(content.productPage.galleryItems || [])],
   });
 
   const set = (k: string, v: any) => setForm((p) => ({ ...p, [k]: v }));
@@ -148,6 +155,15 @@ const TabHomepage = () => {
   const removeStatItem = (id: string) =>
     set("statsItems", form.statsItems.filter((s: StatItem) => s.id !== id));
 
+  const updateProductGalleryItem = (id: string, data: Partial<ProductGalleryItem>) =>
+    set("productGalleryItems", form.productGalleryItems.map((g: ProductGalleryItem) => g.id === id ? { ...g, ...data } : g));
+
+  const addProductGalleryItem = () =>
+    set("productGalleryItems", [...form.productGalleryItems, { id: genId(), src: "", alt: "", height: "h-72" }]);
+
+  const removeProductGalleryItem = (id: string) =>
+    set("productGalleryItems", form.productGalleryItems.filter((g: ProductGalleryItem) => g.id !== id));
+
   const save = () => {
     updateHomepage({
       heroTitle: form.heroTitle,
@@ -167,14 +183,19 @@ const TabHomepage = () => {
       contactCTAImage: form.contactCTAImage,
       valueCards: form.valueCards,
       statsItems: form.statsItems,
+      heroPosterImage: form.heroPosterImage,
+      heroVideoUrl: form.heroVideoUrl,
+      fabricSectionImage: form.fabricSectionImage,
     });
     updateProductPage({
       configuratorTitle: form.configuratorTitle,
       configuratorSubtitle: form.configuratorSubtitle,
       stepLabels: form.stepLabels,
       orderConfirmationMessage: form.orderConfirmationMessage,
+      heroImage: form.productHeroImage,
+      galleryItems: form.productGalleryItems,
     });
-    toast({ title: "✅ Page d'accueil mise à jour" });
+    toast({ title: "✅ Contenu mis à jour" });
   };
 
   return (
@@ -192,6 +213,10 @@ const TabHomepage = () => {
           <Field label="Sous-titre / description" value={form.heroSubtitle} onChange={(v) => set("heroSubtitle", v)} textarea />
           <div className="grid grid-cols-2 gap-4">
             <Field label="Texte CTA bouton 1" value={form.heroCTA1} onChange={(v) => set("heroCTA1", v)} />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <ImagePicker label="Image poster (fond vidéo)" value={form.heroPosterImage} onChange={(v) => set("heroPosterImage", v)} helper="Affichée avant le chargement de la vidéo" />
+            <Field label="URL vidéo de fond" value={form.heroVideoUrl} onChange={(v) => set("heroVideoUrl", v)} helper="Chemin vers la vidéo MP4" />
           </div>
         </CardContent>
       </Card>
@@ -217,7 +242,7 @@ const TabHomepage = () => {
             <Field label="Titre (ligne 2, couleur accent)" value={form.highlightSubtitle} onChange={(v) => set("highlightSubtitle", v)} />
           </div>
           <Field label="Description" value={form.highlightDescription} onChange={(v) => set("highlightDescription", v)} textarea />
-          <Field label="URL image produit" value={form.highlightImage} onChange={(v) => set("highlightImage", v)} helper="Image affichée à droite de la section" />
+          <ImagePicker label="Image produit" value={form.highlightImage} onChange={(v) => set("highlightImage", v)} helper="Image affichée à droite de la section" />
 
           <div className="space-y-3 mt-4">
             <Label className="text-sm font-medium">Points forts</Label>
@@ -263,7 +288,7 @@ const TabHomepage = () => {
               <div className="flex-1 space-y-2">
                 <Input placeholder="Titre" value={v.title} onChange={(e) => updateValueCard(v.id, { title: e.target.value })} className="h-8 text-sm" />
                 <Input placeholder="Description" value={v.desc} onChange={(e) => updateValueCard(v.id, { desc: e.target.value })} className="h-8 text-sm" />
-                <Input placeholder="URL image" value={v.image} onChange={(e) => updateValueCard(v.id, { image: e.target.value })} className="h-8 text-sm" />
+                <ImagePicker value={v.image} onChange={(url) => updateValueCard(v.id, { image: url })} />
               </div>
               <button onClick={() => removeValueCard(v.id)} className="text-muted-foreground hover:text-destructive mt-1">
                 <Trash2 className="w-4 h-4" />
@@ -314,7 +339,7 @@ const TabHomepage = () => {
         <CardContent className="space-y-4">
           <Field label="Titre" value={form.contactCTATitle} onChange={(v) => set("contactCTATitle", v)} />
           <Field label="Sous-titre" value={form.contactCTASubtitle} onChange={(v) => set("contactCTASubtitle", v)} />
-          <Field label="URL image de fond" value={form.contactCTAImage} onChange={(v) => set("contactCTAImage", v)} />
+          <ImagePicker label="Image de fond" value={form.contactCTAImage} onChange={(v) => set("contactCTAImage", v)} />
         </CardContent>
       </Card>
 
@@ -345,6 +370,52 @@ const TabHomepage = () => {
           <Textarea value={form.orderConfirmationMessage} onChange={(e) => set("orderConfirmationMessage", e.target.value)} rows={3} />
         </CardContent>
       </Card>
+
+      {/* Fabric section image */}
+      <Card>
+        <CardHeader><CardTitle>Section Toile Dickson</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          <ImagePicker label="Image de la toile" value={form.fabricSectionImage} onChange={(v) => set("fabricSectionImage", v)} helper="Image affichée à gauche dans la section Toile Dickson" />
+        </CardContent>
+      </Card>
+
+      {/* Product page visuals */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Page produit — Visuels</CardTitle>
+          <CardDescription>Image hero et galerie de la page produit</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <ImagePicker label="Image hero produit" value={form.productHeroImage} onChange={(v) => set("productHeroImage", v)} helper="Grande image à droite sur la page produit" />
+
+          <div className="space-y-3 mt-4">
+            <Label className="text-sm font-medium">Galerie produit</Label>
+            {form.productGalleryItems.map((g: ProductGalleryItem) => (
+              <div key={g.id} className="flex items-start gap-3 border rounded-lg p-3 bg-muted/30">
+                <div className="flex-1 space-y-2">
+                  <ImagePicker value={g.src} onChange={(url) => updateProductGalleryItem(g.id, { src: url })} />
+                  <Input placeholder="Texte alt SEO" value={g.alt} onChange={(e) => updateProductGalleryItem(g.id, { alt: e.target.value })} className="h-8 text-sm" />
+                  <Select value={g.height} onValueChange={(v) => updateProductGalleryItem(g.id, { height: v })}>
+                    <SelectTrigger className="w-32 h-8 text-xs"><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="h-64">Petit</SelectItem>
+                      <SelectItem value="h-72">Moyen</SelectItem>
+                      <SelectItem value="h-80">Grand</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <button onClick={() => removeProductGalleryItem(g.id)} className="text-muted-foreground hover:text-destructive mt-1">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addProductGalleryItem}>
+              <Plus className="w-3 h-3 mr-1" /> Ajouter une image
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Button onClick={save}>Sauvegarder</Button>
     </div>
   );

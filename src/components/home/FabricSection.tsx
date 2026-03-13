@@ -1,5 +1,6 @@
 import AnimatedSection from "@/components/AnimatedSection";
 import { Check } from "lucide-react";
+import { useContent } from "@/contexts/ContentContext";
 
 const specs = [
   { label: "Composition", value: "100 % acrylique teint masse" },
@@ -18,62 +19,67 @@ const benefits = [
   "173 coloris disponibles",
 ];
 
-const FabricSection = () => (
-  <section className="py-16 lg:py-20 bg-card">
-    <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
-        <AnimatedSection>
-          <div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-lg">
-            <img
-              src="/images/store-toile-detail.webp"
-              alt="Détail de la toile Orchestra Dickson sur store coffre"
-              className="w-full h-full object-cover"
-              loading="lazy"
-            />
-          </div>
-        </AnimatedSection>
+const FabricSection = () => {
+  const { content } = useContent();
+  const fabricImage = content.homepage.fabricSectionImage || "/images/store-toile-detail.webp";
 
-        <AnimatedSection delay={0.2}>
-          <div className="space-y-6">
-            <p className="text-xs uppercase tracking-[0.3em] text-primary font-sans font-medium">
-              Toile Orchestra by Dickson
-            </p>
-            <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
-              LA référence en matière
-              <br />
-              <span className="italic">de protection solaire</span>
-            </h2>
-            <p className="text-muted-foreground leading-relaxed text-sm">
-              La toile Orchestra est composée de fibre acrylique teint masse avec traitement 
-              Cleanguard, lui conférant une durabilité exceptionnelle des couleurs et une résistance 
-              remarquable aux intempéries. Certifiée OEKO-TEX classe II, elle est adaptée au 
-              contact direct avec la peau.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
-              {benefits.map((b) => (
-                <div key={b} className="flex items-center gap-2 text-sm text-foreground">
-                  <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
-                  <span>{b}</span>
-                </div>
-              ))}
+  return (
+    <section className="py-16 lg:py-20 bg-card">
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <AnimatedSection>
+            <div className="aspect-[4/3] overflow-hidden rounded-2xl shadow-lg">
+              <img
+                src={fabricImage}
+                alt="Détail de la toile Orchestra Dickson sur store coffre"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
+          </AnimatedSection>
 
-            <div className="border-t border-border pt-6 mt-6">
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                {specs.map((s) => (
-                  <div key={s.label} className="bg-secondary/50 rounded-lg px-3 py-2">
-                    <p className="text-xs text-muted-foreground uppercase tracking-wider">{s.label}</p>
-                    <p className="text-sm font-medium text-foreground mt-1">{s.value}</p>
+          <AnimatedSection delay={0.2}>
+            <div className="space-y-6">
+              <p className="text-xs uppercase tracking-[0.3em] text-primary font-sans font-medium">
+                Toile Orchestra by Dickson
+              </p>
+              <h2 className="font-serif text-3xl md:text-4xl font-bold leading-tight">
+                LA référence en matière
+                <br />
+                <span className="italic">de protection solaire</span>
+              </h2>
+              <p className="text-muted-foreground leading-relaxed text-sm">
+                La toile Orchestra est composée de fibre acrylique teint masse avec traitement 
+                Cleanguard, lui conférant une durabilité exceptionnelle des couleurs et une résistance 
+                remarquable aux intempéries. Certifiée OEKO-TEX classe II, elle est adaptée au 
+                contact direct avec la peau.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                {benefits.map((b) => (
+                  <div key={b} className="flex items-center gap-2 text-sm text-foreground">
+                    <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
+                    <span>{b}</span>
                   </div>
                 ))}
               </div>
+
+              <div className="border-t border-border pt-6 mt-6">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  {specs.map((s) => (
+                    <div key={s.label} className="bg-secondary/50 rounded-lg px-3 py-2">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider">{s.label}</p>
+                      <p className="text-sm font-medium text-foreground mt-1">{s.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
-        </AnimatedSection>
+          </AnimatedSection>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default FabricSection;

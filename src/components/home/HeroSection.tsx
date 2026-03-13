@@ -55,10 +55,10 @@ const HeroSection = () => {
         muted
         loop
         playsInline
-        poster="/images/store-vue-ensemble.webp"
+        poster={homepage.heroPosterImage || "/images/store-vue-ensemble.webp"}
         className="absolute inset-0 w-full h-full object-cover"
       >
-        <source src="/videos/hero-store.mp4" type="video/mp4" />
+        <source src={homepage.heroVideoUrl || "/videos/hero-store.mp4"} type="video/mp4" />
       </video>
 
       {/* Overlay gradient */}
