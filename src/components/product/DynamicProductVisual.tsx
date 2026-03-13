@@ -28,6 +28,7 @@ const DynamicProductVisual = ({
   options,
   className,
   compact = false,
+  fillContainer = false,
 }: DynamicProductVisualProps) => {
   const showLed = options.led || options.packConnect;
   const [imageUrl, setImageUrl] = useState<string | null>(null);
