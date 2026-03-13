@@ -84,14 +84,10 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                 {/* Fiche technique toile */}
                 <div className="border-t border-border pt-4 mt-2">
                   <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-3">Fiche technique — Toile Dickson</p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-3 gap-2">
                     <div className="bg-secondary/60 rounded-lg px-3 py-2">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Composition</p>
                       <p className="text-xs font-medium text-foreground mt-0.5">Acrylique teint masse</p>
-                    </div>
-                    <div className="bg-secondary/60 rounded-lg px-3 py-2">
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Poids</p>
-                      <p className="text-xs font-medium text-foreground mt-0.5">290 g/m²</p>
                     </div>
                     <div className="bg-secondary/60 rounded-lg px-3 py-2">
                       <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Certification</p>
