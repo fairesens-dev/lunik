@@ -71,14 +71,6 @@ const HeroSection = () => {
       <div className="relative z-10 max-w-[1400px] mx-auto px-6 lg:px-16 xl:px-24 w-full pt-32 pb-20">
         <div className="flex flex-col items-center text-center">
           {/* Overline */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-xs uppercase tracking-[0.4em] text-white/60 mb-8 font-sans font-medium"
-          >
-            {homepage.heroOverline}
-          </motion.p>
 
           {/* Giant headline */}
           <motion.h1
