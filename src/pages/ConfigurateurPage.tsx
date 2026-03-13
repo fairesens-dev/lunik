@@ -198,10 +198,9 @@ const ConfigurateurPage = () => {
               {/* Specs */}
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">Fiche technique — Toile Dickson</p>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-2">
+                <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: "Composition", value: "Acrylique teint masse" },
-                    { label: "Poids", value: "290 g/m²" },
                     { label: "Certification", value: "OEKO-TEX classe II" },
                     { label: "Garantie toile", value: "10 ans" },
                   ].map(item => (
