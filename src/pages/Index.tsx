@@ -50,6 +50,7 @@ const Index = () => {
       <HeroSection />
       <MarqueeSection />
       <ProductHighlightSection />
+      <NormandySection />
       <div className="-mt-8 lg:-mt-12">
         <ProductFeaturesSection />
       </div>
