@@ -569,16 +569,8 @@ const TabGallery = () => {
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Titre de la section</Label>
               <Textarea 
-                value={items.length > 0 ? (items[0] as any).__galleryTitle || "" : ""} 
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setItems(prev => {
-                    if (prev.length === 0) return prev;
-                    const updated = [...prev];
-                    (updated[0] as any).__galleryTitle = val;
-                    return updated;
-                  });
-                }}
+                value={galleryTitle} 
+                onChange={(e) => setGalleryTitle(e.target.value)}
                 placeholder="Ils ont sauté\nle pas"
                 rows={2}
               />
@@ -587,16 +579,8 @@ const TabGallery = () => {
             <div>
               <Label className="text-sm font-medium mb-1.5 block">Sous-titre</Label>
               <Input 
-                value={items.length > 0 ? (items[0] as any).__gallerySubtitle || "" : ""} 
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setItems(prev => {
-                    if (prev.length === 0) return prev;
-                    const updated = [...prev];
-                    (updated[0] as any).__gallerySubtitle = val;
-                    return updated;
-                  });
-                }}
+                value={gallerySubtitle} 
+                onChange={(e) => setGallerySubtitle(e.target.value)}
                 placeholder="Quelques réalisations parmi nos clients satisfaits"
               />
             </div>
