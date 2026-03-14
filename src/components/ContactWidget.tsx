@@ -385,7 +385,7 @@ const ContactWidget = () => {
                         ) : (
                           <p className="text-xs text-muted-foreground">Notre équipe revient vers vous dans les meilleurs délais.</p>
                         )}
-                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("menu")}>Nouvelle question</Button>
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("menu" as WidgetScreen)}>Nouvelle question</Button>
                       </div>
                     ) : (
                       <>
