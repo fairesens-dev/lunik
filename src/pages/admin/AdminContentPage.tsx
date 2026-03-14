@@ -571,7 +571,7 @@ const TabGallery = () => {
               <Textarea 
                 value={galleryTitle} 
                 onChange={(e) => setGalleryTitle(e.target.value)}
-                placeholder="Ils ont sauté\nle pas"
+                placeholder="Installés\npar nos clients"
                 rows={2}
               />
               <p className="text-xs text-muted-foreground mt-1">Utilisez Entrée pour les retours à la ligne</p>
