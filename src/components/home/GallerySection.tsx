@@ -17,7 +17,7 @@ const GallerySection = () => {
             <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
               Galerie
             </p>
-            <h2 className="font-display text-3xl md:text-5xl font-bold tracking-tight">
+            <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight whitespace-pre-line">
               {content.homepage.galleryTitle || "Installés\npar nos clients"}
             </h2>
           </div>

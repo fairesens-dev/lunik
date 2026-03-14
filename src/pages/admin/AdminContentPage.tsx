@@ -562,7 +562,7 @@ const TabGallery = () => {
       <Card>
         <CardHeader>
           <CardTitle>Réalisations clients</CardTitle>
-          <CardDescription>Gérez les photos de la galerie "Ils ont sauté le pas".</CardDescription>
+          <CardDescription>Gérez les photos de la galerie "Installés par nos clients".</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-4 border-b pb-4 mb-4">
