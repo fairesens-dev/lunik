@@ -293,9 +293,9 @@ const ContactWidget = () => {
               {screen === "menu" && (
                 <div className="p-4 space-y-2">
                   {[
-                    { icon: <MessageCircle className="w-5 h-5" />, title: "Poser une question", sub: "Notre IA répond instantanément", target: "ai_chat" as Screen },
-                    { icon: <Wrench className="w-5 h-5" />, title: "Service après-vente", sub: "Un problème avec votre commande ?", target: "sav" as Screen },
-                    { icon: <Phone className="w-5 h-5" />, title: "Être rappelé", sub: "Laissez vos coordonnées", target: "callback" as Screen },
+                    { icon: <MessageCircle className="w-5 h-5" />, title: "Poser une question", sub: "Notre IA répond instantanément", target: "ai_chat" as WidgetScreen },
+                    { icon: <Wrench className="w-5 h-5" />, title: "Service après-vente", sub: "Un problème avec votre commande ?", target: "sav" as WidgetScreen },
+                    { icon: <Phone className="w-5 h-5" />, title: "Être rappelé", sub: "Laissez vos coordonnées", target: "callback" as WidgetScreen },
                   ].map(item => (
                     <button key={item.target} onClick={() => resetScreen(item.target)}
                       className="w-full flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-secondary/50 transition-colors text-left">
