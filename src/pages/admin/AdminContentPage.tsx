@@ -8,7 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { useContent, type Testimonial, type FAQItem, type GalleryItem, type HighlightFeature, type ValueCard, type StatItem, type ProductGalleryItem } from "@/contexts/ContentContext";
+import { useContent, type Testimonial, type FAQItem, type GalleryItem, type HighlightFeature, type ValueCard, type StatItem, type ProductGalleryItem, type ProductFeatureItem } from "@/contexts/ContentContext";
 import { ExternalLink, Trash2, ArrowUp, ArrowDown, Plus, Upload, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,6 +116,10 @@ const TabHomepage = () => {
     heroPosterImage: content.homepage.heroPosterImage || "",
     heroVideoUrl: content.homepage.heroVideoUrl || "",
     fabricSectionImage: content.homepage.fabricSectionImage || "",
+    // Product features
+    productFeaturesTitle1: content.homepage.productFeaturesTitle1 || "Conçu pour durer.",
+    productFeaturesTitle2: content.homepage.productFeaturesTitle2 || "Pensé pour vous.",
+    productFeatures: [...(content.homepage.productFeatures || [])],
     // Product page visuals
     productHeroImage: content.productPage.heroImage || "",
     productGalleryItems: [...(content.productPage.galleryItems || [])],
@@ -164,6 +168,35 @@ const TabHomepage = () => {
   const removeProductGalleryItem = (id: string) =>
     set("productGalleryItems", form.productGalleryItems.filter((g: ProductGalleryItem) => g.id !== id));
 
+  const updateProductFeature = (id: string, data: Partial<ProductFeatureItem>) =>
+    set("productFeatures", form.productFeatures.map((f: ProductFeatureItem) => f.id === id ? { ...f, ...data } : f));
+
+  const addProductFeature = () =>
+    set("productFeatures", [...form.productFeatures, { id: genId(), label: "", title: "", body: "", specs: [], image: "", imageAlt: "" }]);
+
+  const removeProductFeature = (id: string) =>
+    set("productFeatures", form.productFeatures.filter((f: ProductFeatureItem) => f.id !== id));
+
+  const updateProductFeatureSpec = (featureId: string, specIndex: number, value: string) => {
+    const feature = form.productFeatures.find((f: ProductFeatureItem) => f.id === featureId);
+    if (!feature) return;
+    const newSpecs = [...feature.specs];
+    newSpecs[specIndex] = value;
+    updateProductFeature(featureId, { specs: newSpecs });
+  };
+
+  const addProductFeatureSpec = (featureId: string) => {
+    const feature = form.productFeatures.find((f: ProductFeatureItem) => f.id === featureId);
+    if (!feature) return;
+    updateProductFeature(featureId, { specs: [...feature.specs, ""] });
+  };
+
+  const removeProductFeatureSpec = (featureId: string, specIndex: number) => {
+    const feature = form.productFeatures.find((f: ProductFeatureItem) => f.id === featureId);
+    if (!feature) return;
+    updateProductFeature(featureId, { specs: feature.specs.filter((_: string, i: number) => i !== specIndex) });
+  };
+
   const save = () => {
     updateHomepage({
       heroTitle: form.heroTitle,
@@ -186,6 +219,9 @@ const TabHomepage = () => {
       heroPosterImage: form.heroPosterImage,
       heroVideoUrl: form.heroVideoUrl,
       fabricSectionImage: form.fabricSectionImage,
+      productFeaturesTitle1: form.productFeaturesTitle1,
+      productFeaturesTitle2: form.productFeaturesTitle2,
+      productFeatures: form.productFeatures,
     });
     updateProductPage({
       configuratorTitle: form.configuratorTitle,
@@ -270,7 +306,55 @@ const TabHomepage = () => {
         </CardContent>
       </Card>
 
-      {/* Value cards (engagements) */}
+      {/* Product features (Conçu pour durer) */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Section « Conçu pour durer »</CardTitle>
+          <CardDescription>Les 3 blocs avec image, texte et spécifications techniques</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Titre ligne 1 (couleur primaire)" value={form.productFeaturesTitle1} onChange={(v) => set("productFeaturesTitle1", v)} />
+            <Field label="Titre ligne 2 (couleur secondaire)" value={form.productFeaturesTitle2} onChange={(v) => set("productFeaturesTitle2", v)} />
+          </div>
+
+          <div className="space-y-4 mt-4">
+            <Label className="text-sm font-medium">Caractéristiques produit</Label>
+            {form.productFeatures.map((f: ProductFeatureItem) => (
+              <div key={f.id} className="border rounded-lg p-4 bg-muted/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Input placeholder="Label court (ex: Toile)" value={f.label} onChange={(e) => updateProductFeature(f.id, { label: e.target.value })} className="h-8 text-sm w-40" />
+                  <button onClick={() => removeProductFeature(f.id)} className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <Input placeholder="Titre complet" value={f.title} onChange={(e) => updateProductFeature(f.id, { title: e.target.value })} className="h-8 text-sm" />
+                <Textarea placeholder="Description" value={f.body} onChange={(e) => updateProductFeature(f.id, { body: e.target.value })} rows={2} className="text-sm" />
+                <ImagePicker label="Image" value={f.image} onChange={(url) => updateProductFeature(f.id, { image: url })} />
+                <Input placeholder="Texte alternatif image" value={f.imageAlt} onChange={(e) => updateProductFeature(f.id, { imageAlt: e.target.value })} className="h-8 text-sm" />
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Spécifications (→)</Label>
+                  {f.specs.map((spec: string, si: number) => (
+                    <div key={si} className="flex items-center gap-2">
+                      <Input value={spec} onChange={(e) => updateProductFeatureSpec(f.id, si, e.target.value)} className="h-7 text-xs flex-1" />
+                      <button onClick={() => removeProductFeatureSpec(f.id, si)} className="text-muted-foreground hover:text-destructive">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <Button variant="ghost" size="sm" onClick={() => addProductFeatureSpec(f.id)} className="text-xs h-7">
+                    <Plus className="w-3 h-3 mr-1" /> Spec
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addProductFeature}>
+              <Plus className="w-3 h-3 mr-1" /> Ajouter une caractéristique
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Section Engagements (carrousel)</CardTitle>

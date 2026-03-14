@@ -59,6 +59,16 @@ export interface StatItem {
   decimals: number;
 }
 
+export interface ProductFeatureItem {
+  id: string;
+  label: string;
+  title: string;
+  body: string;
+  specs: string[];
+  image: string;
+  imageAlt: string;
+}
+
 export interface GlobalContent {
   brandName: string;
   tagline: string;
@@ -97,6 +107,9 @@ export interface HomepageContent {
   heroPosterImage: string;
   heroVideoUrl: string;
   fabricSectionImage: string;
+  productFeaturesTitle1: string;
+  productFeaturesTitle2: string;
+  productFeatures: ProductFeatureItem[];
 }
 
 export interface ProductGalleryItem {
@@ -178,6 +191,36 @@ const defaultStatsItems: StatItem[] = [
   { id: "s4", value: 5, suffix: " ans", label: "De garantie pièces & main d'œuvre", decimals: 0 },
 ];
 
+const defaultProductFeatures: ProductFeatureItem[] = [
+  {
+    id: "pf1",
+    label: "Toile",
+    title: "Toile Orchestra by Dickson",
+    body: "173 coloris en acrylique teint masse avec traitement Cleanguard. Certifiée OEKO-TEX classe II, garantie 10 ans. La référence mondiale de la protection solaire.",
+    specs: ["Traitement anti-taches et anti-moisissures", "Résistance UV classement 5/5", "Garantie 5 ans"],
+    image: "/images/store-toile-detail.webp",
+    imageAlt: "Détail de la toile Dickson du store coffre",
+  },
+  {
+    id: "pf2",
+    label: "Structure",
+    title: "Armature aluminium extrudé",
+    body: "Profilés aluminium extrudé thermolaqué, traitement anti-corrosion. Notre coffre intégral protège la toile des intempéries quand le store est replié.",
+    specs: ["Aluminium extrudé haute résistance", "Coffre intégral étanche", "Sans entretien"],
+    image: "/images/store-bras-fixations.webp",
+    imageAlt: "Détail des fixations aluminium du store coffre",
+  },
+  {
+    id: "pf3",
+    label: "Motorisation",
+    title: "Motorisation Somfy io",
+    body: "Pilotez votre store depuis une télécommande, un interrupteur mural ou votre smartphone via l'application TaHoma de Somfy. Compatible assistants vocaux.",
+    specs: ["Application TaHoma iOS & Android", "Compatible Google Home & Alexa", "Détecteur de vent en option"],
+    image: "/images/store-led-nuit.webp",
+    imageAlt: "Store coffre avec éclairage LED intégré de nuit",
+  },
+];
+
 const defaultContent: SiteContent = {
   global: {
     brandName: "LuniK",
@@ -216,6 +259,9 @@ const defaultContent: SiteContent = {
     heroPosterImage: "/images/store-vue-ensemble.webp",
     heroVideoUrl: "/videos/hero-store.mp4",
     fabricSectionImage: "/images/store-toile-detail.webp",
+    productFeaturesTitle1: "Conçu pour durer.",
+    productFeaturesTitle2: "Pensé pour vous.",
+    productFeatures: defaultProductFeatures,
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
