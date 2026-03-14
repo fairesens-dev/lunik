@@ -35,17 +35,16 @@ const ContactCTASection = () => {
         </AnimatedSection>
         <AnimatedSection delay={0.15}>
           <div className="flex flex-wrap justify-center gap-4">
-            <a href="tel:+33368381030">
-              <Button
-                variant="outline"
-                className="border-white/30 text-white px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium hover:bg-white/10 h-auto bg-transparent"
-              >
-                Nous appeler
-              </Button>
-            </a>
-            <Link to="/contact">
+            <Button
+              variant="outline"
+              onClick={handleCallbackClick}
+              className="border-white/30 text-white px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium hover:bg-white/10 h-auto bg-transparent"
+            >
+              Nous appeler
+            </Button>
+            <Link to="/configurateur">
               <Button className="bg-white text-black px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto hover:bg-white/90">
-                Envoyer un message
+                Tester
               </Button>
             </Link>
           </div>
