@@ -52,7 +52,7 @@ const NormandySection = () => {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 max-w-sm p-6 md:p-8 bg-card/80 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none rounded-xl m-4 md:m-0">
+          <div className="relative z-10 max-w-sm p-6 md:p-8 bg-card/80 backdrop-blur-sm md:bg-transparent md:backdrop-blur-none rounded-xl m-4 md:m-0 mt-auto self-end">
             <div className="flex items-center gap-2 mb-3">
               <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
                 <MapPin className="w-4 h-4 text-primary" />
