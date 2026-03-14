@@ -6,7 +6,7 @@ const NormandySection = () => {
   return (
     <div className="max-w-[1400px] mx-auto px-6 lg:px-16 pb-6">
       <AnimatedSection>
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 min-h-[280px] md:min-h-[220px]">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 min-h-[280px] md:min-h-[220px] flex flex-col">
           {/* SVG map as full background */}
           <div className="absolute inset-0 pointer-events-none">
             <svg viewBox="0 0 500 440" className="w-full h-full" fill="none" preserveAspectRatio="xMidYMax slice">
