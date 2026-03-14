@@ -168,6 +168,35 @@ const TabHomepage = () => {
   const removeProductGalleryItem = (id: string) =>
     set("productGalleryItems", form.productGalleryItems.filter((g: ProductGalleryItem) => g.id !== id));
 
+  const updateProductFeature = (id: string, data: Partial<ProductFeatureItem>) =>
+    set("productFeatures", form.productFeatures.map((f: ProductFeatureItem) => f.id === id ? { ...f, ...data } : f));
+
+  const addProductFeature = () =>
+    set("productFeatures", [...form.productFeatures, { id: genId(), label: "", title: "", body: "", specs: [], image: "", imageAlt: "" }]);
+
+  const removeProductFeature = (id: string) =>
+    set("productFeatures", form.productFeatures.filter((f: ProductFeatureItem) => f.id !== id));
+
+  const updateProductFeatureSpec = (featureId: string, specIndex: number, value: string) => {
+    const feature = form.productFeatures.find((f: ProductFeatureItem) => f.id === featureId);
+    if (!feature) return;
+    const newSpecs = [...feature.specs];
+    newSpecs[specIndex] = value;
+    updateProductFeature(featureId, { specs: newSpecs });
+  };
+
+  const addProductFeatureSpec = (featureId: string) => {
+    const feature = form.productFeatures.find((f: ProductFeatureItem) => f.id === featureId);
+    if (!feature) return;
+    updateProductFeature(featureId, { specs: [...feature.specs, ""] });
+  };
+
+  const removeProductFeatureSpec = (featureId: string, specIndex: number) => {
+    const feature = form.productFeatures.find((f: ProductFeatureItem) => f.id === featureId);
+    if (!feature) return;
+    updateProductFeature(featureId, { specs: feature.specs.filter((_: string, i: number) => i !== specIndex) });
+  };
+
   const save = () => {
     updateHomepage({
       heroTitle: form.heroTitle,
@@ -190,6 +219,9 @@ const TabHomepage = () => {
       heroPosterImage: form.heroPosterImage,
       heroVideoUrl: form.heroVideoUrl,
       fabricSectionImage: form.fabricSectionImage,
+      productFeaturesTitle1: form.productFeaturesTitle1,
+      productFeaturesTitle2: form.productFeaturesTitle2,
+      productFeatures: form.productFeatures,
     });
     updateProductPage({
       configuratorTitle: form.configuratorTitle,
