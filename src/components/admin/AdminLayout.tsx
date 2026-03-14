@@ -80,7 +80,7 @@ const AdminLayout = () => {
   const sidebarContent = (
     <div className="flex flex-col h-full">
       <div className="px-5 py-6 flex items-center gap-3">
-        <img src={logoLunik} alt="LuniK" className="h-7 brightness-0 invert" />
+        <img src={logoLunik} alt="LuniK" className="h-10 brightness-0 invert" />
         <span className="text-[10px] bg-white/10 text-white/50 px-2 py-0.5 rounded-md font-sans uppercase tracking-wider">Admin</span>
       </div>
       <div className="border-t border-white/[0.06] mx-5" />
