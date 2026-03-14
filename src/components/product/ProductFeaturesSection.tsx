@@ -32,7 +32,7 @@ const features = [
 
 const ProductFeaturesSection = () => {
   return (
-    <section id="features" className="py-20 lg:py-24 bg-foreground text-background">
+    <section id="features" className="py-20 lg:py-24">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-16">
