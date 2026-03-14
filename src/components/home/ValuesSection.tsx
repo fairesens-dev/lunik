@@ -142,7 +142,7 @@ const ValuesSection = () => {
 
         {/* Stats + CTA */}
         <AnimatedSection delay={0.1}>
-          <div className="mt-16 pt-16 border-t border-primary-foreground/10">
+          <div className="mt-12 pt-12 border-t border-primary-foreground/10">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-12">
               {statsItems.map((stat) => (
                 <div key={stat.id} className="space-y-2">

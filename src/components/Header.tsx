@@ -7,9 +7,7 @@ import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.svg";
 
-const navLinks = [
-  { label: "Lunik, simplement unique", href: "/" },
-];
+const navLinks: { label: string; href: string }[] = [];
 
 interface HeaderProps {
   bannerOffset?: boolean;
@@ -81,7 +79,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
           <div className="hidden lg:flex items-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link to="/suivi-commande">
+                <Link to="/suivi">
                   <Button
                     variant="ghost"
                     size="icon"

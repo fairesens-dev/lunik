@@ -32,12 +32,12 @@ const features = [
 
 const ProductFeaturesSection = () => {
   return (
-    <section id="features" className="py-20 lg:py-24 bg-foreground text-background">
+    <section id="features" className="py-20 lg:py-24">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-16">
-            <span className="text-accent">Conçu pour durer.</span><br />
-            <span className="text-accent-light">Pensé pour vous.</span>
+            <span className="text-primary">Conçu pour durer.</span><br />
+            <span className="text-muted-foreground">Pensé pour vous.</span>
           </h2>
         </AnimatedSection>
 
@@ -55,13 +55,12 @@ const ProductFeaturesSection = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-accent-light">{feature.num}.</span>
-                    <h3 className="font-display text-xl font-semibold">{feature.title}</h3>
+                    <h3 className="font-display text-xl font-semibold text-foreground">{feature.title}</h3>
                   </div>
-                  <p className="text-background/60 text-sm leading-relaxed">{feature.body}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.body}</p>
                   <div className="space-y-1.5 pt-2">
                     {feature.specs.map((spec) => (
-                      <p key={spec} className="text-xs text-accent-light">→ {spec}</p>
+                      <p key={spec} className="text-xs text-primary">→ {spec}</p>
                     ))}
                   </div>
                 </div>
