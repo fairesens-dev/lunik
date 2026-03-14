@@ -355,7 +355,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateHomepage = useCallback(
-    (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => {
+    (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems" | "galleryTitle" | "gallerySubtitle">>) => {
       setContent((prev) => {
         const updated = { ...prev.homepage, ...data };
         upsertContent("homepage", updated);
