@@ -116,6 +116,10 @@ const TabHomepage = () => {
     heroPosterImage: content.homepage.heroPosterImage || "",
     heroVideoUrl: content.homepage.heroVideoUrl || "",
     fabricSectionImage: content.homepage.fabricSectionImage || "",
+    // Product features
+    productFeaturesTitle1: content.homepage.productFeaturesTitle1 || "Conçu pour durer.",
+    productFeaturesTitle2: content.homepage.productFeaturesTitle2 || "Pensé pour vous.",
+    productFeatures: [...(content.homepage.productFeatures || [])],
     // Product page visuals
     productHeroImage: content.productPage.heroImage || "",
     productGalleryItems: [...(content.productPage.galleryItems || [])],
