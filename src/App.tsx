@@ -107,6 +107,7 @@ const App = () => (
 
             <Route path="*" element={<NotFound />} />
           </Routes>
+        </ContactWidgetProvider>
         </AuthProvider>
         </CartProvider>
         </ConfiguratorSettingsProvider>
