@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useContactWidget } from "@/contexts/ContactWidgetContext";
 
 type Msg = { role: "user" | "assistant"; content: string };
+type WidgetScreen = "menu" | "ai_chat" | "sav" | "callback";
 
 // ── Streaming helper ──
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/widget-chat`;
