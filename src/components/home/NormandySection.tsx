@@ -7,12 +7,12 @@ const NormandySection = () => {
     <div className="max-w-[1400px] mx-auto px-6 lg:px-16 pb-6">
       <AnimatedSection>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 p-6 md:p-8 md:min-h-[220px]">
-          {/* France map + factory circle */}
-          <div className="relative mx-auto w-[75%] mt-4 md:mt-0 md:absolute md:-right-4 md:top-1/2 md:-translate-y-[40%] md:w-[65%] order-2 md:order-none">
+          {/* France map + factory circle - larger on mobile */}
+          <div className="relative mx-auto w-[95%] sm:w-[85%] mt-6 md:mt-0 md:absolute md:-right-4 md:top-1/2 md:-translate-y-[40%] md:w-[65%] order-2 md:order-none">
             <svg viewBox="50 -40 420 440" className="w-full h-full" fill="none">
               <defs>
                 <clipPath id="factory-circle-clip">
-                  <circle cx="245" cy="115" r="55" />
+                  <circle cx="245" cy="115" r="65" />
                 </clipPath>
               </defs>
 
@@ -23,18 +23,18 @@ const NormandySection = () => {
                 strokeWidth="1"
               />
 
-              {/* Factory image in circle */}
+              {/* Factory image in circle - larger on mobile */}
               <image
                 href={factoryImg}
-                x="185"
-                y="55"
-                width="120"
-                height="120"
+                x="175"
+                y="45"
+                width="140"
+                height="140"
                 clipPath="url(#factory-circle-clip)"
                 preserveAspectRatio="xMidYMid slice"
               />
-              {/* Circle border */}
-              <circle cx="245" cy="115" r="55" className="stroke-primary/20" strokeWidth="2" fill="none" />
+              {/* Circle border - larger on mobile */}
+              <circle cx="245" cy="115" r="65" className="stroke-primary/20" strokeWidth="2" fill="none" />
 
               {/* Workshop marker + label */}
               <circle cx="245" cy="178" r="3" fill="white" fillOpacity="0.9" />
