@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useContactWidget } from "@/contexts/ContactWidgetContext";
 
-type Screen = "menu" | "ai_chat" | "sav" | "callback";
 type Msg = { role: "user" | "assistant"; content: string };
 
 // ── Streaming helper ──
