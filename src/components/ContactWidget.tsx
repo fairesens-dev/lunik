@@ -87,8 +87,7 @@ const TypingDots = () => (
 
 // ── Main component ──
 const ContactWidget = () => {
-  const [open, setOpen] = useState(false);
-  const [screen, setScreen] = useState<Screen>("menu");
+  const { isOpen, openWidget, closeWidget, screen, setScreen } = useContactWidget();
   const { toast } = useToast();
 
   // Pulse animation - stop after first open
