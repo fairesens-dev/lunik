@@ -102,7 +102,7 @@ const HeroSection = () => {
                 {homepage.heroCTA1}
               </Button>
             </Link>
-            <a href="#gallery">
+            <a href="#gallery" className="hidden sm:block">
               <Button
                 variant="outline"
                 className="border-white/30 text-white px-10 py-5 tracking-[0.15em] uppercase text-sm font-medium hover:bg-white/10 h-auto bg-transparent"

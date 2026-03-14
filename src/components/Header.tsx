@@ -108,13 +108,20 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
             </Link>
           </div>
 
-          <button
-            className={cn("lg:hidden p-2", isTransparent && "text-white")}
-            onClick={() => setMobileOpen(!mobileOpen)}
-            aria-label="Menu"
-          >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+          <Link to="/suivi" className="lg:hidden">
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-10 w-10 rounded-full",
+                isTransparent
+                  ? "text-white/70 hover:text-white hover:bg-white/10"
+                  : "text-muted-foreground hover:text-foreground"
+              )}
+            >
+              <PackageSearch className="w-5 h-5" />
+            </Button>
+          </Link>
         </div>
       </header>
 
