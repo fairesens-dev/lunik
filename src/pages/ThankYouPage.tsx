@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { CheckCircle2 } from "lucide-react";
+import logoLunik from "@/assets/logo-lunik.svg";
 
 const ThankYouPage = () => {
   const [params] = useSearchParams();
