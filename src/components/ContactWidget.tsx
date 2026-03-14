@@ -548,13 +548,13 @@ const ContactWidget = () => {
       <motion.button
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        onClick={handleOpen}
+        onClick={() => { if (isOpen) { handleClose(); } else { openWidget(); handleOpen(); } }}
         className={`group w-14 h-14 rounded-full bg-primary text-primary-foreground shadow-lg flex items-center justify-center hover:shadow-xl transition-shadow ${
           !hasOpened ? "animate-pulse" : ""
         }`}
-        aria-label={open ? "Fermer le chat" : "Ouvrir le chat"}
+        aria-label={isOpen ? "Fermer le chat" : "Ouvrir le chat"}
       >
-        {open ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
+        {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6" />}
       </motion.button>
     </div>
   );
