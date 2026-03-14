@@ -241,14 +241,14 @@ const ContactWidget = () => {
 
   // Save transcript on close
   const handleClose = () => {
-    setOpen(false);
+    closeWidget();
     if (chatMessages.length > 1) {
       const email = localStorage.getItem("contact_email") || undefined;
       saveWidgetData("chat_transcript", { transcript: chatMessages, email });
     }
   };
 
-  const resetScreen = (s: Screen) => {
+  const resetScreen = (s: WidgetScreen) => {
     setScreen(s);
     if (s === "sav") { setSavStep(0); setSavData({ order_number: "", problem_category: "", problem_detail: "", email: "", phone: "" }); setSavDone(false); setSavOrderInfo(null); setSavInput(""); }
     if (s === "callback") { setCbForm({ first_name: "", phone: "", city: "" }); setCbRgpd(false); setCbDone(false); }
