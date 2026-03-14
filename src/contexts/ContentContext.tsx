@@ -59,6 +59,16 @@ export interface StatItem {
   decimals: number;
 }
 
+export interface ProductFeatureItem {
+  id: string;
+  label: string;
+  title: string;
+  body: string;
+  specs: string[];
+  image: string;
+  imageAlt: string;
+}
+
 export interface GlobalContent {
   brandName: string;
   tagline: string;
