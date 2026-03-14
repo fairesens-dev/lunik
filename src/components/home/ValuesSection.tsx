@@ -116,7 +116,7 @@ const ValuesSection = () => {
             return (
               <div
                 key={v.id}
-                className="min-w-[280px] sm:min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-primary-foreground/5 border border-primary-foreground/10 rounded-2xl overflow-hidden group"
+                className="min-w-[280px] sm:min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-white border border-primary-foreground/10 rounded-2xl overflow-hidden group"
               >
                 <div className="aspect-[3/2] overflow-hidden">
                   <img
@@ -128,12 +128,12 @@ const ValuesSection = () => {
                 </div>
                 <div className="p-6">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-foreground/10 flex items-center justify-center">
-                      <Icon className="w-5 h-5 text-primary-foreground/80" />
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
-                    <h3 className="font-display text-lg font-bold">{v.title}</h3>
+                    <h3 className="font-display text-lg font-bold text-foreground">{v.title}</h3>
                   </div>
-                  <p className="text-primary-foreground/60 text-sm leading-relaxed">{v.desc}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{v.desc}</p>
                 </div>
               </div>
             );
