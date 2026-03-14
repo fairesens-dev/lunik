@@ -94,6 +94,8 @@ export interface HomepageContent {
   faqItems: FAQItem[];
   featuredReviews: FeaturedReview[];
   galleryItems: GalleryItem[];
+  galleryTitle: string;
+  gallerySubtitle: string;
   highlightFeatures: HighlightFeature[];
   highlightImage: string;
   highlightTitle: string;
