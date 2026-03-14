@@ -23,18 +23,18 @@ const NormandySection = () => {
                 strokeWidth="1"
               />
 
-              {/* Factory image in circle */}
+              {/* Factory image in circle - larger on mobile */}
               <image
                 href={factoryImg}
-                x="185"
-                y="55"
-                width="120"
-                height="120"
+                x="175"
+                y="45"
+                width="140"
+                height="140"
                 clipPath="url(#factory-circle-clip)"
                 preserveAspectRatio="xMidYMid slice"
               />
-              {/* Circle border */}
-              <circle cx="245" cy="115" r="55" className="stroke-primary/20" strokeWidth="2" fill="none" />
+              {/* Circle border - larger on mobile */}
+              <circle cx="245" cy="115" r="65" className="stroke-primary/20" strokeWidth="2" fill="none" />
 
               {/* Workshop marker + label */}
               <circle cx="245" cy="178" r="3" fill="white" fillOpacity="0.9" />
