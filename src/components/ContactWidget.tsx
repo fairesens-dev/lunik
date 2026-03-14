@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useContactWidget } from "@/contexts/ContactWidgetContext";
 
-type Screen = "menu" | "ai_chat" | "sav" | "callback";
 type Msg = { role: "user" | "assistant"; content: string };
+type WidgetScreen = "menu" | "ai_chat" | "sav" | "callback";
 
 // ── Streaming helper ──
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/widget-chat`;
@@ -87,8 +88,7 @@ const TypingDots = () => (
 
 // ── Main component ──
 const ContactWidget = () => {
-  const [open, setOpen] = useState(false);
-  const [screen, setScreen] = useState<Screen>("menu");
+  const { isOpen, openWidget, closeWidget, screen, setScreen } = useContactWidget();
   const { toast } = useToast();
 
   // Pulse animation - stop after first open
@@ -122,19 +122,14 @@ const ContactWidget = () => {
     if (chatMessages.length > 0) sessionStorage.setItem("chatbot_session", JSON.stringify(chatMessages));
   }, [chatMessages]);
 
-  // Auto scroll chat
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages, isStreaming]);
-  useEffect(() => { savEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [savStep]);
-
   // ESC to close
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape" && open) setOpen(false); };
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape" && isOpen) closeWidget(); };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [open]);
+  }, [isOpen, closeWidget]);
 
   const handleOpen = () => {
-    setOpen(!open);
     if (!hasOpened) { setHasOpened(true); sessionStorage.setItem("widget_opened", "true"); }
   };
 
@@ -247,14 +242,14 @@ const ContactWidget = () => {
 
   // Save transcript on close
   const handleClose = () => {
-    setOpen(false);
+    closeWidget();
     if (chatMessages.length > 1) {
       const email = localStorage.getItem("contact_email") || undefined;
       saveWidgetData("chat_transcript", { transcript: chatMessages, email });
     }
   };
 
-  const resetScreen = (s: Screen) => {
+  const resetScreen = (s: WidgetScreen) => {
     setScreen(s);
     if (s === "sav") { setSavStep(0); setSavData({ order_number: "", problem_category: "", problem_detail: "", email: "", phone: "" }); setSavDone(false); setSavOrderInfo(null); setSavInput(""); }
     if (s === "callback") { setCbForm({ first_name: "", phone: "", city: "" }); setCbRgpd(false); setCbDone(false); }
@@ -298,9 +293,9 @@ const ContactWidget = () => {
               {screen === "menu" && (
                 <div className="p-4 space-y-2">
                   {[
-                    { icon: <MessageCircle className="w-5 h-5" />, title: "Poser une question", sub: "Notre IA répond instantanément", target: "ai_chat" as Screen },
-                    { icon: <Wrench className="w-5 h-5" />, title: "Service après-vente", sub: "Un problème avec votre commande ?", target: "sav" as Screen },
-                    { icon: <Phone className="w-5 h-5" />, title: "Être rappelé", sub: "Laissez vos coordonnées", target: "callback" as Screen },
+                    { icon: <MessageCircle className="w-5 h-5" />, title: "Poser une question", sub: "Notre IA répond instantanément", target: "ai_chat" as WidgetScreen },
+                    { icon: <Wrench className="w-5 h-5" />, title: "Service après-vente", sub: "Un problème avec votre commande ?", target: "sav" as WidgetScreen },
+                    { icon: <Phone className="w-5 h-5" />, title: "Être rappelé", sub: "Laissez vos coordonnées", target: "callback" as WidgetScreen },
                   ].map(item => (
                     <button key={item.target} onClick={() => resetScreen(item.target)}
                       className="w-full flex items-center gap-3 p-3 border border-border rounded-xl hover:bg-secondary/50 transition-colors text-left">
@@ -315,7 +310,7 @@ const ContactWidget = () => {
               {screen === "ai_chat" && (
                 <div className="flex flex-col h-full">
                   <div className="px-4 pt-2">
-                    <button onClick={() => resetScreen("menu")} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
+                    <button onClick={() => resetScreen("menu" as WidgetScreen)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
                       <ArrowLeft className="w-3 h-3" /> Retour
                     </button>
                   </div>
@@ -334,7 +329,7 @@ const ContactWidget = () => {
                         }`}>
                           {m.content}
                           {m.role === "assistant" && /rappel|contacter|rappeler/i.test(m.content) && (
-                            <button onClick={() => resetScreen("callback")}
+                            <button onClick={() => resetScreen("callback" as WidgetScreen)}
                               className="mt-2 text-xs text-primary underline block">📞 Demander un rappel</button>
                           )}
                         </div>
@@ -344,7 +339,7 @@ const ContactWidget = () => {
                     {userMsgCount >= 20 && (
                       <div className="text-center py-3 space-y-2">
                         <p className="text-xs text-muted-foreground">Vous souhaitez parler à un humain ?</p>
-                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("callback")}>
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("callback" as WidgetScreen)}>
                           📞 Demander un rappel
                         </Button>
                       </div>
@@ -369,7 +364,7 @@ const ContactWidget = () => {
               {screen === "sav" && (
                 <div className="flex flex-col h-full">
                   <div className="px-4 pt-2">
-                    <button onClick={() => resetScreen("menu")} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
+                    <button onClick={() => resetScreen("menu" as WidgetScreen)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
                       <ArrowLeft className="w-3 h-3" /> Retour
                     </button>
                   </div>
@@ -390,7 +385,7 @@ const ContactWidget = () => {
                         ) : (
                           <p className="text-xs text-muted-foreground">Notre équipe revient vers vous dans les meilleurs délais.</p>
                         )}
-                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("menu")}>Nouvelle question</Button>
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("menu" as WidgetScreen)}>Nouvelle question</Button>
                       </div>
                     ) : (
                       <>
@@ -503,7 +498,7 @@ const ContactWidget = () => {
               {/* ── Callback Screen ── */}
               {screen === "callback" && (
                 <div className="p-4 flex flex-col h-full overflow-y-auto">
-                  <button onClick={() => resetScreen("menu")} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
+                  <button onClick={() => resetScreen("menu" as WidgetScreen)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
                     <ArrowLeft className="w-3 h-3" /> Retour
                   </button>
                   {cbDone ? (
