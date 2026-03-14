@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.svg";
 
 const navLinks = [
-  { label: "Accueil", href: "/" },
-  { label: "Configurateur", href: "/configurateur" },
+  { label: "Lunik, simplement unique", href: "/" },
 ];
 
 interface HeaderProps {
@@ -78,16 +78,37 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
             ))}
           </nav>
 
-          <Link to="/configurateur" className="hidden lg:block">
-            <Button
-              className={cn(
-                "px-6 py-3 tracking-[0.12em] uppercase text-xs font-medium h-auto",
-                isTransparent && "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20"
-              )}
-            >
-              Configurer mon store
-            </Button>
-          </Link>
+          <div className="hidden lg:flex items-center gap-3">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link to="/suivi-commande">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "h-10 w-10 rounded-full",
+                      isTransparent
+                        ? "text-white/70 hover:text-white hover:bg-white/10"
+                        : "text-muted-foreground hover:text-foreground"
+                    )}
+                  >
+                    <PackageSearch className="w-5 h-5" />
+                  </Button>
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent>Suivi de commande</TooltipContent>
+            </Tooltip>
+            <Link to="/configurateur">
+              <Button
+                className={cn(
+                  "px-6 py-3 tracking-[0.12em] uppercase text-xs font-medium h-auto",
+                  isTransparent && "bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20"
+                )}
+              >
+                Configurer mon store
+              </Button>
+            </Link>
+          </div>
 
           <button
             className={cn("lg:hidden p-2", isTransparent && "text-white")}
