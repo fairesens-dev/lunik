@@ -259,6 +259,9 @@ const defaultContent: SiteContent = {
     heroPosterImage: "/images/store-vue-ensemble.webp",
     heroVideoUrl: "/videos/hero-store.mp4",
     fabricSectionImage: "/images/store-toile-detail.webp",
+    productFeaturesTitle1: "Conçu pour durer.",
+    productFeaturesTitle2: "Pensé pour vous.",
+    productFeatures: defaultProductFeatures,
   },
   productPage: {
     heroTitle: "Le store qui\nredéfinit l'extérieur.",
