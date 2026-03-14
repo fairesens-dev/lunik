@@ -107,6 +107,9 @@ export interface HomepageContent {
   heroPosterImage: string;
   heroVideoUrl: string;
   fabricSectionImage: string;
+  productFeaturesTitle1: string;
+  productFeaturesTitle2: string;
+  productFeatures: ProductFeatureItem[];
 }
 
 export interface ProductGalleryItem {
