@@ -12,7 +12,7 @@ const NormandySection = () => {
             <svg viewBox="50 -40 420 440" className="w-full h-full" fill="none">
               <defs>
                 <clipPath id="factory-circle-clip">
-                  <circle cx="245" cy="115" r="55" />
+                  <circle cx="245" cy="115" r="65" />
                 </clipPath>
               </defs>
 
