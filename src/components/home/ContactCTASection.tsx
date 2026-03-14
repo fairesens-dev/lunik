@@ -2,10 +2,17 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import AnimatedSection from "@/components/AnimatedSection";
 import { useContent } from "@/contexts/ContentContext";
+import { useContactWidget } from "@/contexts/ContactWidgetContext";
 
 const ContactCTASection = () => {
   const { content } = useContent();
   const { contactCTATitle, contactCTASubtitle, contactCTAImage } = content.homepage;
+  const { openWidget, setScreen } = useContactWidget();
+
+  const handleCallbackClick = () => {
+    setScreen("callback");
+    openWidget();
+  };
 
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden">
