@@ -43,12 +43,11 @@ const ImagePicker = ({ value, onChange, label, helper }: ImagePickerProps) => {
       const { data } = await supabase.storage.from(BUCKET).list(folder, { limit: 500 });
       if (!data) return;
       for (const f of data) {
-        if (f.metadata) {
-          // It's a file
+        if (f.name === '.emptyFolderPlaceholder') continue;
+        if (f.id) {
           const fullPath = folder ? `${folder}/${f.name}` : f.name;
           allFiles.push({ name: f.name, folder, fullPath, url: getPublicUrl(fullPath) });
-        } else if (f.id === null || !f.metadata) {
-          // It's likely a folder — recurse into it
+        } else {
           const subFolder = folder ? `${folder}/${f.name}` : f.name;
           await listFolder(subFolder);
         }
