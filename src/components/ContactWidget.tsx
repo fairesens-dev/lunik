@@ -310,7 +310,7 @@ const ContactWidget = () => {
               {screen === "ai_chat" && (
                 <div className="flex flex-col h-full">
                   <div className="px-4 pt-2">
-                    <button onClick={() => resetScreen("menu")} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
+                    <button onClick={() => resetScreen("menu" as WidgetScreen)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
                       <ArrowLeft className="w-3 h-3" /> Retour
                     </button>
                   </div>
