@@ -121,19 +121,14 @@ const ContactWidget = () => {
     if (chatMessages.length > 0) sessionStorage.setItem("chatbot_session", JSON.stringify(chatMessages));
   }, [chatMessages]);
 
-  // Auto scroll chat
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [chatMessages, isStreaming]);
-  useEffect(() => { savEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [savStep]);
-
   // ESC to close
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === "Escape" && open) setOpen(false); };
+    const h = (e: KeyboardEvent) => { if (e.key === "Escape" && isOpen) closeWidget(); };
     window.addEventListener("keydown", h);
     return () => window.removeEventListener("keydown", h);
-  }, [open]);
+  }, [isOpen, closeWidget]);
 
   const handleOpen = () => {
-    setOpen(!open);
     if (!hasOpened) { setHasOpened(true); sessionStorage.setItem("widget_opened", "true"); }
   };
 
