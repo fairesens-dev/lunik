@@ -6,7 +6,7 @@ const NormandySection = () => {
   return (
     <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6">
       <AnimatedSection>
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 p-8 md:p-10 min-h-[280px] md:min-h-[320px]">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 p-6 md:p-8 min-h-[200px] md:min-h-[220px]">
           {/* France + Normandy map — centered on Normandy */}
           <div className="absolute right-0 md:right-4 top-1/2 -translate-y-[40%] w-[65%] md:w-[55%] max-w-[600px]">
             <svg viewBox="50 -40 420 440" className="w-full h-full" fill="none">
