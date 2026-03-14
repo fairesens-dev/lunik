@@ -4,7 +4,7 @@ import factoryImg from "@/assets/factory-normandy.jpg";
 
 const NormandySection = () => {
   return (
-    <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6">
+    <div className="max-w-[1400px] mx-auto px-6 lg:px-16 pb-6">
       <AnimatedSection>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 p-6 md:p-8 min-h-[200px] md:min-h-[220px]">
           {/* France map + factory circle */}
