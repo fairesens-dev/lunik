@@ -508,7 +508,7 @@ const TabHomepage = () => {
 // ── Tab: Réalisations (Gallery) ────────────────────────
 
 const TabGallery = () => {
-  const { content, updateGalleryItems } = useContent();
+  const { content, updateGalleryItems, updateHomepage } = useContent();
   const { toast } = useToast();
   const [items, setItems] = useState<GalleryItem[]>([...(content.homepage.galleryItems || [])]);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -548,8 +548,12 @@ const TabGallery = () => {
     }
   };
 
+  const [galleryTitle, setGalleryTitle] = useState(content.homepage.galleryTitle || "Ils ont sauté\nle pas");
+  const [gallerySubtitle, setGallerySubtitle] = useState(content.homepage.gallerySubtitle || "Quelques réalisations parmi nos clients satisfaits");
+
   const save = () => {
     updateGalleryItems(items);
+    updateHomepage({ galleryTitle, gallerySubtitle });
     toast({ title: "✅ Réalisations mises à jour" });
   };
 
@@ -561,6 +565,26 @@ const TabGallery = () => {
           <CardDescription>Gérez les photos de la galerie "Ils ont sauté le pas".</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4 border-b pb-4 mb-4">
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Titre de la section</Label>
+              <Textarea 
+                value={galleryTitle} 
+                onChange={(e) => setGalleryTitle(e.target.value)}
+                placeholder="Ils ont sauté\nle pas"
+                rows={2}
+              />
+              <p className="text-xs text-muted-foreground mt-1">Utilisez Entrée pour les retours à la ligne</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Sous-titre</Label>
+              <Input 
+                value={gallerySubtitle} 
+                onChange={(e) => setGallerySubtitle(e.target.value)}
+                placeholder="Quelques réalisations parmi nos clients satisfaits"
+              />
+            </div>
+          </div>
           {items.map((g, i) => (
             <div key={g.id} className="flex items-start gap-3 border border-gray-100 rounded-lg p-3 bg-white">
               {deleting === g.id ? (

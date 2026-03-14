@@ -94,6 +94,8 @@ export interface HomepageContent {
   faqItems: FAQItem[];
   featuredReviews: FeaturedReview[];
   galleryItems: GalleryItem[];
+  galleryTitle: string;
+  gallerySubtitle: string;
   highlightFeatures: HighlightFeature[];
   highlightImage: string;
   highlightTitle: string;
@@ -246,6 +248,8 @@ const defaultContent: SiteContent = {
     faqItems: [],
     featuredReviews: [],
     galleryItems: defaultGalleryItems,
+    galleryTitle: "Ils ont sauté\nle pas",
+    gallerySubtitle: "Quelques réalisations parmi nos clients satisfaits",
     highlightFeatures: defaultHighlightFeatures,
     highlightImage: "/images/store-vue-ensemble.webp",
     highlightTitle: "Chaque détail",
@@ -351,7 +355,7 @@ export const ContentProvider: React.FC<{ children: React.ReactNode }> = ({ child
   }, []);
 
   const updateHomepage = useCallback(
-    (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems">>) => {
+    (data: Partial<Omit<HomepageContent, "testimonials" | "faqItems" | "featuredReviews" | "galleryItems" | "galleryTitle" | "gallerySubtitle">>) => {
       setContent((prev) => {
         const updated = { ...prev.homepage, ...data };
         upsertContent("homepage", updated);
