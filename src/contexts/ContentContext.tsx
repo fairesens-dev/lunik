@@ -248,7 +248,7 @@ const defaultContent: SiteContent = {
     faqItems: [],
     featuredReviews: [],
     galleryItems: defaultGalleryItems,
-    galleryTitle: "Ils ont sauté\nle pas",
+    galleryTitle: "Installés\npar nos clients",
     gallerySubtitle: "Quelques réalisations parmi nos clients satisfaits",
     highlightFeatures: defaultHighlightFeatures,
     highlightImage: "/images/store-vue-ensemble.webp",
