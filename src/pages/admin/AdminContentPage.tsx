@@ -549,7 +549,17 @@ const TabGallery = () => {
   };
 
   const save = () => {
-    updateGalleryItems(items);
+    // Extract title/subtitle from temporary fields on first item
+    const galleryTitle = items.length > 0 ? (items[0] as any).__galleryTitle || "" : "";
+    const gallerySubtitle = items.length > 0 ? (items[0] as any).__gallerySubtitle || "" : "";
+    
+    // Clean up temporary fields before saving
+    const cleanItems = items.map(({ ...item }) => {
+      const { __galleryTitle, __gallerySubtitle, ...rest } = item as any;
+      return rest;
+    });
+    
+    updateGalleryItems(cleanItems);
     toast({ title: "✅ Réalisations mises à jour" });
   };
 
