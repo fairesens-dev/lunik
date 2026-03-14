@@ -508,7 +508,7 @@ const TabHomepage = () => {
 // ── Tab: Réalisations (Gallery) ────────────────────────
 
 const TabGallery = () => {
-  const { content, updateGalleryItems } = useContent();
+  const { content, updateGalleryItems, updateHomepage } = useContent();
   const { toast } = useToast();
   const [items, setItems] = useState<GalleryItem[]>([...(content.homepage.galleryItems || [])]);
   const [deleting, setDeleting] = useState<string | null>(null);
