@@ -3,6 +3,7 @@ import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/contexts/CartContext";
 import { CheckCircle2 } from "lucide-react";
+import logoLunik from "@/assets/logo-lunik.svg";
 
 const ThankYouPage = () => {
   const [params] = useSearchParams();
@@ -28,6 +29,11 @@ const ThankYouPage = () => {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-6 py-20">
       <div className="max-w-lg w-full text-center space-y-8">
+        {/* Logo */}
+        <div className="flex justify-center">
+          <img src={logoLunik} alt="LuniK" className="h-8" />
+        </div>
+
         {/* Checkmark animation */}
         <div className="flex justify-center">
           <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center animate-[scale-in_0.4s_ease-out]">

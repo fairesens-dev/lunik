@@ -358,7 +358,7 @@ const AdminOrderDetailPage = () => {
   const armatureHex = getArmatureHex(order.armature_color);
 
   return (
-    <div className="space-y-6 font-sans print:space-y-4" id="order-detail">
+    <div className="space-y-6 font-sans print:space-y-4 -mt-8 pt-0" id="order-detail">
       {/* Print header */}
       <div className="hidden print:block print-header mb-6">
         <div className="flex justify-between items-start border-b-2 border-gray-900 pb-4">
