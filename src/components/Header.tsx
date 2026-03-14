@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Menu, X, PackageSearch } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.svg";
 
 const navLinks = [
-  { label: "Accueil", href: "/" },
-  { label: "Configurateur", href: "/configurateur" },
+  { label: "Lunik, simplement unique", href: "/" },
 ];
 
 interface HeaderProps {
