@@ -306,7 +306,55 @@ const TabHomepage = () => {
         </CardContent>
       </Card>
 
-      {/* Value cards (engagements) */}
+      {/* Product features (Conçu pour durer) */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Section « Conçu pour durer »</CardTitle>
+          <CardDescription>Les 3 blocs avec image, texte et spécifications techniques</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Titre ligne 1 (couleur primaire)" value={form.productFeaturesTitle1} onChange={(v) => set("productFeaturesTitle1", v)} />
+            <Field label="Titre ligne 2 (couleur secondaire)" value={form.productFeaturesTitle2} onChange={(v) => set("productFeaturesTitle2", v)} />
+          </div>
+
+          <div className="space-y-4 mt-4">
+            <Label className="text-sm font-medium">Caractéristiques produit</Label>
+            {form.productFeatures.map((f: ProductFeatureItem) => (
+              <div key={f.id} className="border rounded-lg p-4 bg-muted/30 space-y-3">
+                <div className="flex items-center justify-between">
+                  <Input placeholder="Label court (ex: Toile)" value={f.label} onChange={(e) => updateProductFeature(f.id, { label: e.target.value })} className="h-8 text-sm w-40" />
+                  <button onClick={() => removeProductFeature(f.id)} className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <Input placeholder="Titre complet" value={f.title} onChange={(e) => updateProductFeature(f.id, { title: e.target.value })} className="h-8 text-sm" />
+                <Textarea placeholder="Description" value={f.body} onChange={(e) => updateProductFeature(f.id, { body: e.target.value })} rows={2} className="text-sm" />
+                <ImagePicker label="Image" value={f.image} onChange={(url) => updateProductFeature(f.id, { image: url })} />
+                <Input placeholder="Texte alternatif image" value={f.imageAlt} onChange={(e) => updateProductFeature(f.id, { imageAlt: e.target.value })} className="h-8 text-sm" />
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Spécifications (→)</Label>
+                  {f.specs.map((spec: string, si: number) => (
+                    <div key={si} className="flex items-center gap-2">
+                      <Input value={spec} onChange={(e) => updateProductFeatureSpec(f.id, si, e.target.value)} className="h-7 text-xs flex-1" />
+                      <button onClick={() => removeProductFeatureSpec(f.id, si)} className="text-muted-foreground hover:text-destructive">
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ))}
+                  <Button variant="ghost" size="sm" onClick={() => addProductFeatureSpec(f.id)} className="text-xs h-7">
+                    <Plus className="w-3 h-3 mr-1" /> Spec
+                  </Button>
+                </div>
+              </div>
+            ))}
+            <Button variant="outline" size="sm" onClick={addProductFeature}>
+              <Plus className="w-3 h-3 mr-1" /> Ajouter une caractéristique
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>Section Engagements (carrousel)</CardTitle>
