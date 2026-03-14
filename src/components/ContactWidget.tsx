@@ -498,7 +498,7 @@ const ContactWidget = () => {
               {/* ── Callback Screen ── */}
               {screen === "callback" && (
                 <div className="p-4 flex flex-col h-full overflow-y-auto">
-                  <button onClick={() => resetScreen("menu")} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
+                  <button onClick={() => resetScreen("menu" as WidgetScreen)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
                     <ArrowLeft className="w-3 h-3" /> Retour
                   </button>
                   {cbDone ? (
