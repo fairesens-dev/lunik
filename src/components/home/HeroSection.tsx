@@ -4,7 +4,7 @@ import { useContent } from "@/contexts/ContentContext";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 
-function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffix: string; decimals?: number }) {
+function AnimatedCounter({ value, suffix, decimals = 0, small = false }: { value: number; suffix: string; decimals?: number; small?: boolean }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -32,7 +32,7 @@ function AnimatedCounter({ value, suffix, decimals = 0 }: { value: number; suffi
 
   return (
     <div ref={ref}>
-      <span className="font-display text-3xl md:text-4xl font-bold tracking-tight">
+      <span className={`font-display font-bold tracking-tight ${small ? "text-xl md:text-2xl" : "text-3xl md:text-4xl"}`}>
         {decimals > 0 ? count.toFixed(decimals) : Math.floor(count).toLocaleString("fr-FR")}
         {suffix}
       </span>
