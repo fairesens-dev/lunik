@@ -1,5 +1,4 @@
 import AnimatedSection from "@/components/AnimatedSection";
-import { MapPin } from "lucide-react";
 
 const NormandySection = () => {
   return (
