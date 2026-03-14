@@ -55,6 +55,7 @@ const App = () => (
         <ConfiguratorSettingsProvider>
         <CartProvider>
         <AuthProvider>
+        <ContactWidgetProvider>
           <Routes>
             {/* Public site */}
             <Route element={<Layout />}>
