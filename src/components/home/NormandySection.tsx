@@ -7,12 +7,12 @@ const NormandySection = () => {
     <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6">
       <AnimatedSection>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 p-6 md:p-8 min-h-[200px] md:min-h-[220px]">
-          {/* France + Normandy map — centered on Normandy */}
+          {/* France map + factory circle */}
           <div className="absolute right-0 md:right-4 top-1/2 -translate-y-[40%] w-[65%] md:w-[55%] max-w-[600px]">
             <svg viewBox="50 -40 420 440" className="w-full h-full" fill="none">
               <defs>
-                <clipPath id="normandy-clip">
-                  <path d="M168 155 C160 148 155 142 142 137 C138 131 138 125 146 113 C143 107 142 100 150 88 C156 85 162 84 174 76 C172 70 170 64 178 56 C184 53 190 52 202 56 C206 50 210 47 222 52 C227 48 232 45 244 50 C249 46 254 43 266 48 C270 52 274 56 286 52 C292 54 298 56 310 50 C316 52 322 56 330 64 C332 70 334 76 342 84 C344 90 346 96 338 108 C340 114 342 120 334 130 C330 133 326 136 318 148 C312 151 306 154 294 160 C287 162 280 164 268 168 C262 167 256 166 244 170 C238 169 232 168 222 172 C216 170 210 168 198 172 C192 170 186 168 174 164 C171 160 168 155 168 155Z" />
+                <clipPath id="factory-circle-clip">
+                  <circle cx="245" cy="115" r="55" />
                 </clipPath>
               </defs>
 
@@ -23,42 +23,27 @@ const NormandySection = () => {
                 strokeWidth="1"
               />
 
-              {/* Normandy with factory image */}
+              {/* Factory image in circle */}
               <image
                 href={factoryImg}
-                x="130"
-                y="40"
-                width="230"
-                height="160"
-                clipPath="url(#normandy-clip)"
+                x="185"
+                y="55"
+                width="120"
+                height="120"
+                clipPath="url(#factory-circle-clip)"
                 preserveAspectRatio="xMidYMid slice"
               />
-              {/* Normandy border — smooth */}
-              <path
-                d="M168 155 C160 148 155 142 142 137 C138 131 138 125 146 113 C143 107 142 100 150 88 C156 85 162 84 174 76 C172 70 170 64 178 56 C184 53 190 52 202 56 C206 50 210 47 222 52 C227 48 232 45 244 50 C249 46 254 43 266 48 C270 52 274 56 286 52 C292 54 298 56 310 50 C316 52 322 56 330 64 C332 70 334 76 342 84 C344 90 346 96 338 108 C340 114 342 120 334 130 C330 133 326 136 318 148 C312 151 306 154 294 160 C287 162 280 164 268 168 C262 167 256 166 244 170 C238 169 232 168 222 172 C216 170 210 168 198 172 C192 170 186 168 174 164 C171 160 168 155 168 155Z"
-                className="stroke-primary/25"
-                fill="none"
-                strokeWidth="1.5"
-                strokeLinejoin="round"
-              />
+              {/* Circle border */}
+              <circle cx="245" cy="115" r="55" className="stroke-primary/20" strokeWidth="2" fill="none" />
 
-              {/* Workshop marker */}
-              <circle cx="250" cy="110" r="10" className="fill-accent/25" />
-              <circle cx="250" cy="110" r="4" className="fill-accent" />
+              {/* Workshop marker + label */}
+              <circle cx="245" cy="178" r="3" fill="white" fillOpacity="0.9" />
+              <circle cx="245" cy="178" r="2" className="fill-accent" />
+              <text x="255" y="182" className="fill-accent" fontSize="8" fontFamily="DM Sans, sans-serif" fontWeight="600">Notre atelier</text>
 
               {/* City labels */}
               <circle cx="305" cy="195" r="2.5" className="fill-muted-foreground/30" />
               <text x="313" y="198" className="fill-muted-foreground/40" fontSize="9" fontFamily="DM Sans, sans-serif">Paris</text>
-
-              <circle cx="262" cy="138" r="3" fill="white" fillOpacity="0.9" />
-              <circle cx="262" cy="138" r="2" className="fill-primary" />
-              <text x="245" y="155" fill="white" fillOpacity="0.95" fontSize="9" fontFamily="DM Sans, sans-serif" fontWeight="600" stroke="hsl(0 0% 0% / 0.3)" strokeWidth="2.5" paintOrder="stroke">Rouen</text>
-
-              <circle cx="195" cy="125" r="2" className="fill-primary/40" />
-              <text x="175" y="137" className="fill-primary/50" fontSize="8" fontFamily="DM Sans, sans-serif">Caen</text>
-
-              <circle cx="225" cy="98" r="2" className="fill-primary/40" />
-              <text x="205" y="93" className="fill-primary/50" fontSize="7.5" fontFamily="DM Sans, sans-serif">Le Havre</text>
 
               <circle cx="155" cy="210" r="2" className="fill-muted-foreground/25" />
               <text x="130" y="222" className="fill-muted-foreground/30" fontSize="8" fontFamily="DM Sans, sans-serif">Rennes</text>
