@@ -7,8 +7,8 @@ const NormandySection = () => {
     <div className="max-w-[1400px] mx-auto px-6 lg:px-16 pb-6">
       <AnimatedSection>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 p-6 md:p-8 md:min-h-[220px]">
-          {/* France map + factory circle */}
-          <div className="relative mx-auto w-[75%] mt-4 md:mt-0 md:absolute md:-right-4 md:top-1/2 md:-translate-y-[40%] md:w-[65%] order-2 md:order-none">
+          {/* France map + factory circle - larger on mobile */}
+          <div className="relative mx-auto w-[95%] sm:w-[85%] mt-6 md:mt-0 md:absolute md:-right-4 md:top-1/2 md:-translate-y-[40%] md:w-[65%] order-2 md:order-none">
             <svg viewBox="50 -40 420 440" className="w-full h-full" fill="none">
               <defs>
                 <clipPath id="factory-circle-clip">
