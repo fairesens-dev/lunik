@@ -55,8 +55,7 @@ const ProductFeaturesSection = () => {
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
-                    <span className="text-xs font-mono text-accent-light">{feature.num}.</span>
-                    <h3 className="font-display text-xl font-semibold">{feature.title}</h3>
+                    <h3 className="font-display text-xl font-semibold text-foreground">{feature.title}</h3>
                   </div>
                   <p className="text-background/60 text-sm leading-relaxed">{feature.body}</p>
                   <div className="space-y-1.5 pt-2">
