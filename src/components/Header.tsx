@@ -115,7 +115,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
               className={cn(
                 "h-10 w-10 rounded-full",
                 isTransparent
-                  ? "text-white/70 hover:text-white hover:bg-white/10"
+                  ? "text-white/70 hover:text-white bg-white/10 hover:bg-white/20"
                   : "text-muted-foreground hover:text-foreground"
               )}
             >
