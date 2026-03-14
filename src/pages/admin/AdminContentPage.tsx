@@ -548,7 +548,7 @@ const TabGallery = () => {
     }
   };
 
-  const [galleryTitle, setGalleryTitle] = useState(content.homepage.galleryTitle || "Ils ont sauté\nle pas");
+  const [galleryTitle, setGalleryTitle] = useState(content.homepage.galleryTitle || "Installés\npar nos clients");
   const [gallerySubtitle, setGallerySubtitle] = useState(content.homepage.gallerySubtitle || "Quelques réalisations parmi nos clients satisfaits");
 
   const save = () => {
