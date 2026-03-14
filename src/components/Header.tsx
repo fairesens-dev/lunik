@@ -7,9 +7,7 @@ import { cn } from "@/lib/utils";
 import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.svg";
 
-const navLinks = [
-  { label: "Lunik, simplement unique", href: "/" },
-];
+const navLinks: { label: string; href: string }[] = [];
 
 interface HeaderProps {
   bannerOffset?: boolean;
