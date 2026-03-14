@@ -88,7 +88,7 @@ const SocialProofToast = () => {
           animate={{ x: 0, opacity: 1 }}
           exit={{ x: -320, opacity: 0 }}
           transition={{ type: "spring", damping: 25 }}
-          className="fixed bottom-6 left-6 z-40 w-[300px] bg-background border border-border shadow-lg overflow-hidden print:hidden"
+          className="fixed bottom-20 sm:bottom-6 left-6 z-40 w-[300px] bg-background border border-border shadow-lg overflow-hidden print:hidden"
         >
           <div className="p-4 pr-10">
             <p className="text-sm leading-relaxed">{message}</p>
