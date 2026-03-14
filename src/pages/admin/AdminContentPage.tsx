@@ -548,7 +548,7 @@ const TabGallery = () => {
     }
   };
 
-  const [galleryTitle, setGalleryTitle] = useState(content.homepage.galleryTitle || "Ils ont sauté\nle pas");
+  const [galleryTitle, setGalleryTitle] = useState(content.homepage.galleryTitle || "Installés\npar nos clients");
   const [gallerySubtitle, setGallerySubtitle] = useState(content.homepage.gallerySubtitle || "Quelques réalisations parmi nos clients satisfaits");
 
   const save = () => {
@@ -562,7 +562,7 @@ const TabGallery = () => {
       <Card>
         <CardHeader>
           <CardTitle>Réalisations clients</CardTitle>
-          <CardDescription>Gérez les photos de la galerie "Ils ont sauté le pas".</CardDescription>
+          <CardDescription>Gérez les photos de la galerie "Installés par nos clients".</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           <div className="grid grid-cols-2 gap-4 border-b pb-4 mb-4">
@@ -571,7 +571,7 @@ const TabGallery = () => {
               <Textarea 
                 value={galleryTitle} 
                 onChange={(e) => setGalleryTitle(e.target.value)}
-                placeholder="Ils ont sauté\nle pas"
+                placeholder="Installés\npar nos clients"
                 rows={2}
               />
               <p className="text-xs text-muted-foreground mt-1">Utilisez Entrée pour les retours à la ligne</p>
