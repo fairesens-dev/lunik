@@ -6,6 +6,7 @@ import { useCartAbandonment } from "@/hooks/useCartAbandonment";
 import HeroSection from "@/components/home/HeroSection";
 import MarqueeSection from "@/components/home/MarqueeSection";
 import ProductHighlightSection from "@/components/home/ProductHighlightSection";
+import NormandySection from "@/components/home/NormandySection";
 import ProductFeaturesSection from "@/components/product/ProductFeaturesSection";
 import ValuesSection from "@/components/home/ValuesSection";
 import GallerySection from "@/components/home/GallerySection";
@@ -49,6 +50,7 @@ const Index = () => {
       <HeroSection />
       <MarqueeSection />
       <ProductHighlightSection />
+      <NormandySection />
       <div className="-mt-8 lg:-mt-12">
         <ProductFeaturesSection />
       </div>
