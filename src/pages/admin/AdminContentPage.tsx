@@ -548,18 +548,12 @@ const TabGallery = () => {
     }
   };
 
+  const [galleryTitle, setGalleryTitle] = useState(content.homepage.galleryTitle || "Ils ont sauté\nle pas");
+  const [gallerySubtitle, setGallerySubtitle] = useState(content.homepage.gallerySubtitle || "Quelques réalisations parmi nos clients satisfaits");
+
   const save = () => {
-    // Extract title/subtitle from temporary fields on first item
-    const galleryTitle = items.length > 0 ? (items[0] as any).__galleryTitle || "" : "";
-    const gallerySubtitle = items.length > 0 ? (items[0] as any).__gallerySubtitle || "" : "";
-    
-    // Clean up temporary fields before saving
-    const cleanItems = items.map(({ ...item }) => {
-      const { __galleryTitle, __gallerySubtitle, ...rest } = item as any;
-      return rest;
-    });
-    
-    updateGalleryItems(cleanItems);
+    updateGalleryItems(items);
+    updateHomepage({ galleryTitle, gallerySubtitle });
     toast({ title: "✅ Réalisations mises à jour" });
   };
 
