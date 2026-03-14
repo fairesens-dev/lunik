@@ -50,7 +50,9 @@ const Index = () => {
       <HeroSection />
       <MarqueeSection />
       <ProductHighlightSection />
-      <NormandySection />
+      <div className="-mt-10 lg:-mt-16">
+        <NormandySection />
+      </div>
       <div className="-mt-8 lg:-mt-12">
         <ProductFeaturesSection />
       </div>
