@@ -329,7 +329,7 @@ const ContactWidget = () => {
                         }`}>
                           {m.content}
                           {m.role === "assistant" && /rappel|contacter|rappeler/i.test(m.content) && (
-                            <button onClick={() => resetScreen("callback")}
+                            <button onClick={() => resetScreen("callback" as WidgetScreen)}
                               className="mt-2 text-xs text-primary underline block">📞 Demander un rappel</button>
                           )}
                         </div>
@@ -339,7 +339,7 @@ const ContactWidget = () => {
                     {userMsgCount >= 20 && (
                       <div className="text-center py-3 space-y-2">
                         <p className="text-xs text-muted-foreground">Vous souhaitez parler à un humain ?</p>
-                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("callback")}>
+                        <Button size="sm" variant="outline" className="text-xs" onClick={() => resetScreen("callback" as WidgetScreen)}>
                           📞 Demander un rappel
                         </Button>
                       </div>
