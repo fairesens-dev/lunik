@@ -79,7 +79,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
           <div className="hidden lg:flex items-center gap-3">
             <Tooltip>
               <TooltipTrigger asChild>
-                <Link to="/suivi-commande">
+                <Link to="/suivi">
                   <Button
                     variant="ghost"
                     size="icon"

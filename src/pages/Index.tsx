@@ -49,7 +49,9 @@ const Index = () => {
       <HeroSection />
       <MarqueeSection />
       <ProductHighlightSection />
-      <ProductFeaturesSection />
+      <div className="-mt-8 lg:-mt-12">
+        <ProductFeaturesSection />
+      </div>
       <ValuesSection />
       <GallerySection />
       <TestimonialsSection />

@@ -57,10 +57,10 @@ const ProductFeaturesSection = () => {
                   <div className="flex items-center gap-3">
                     <h3 className="font-display text-xl font-semibold text-foreground">{feature.title}</h3>
                   </div>
-                  <p className="text-background/60 text-sm leading-relaxed">{feature.body}</p>
+                  <p className="text-muted-foreground text-sm leading-relaxed">{feature.body}</p>
                   <div className="space-y-1.5 pt-2">
                     {feature.specs.map((spec) => (
-                      <p key={spec} className="text-xs text-accent-light">→ {spec}</p>
+                      <p key={spec} className="text-xs text-primary">→ {spec}</p>
                     ))}
                   </div>
                 </div>
