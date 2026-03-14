@@ -14,10 +14,12 @@ const GallerySection = () => {
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
           <div className="text-center mb-16">
-            <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4">
-              Ils ont sauté<br /><span className="text-accent-light">le pas</span>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold tracking-tight mb-4 whitespace-pre-line">
+              {content.homepage.galleryTitle || "Ils ont sauté\nle pas"}
             </h2>
-            <p className="text-muted-foreground text-sm">Quelques réalisations parmi nos clients satisfaits</p>
+            <p className="text-muted-foreground text-sm">
+              {content.homepage.gallerySubtitle || "Quelques réalisations parmi nos clients satisfaits"}
+            </p>
           </div>
         </AnimatedSection>
 

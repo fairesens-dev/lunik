@@ -561,6 +561,42 @@ const TabGallery = () => {
           <CardDescription>Gérez les photos de la galerie "Ils ont sauté le pas".</CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
+          <div className="grid grid-cols-2 gap-4 border-b pb-4 mb-4">
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Titre de la section</Label>
+              <Textarea 
+                value={items.length > 0 ? (items[0] as any).__galleryTitle || "" : ""} 
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setItems(prev => {
+                    if (prev.length === 0) return prev;
+                    const updated = [...prev];
+                    (updated[0] as any).__galleryTitle = val;
+                    return updated;
+                  });
+                }}
+                placeholder="Ils ont sauté\nle pas"
+                rows={2}
+              />
+              <p className="text-xs text-muted-foreground mt-1">Utilisez Entrée pour les retours à la ligne</p>
+            </div>
+            <div>
+              <Label className="text-sm font-medium mb-1.5 block">Sous-titre</Label>
+              <Input 
+                value={items.length > 0 ? (items[0] as any).__gallerySubtitle || "" : ""} 
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setItems(prev => {
+                    if (prev.length === 0) return prev;
+                    const updated = [...prev];
+                    (updated[0] as any).__gallerySubtitle = val;
+                    return updated;
+                  });
+                }}
+                placeholder="Quelques réalisations parmi nos clients satisfaits"
+              />
+            </div>
+          </div>
           {items.map((g, i) => (
             <div key={g.id} className="flex items-start gap-3 border border-gray-100 rounded-lg p-3 bg-white">
               {deleting === g.id ? (
