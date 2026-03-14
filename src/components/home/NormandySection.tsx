@@ -50,8 +50,9 @@ const NormandySection = () => {
               <circle cx="305" cy="195" r="2.5" className="fill-muted-foreground/30" />
               <text x="313" y="198" className="fill-muted-foreground/40" fontSize="9" fontFamily="DM Sans, sans-serif">Paris</text>
 
-              <circle cx="262" cy="138" r="2.5" className="fill-primary/50" />
-              <text x="245" y="152" className="fill-primary/60" fontSize="8" fontFamily="DM Sans, sans-serif" fontWeight="500">Rouen</text>
+              <circle cx="262" cy="138" r="3" fill="white" fillOpacity="0.9" />
+              <circle cx="262" cy="138" r="2" className="fill-primary" />
+              <text x="245" y="155" fill="white" fillOpacity="0.95" fontSize="9" fontFamily="DM Sans, sans-serif" fontWeight="600" stroke="hsl(0 0% 0% / 0.3)" strokeWidth="2.5" paintOrder="stroke">Rouen</text>
 
               <circle cx="195" cy="125" r="2" className="fill-primary/40" />
               <text x="175" y="137" className="fill-primary/50" fontSize="8" fontFamily="DM Sans, sans-serif">Caen</text>
