@@ -94,13 +94,21 @@ const Footer = () => {
       </div>
 
       <div className="border-t border-primary-foreground/10">
-        <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-primary-foreground/30 text-xs">
-            © {new Date().getFullYear()} {g.brandName}. Tous droits réservés.
-          </p>
-          <div className="inline-flex items-center gap-2 text-xs text-primary-foreground/40">
-            <span>🇫🇷</span>
-            <span>Fabriqué en France</span>
+        <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6 flex flex-col items-center gap-4">
+          <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
+            <p className="text-primary-foreground/30 text-xs">
+              © {new Date().getFullYear()} {g.brandName}. Tous droits réservés.
+            </p>
+            <div className="inline-flex items-center gap-2 text-xs text-primary-foreground/40">
+              <span>🇫🇷</span>
+              <span>Fabriqué en France</span>
+            </div>
+          </div>
+          <div className="flex flex-col items-center gap-2 pt-2">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-primary-foreground/30">
+              Une marque accompagnée par
+            </p>
+            <img src={logoFairesens} alt="Fairesens IA & Digital" className="h-6 opacity-60" />
           </div>
         </div>
       </div>
