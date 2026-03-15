@@ -10,14 +10,44 @@ const StickyCTABar = () => {
     const hero = document.getElementById("hero");
     if (!hero) return;
 
-    const observer = new IntersectionObserver(
+    const footer = document.querySelector("footer");
+
+    const heroObserver = new IntersectionObserver(
       ([entry]) => {
-        setVisible(!entry.isIntersecting);
+        setVisible((prev) => {
+          const footerVisible = footer
+            ? footer.getBoundingClientRect().top <= window.innerHeight
+            : false;
+          return !entry.isIntersecting && !footerVisible;
+        });
       },
       { threshold: 0 }
     );
-    observer.observe(hero);
-    return () => observer.disconnect();
+    heroObserver.observe(hero);
+
+    if (footer) {
+      const footerObserver = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setVisible(false);
+          } else {
+            const heroEl = document.getElementById("hero");
+            const heroVisible = heroEl
+              ? heroEl.getBoundingClientRect().bottom > 0
+              : false;
+            setVisible(!heroVisible);
+          }
+        },
+        { threshold: 0 }
+      );
+      footerObserver.observe(footer);
+      return () => {
+        heroObserver.disconnect();
+        footerObserver.disconnect();
+      };
+    }
+
+    return () => heroObserver.disconnect();
   }, []);
 
   return (

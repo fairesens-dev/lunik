@@ -96,7 +96,7 @@ const Footer = () => {
       <div className="border-t border-primary-foreground/10">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-16 py-6 flex flex-col items-center gap-4">
           <div className="flex flex-col sm:flex-row items-center justify-between w-full gap-4">
-            <p className="text-primary-foreground/30 text-xs">
+            <p className="text-primary-foreground/60 text-xs">
               © {new Date().getFullYear()} {g.brandName}. Tous droits réservés.
             </p>
             <div className="inline-flex items-center gap-2 text-xs text-primary-foreground/40">
