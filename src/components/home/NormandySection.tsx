@@ -9,7 +9,7 @@ const NormandySection = () => {
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 min-h-[420px] md:min-h-[300px] flex flex-col">
           {/* SVG map as full background */}
           <div className="absolute inset-0 pointer-events-none">
-            <svg viewBox="0 0 500 440" className="w-full h-full" fill="none" preserveAspectRatio="xMidYMid slice">
+            <svg viewBox="0 0 500 440" className="w-full h-full opacity-100" fill="none" preserveAspectRatio="xMidYMid meet">
               <defs>
                 <clipPath id="factory-circle-clip">
                   <circle cx="320" cy="120" r="70" />
