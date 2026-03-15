@@ -104,11 +104,11 @@ const Footer = () => {
               <span>Fabriqué en France</span>
             </div>
           </div>
-          <div className="flex flex-col items-center gap-2 pt-2">
+          <div className="flex flex-col items-center gap-0 pt-2">
             <p className="text-[10px] uppercase tracking-[0.2em] text-primary-foreground/30">
               Une marque accompagnée par
             </p>
-            <img src={logoFairesens} alt="Fairesens IA & Digital" className="h-20 opacity-60" />
+            <img src={logoFairesens} alt="Fairesens IA & Digital" className="h-40 opacity-60 -mt-4" />
           </div>
         </div>
       </div>
