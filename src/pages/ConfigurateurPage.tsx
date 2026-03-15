@@ -143,11 +143,11 @@ const ConfigurateurPage = () => {
           {/* 2 boutons compacts — décalés à droite, au-dessus de la fiche technique */}
           <div className="absolute bottom-[100px] lg:bottom-[140px] right-4 flex gap-1.5 z-20">
             <button
-              onClick={() => setVisualizeOpen(true)}
-              className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
+              disabled
+              className="h-[34px] px-3 bg-background/50 border border-border rounded-lg flex items-center gap-1.5 shadow-sm cursor-not-allowed opacity-50"
             >
-              <Camera className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium text-foreground">Projeter</span>
+              <Camera className="w-3.5 h-3.5 text-muted-foreground" />
+              <span className="text-[10px] font-medium text-muted-foreground">Bientôt</span>
             </button>
             <button
               onClick={() => setCloseUpOpen(true)}
