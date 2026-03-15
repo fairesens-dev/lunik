@@ -18,6 +18,7 @@ const NormandySection = () => {
 
               {/* Factory image in circle */}
               <image
+                xlinkHref={factoryImg}
                 href={factoryImg}
                 x="245"
                 y="45"
