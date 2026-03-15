@@ -140,6 +140,24 @@ const TestimonialsSection = () => {
             </div>
           ))}
         </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-2 mt-6">
+          {items.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                const el = scrollRef.current;
+                if (!el) return;
+                const cardWidth = el.querySelector("div")?.offsetWidth ?? 400;
+                el.scrollTo({ left: i * (cardWidth + 24), behavior: "smooth" });
+              }}
+              className={`w-2 h-2 rounded-full transition-all ${
+                i === currentIndex ? "bg-primary w-6" : "bg-border"
+              }`}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
