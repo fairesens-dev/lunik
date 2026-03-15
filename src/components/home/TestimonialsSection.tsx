@@ -82,7 +82,7 @@ const TestimonialsSection = () => {
                 Ce que nos clients<br />en pensent
               </h2>
             </div>
-            <div className="hidden md:flex items-center gap-4">
+            <div className="flex items-center gap-3 md:gap-4">
               <span className="text-sm font-mono text-muted-foreground">
                 {String(currentIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
               </span>
@@ -90,14 +90,14 @@ const TestimonialsSection = () => {
                 <button
                   onClick={() => scroll("left")}
                   disabled={!canScrollLeft}
-                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => scroll("right")}
                   disabled={!canScrollRight}
-                  className="w-12 h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
+                  className="w-10 h-10 md:w-12 md:h-12 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors disabled:opacity-20"
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
@@ -138,6 +138,24 @@ const TestimonialsSection = () => {
                 </span>
               </div>
             </div>
+          ))}
+        </div>
+
+        {/* Dot indicators */}
+        <div className="flex justify-center gap-2 mt-6">
+          {items.map((_, i) => (
+            <button
+              key={i}
+              onClick={() => {
+                const el = scrollRef.current;
+                if (!el) return;
+                const cardWidth = el.querySelector("div")?.offsetWidth ?? 400;
+                el.scrollTo({ left: i * (cardWidth + 24), behavior: "smooth" });
+              }}
+              className={`w-2 h-2 rounded-full transition-all ${
+                i === currentIndex ? "bg-primary w-6" : "bg-border"
+              }`}
+            />
           ))}
         </div>
       </div>
