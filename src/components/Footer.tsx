@@ -108,7 +108,7 @@ const Footer = () => {
             <p className="text-[10px] uppercase tracking-[0.2em] text-primary-foreground/30">
               Une marque accompagnée par
             </p>
-            <img src={logoFairesens} alt="Fairesens IA & Digital" className="h-6 opacity-60" />
+            <img src={logoFairesens} alt="Fairesens IA & Digital" className="h-10 opacity-60" />
           </div>
         </div>
       </div>
