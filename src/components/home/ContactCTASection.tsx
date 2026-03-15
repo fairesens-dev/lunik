@@ -42,11 +42,9 @@ const ContactCTASection = () => {
             >
               Nous appeler
             </Button>
-            <Link to="/configurateur">
-              <Button className="bg-white text-black px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto hover:bg-white/90">
-                Tester
-              </Button>
-            </Link>
+            <Button disabled className="bg-white/50 text-black/40 px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto cursor-not-allowed">
+              Bientôt
+            </Button>
           </div>
         </AnimatedSection>
       </div>
