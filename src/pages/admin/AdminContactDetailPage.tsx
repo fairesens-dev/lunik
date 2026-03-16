@@ -347,6 +347,22 @@ const AdminContactDetailPage = () => {
                           </div>
                           {a.subject && <p className="text-sm font-medium font-sans mt-0.5">{a.subject}</p>}
                           {a.body && <p className="text-xs text-muted-foreground font-sans line-clamp-2">{a.body}</p>}
+                          {a.metadata && typeof a.metadata === "object" && !Array.isArray(a.metadata) && Object.keys(a.metadata as Record<string, unknown>).length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {(a.metadata as Record<string, unknown>).order_number && (
+                                <Badge variant="outline" className="text-[10px] font-sans">Cmd: {String((a.metadata as Record<string, unknown>).order_number)}</Badge>
+                              )}
+                              {(a.metadata as Record<string, unknown>).problem_category && (
+                                <Badge variant="outline" className="text-[10px] font-sans">{String((a.metadata as Record<string, unknown>).problem_category)}</Badge>
+                              )}
+                              {(a.metadata as Record<string, unknown>).phone && (
+                                <Badge variant="outline" className="text-[10px] font-sans">📞 {String((a.metadata as Record<string, unknown>).phone)}</Badge>
+                              )}
+                              {(a.metadata as Record<string, unknown>).message_count && (
+                                <Badge variant="outline" className="text-[10px] font-sans">{String((a.metadata as Record<string, unknown>).message_count)} msgs</Badge>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
