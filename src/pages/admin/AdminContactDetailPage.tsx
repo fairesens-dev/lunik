@@ -316,7 +316,7 @@ const AdminContactDetailPage = () => {
                         <Select value={logForm.type} onValueChange={v => setLogForm({ ...logForm, type: v as any })}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            {["note","call","email_sent","sms_sent","form_submit","purchase","page_view"].map(t =>
+                            {["note","call","email_sent","sms_sent","form_submit","purchase","page_view","sav_request","callback_request","chatbot_conversation"].map(t =>
                               <SelectItem key={t} value={t}>{t}</SelectItem>)}
                           </SelectContent>
                         </Select>
