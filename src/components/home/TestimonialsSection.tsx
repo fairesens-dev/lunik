@@ -100,7 +100,6 @@ const TestimonialsSection = () => {
               </div>
             </div>
           </div>
-        </AnimatedSection>
 
         <div
           ref={scrollRef}
