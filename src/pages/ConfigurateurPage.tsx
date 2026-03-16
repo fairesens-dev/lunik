@@ -142,13 +142,18 @@ const ConfigurateurPage = () => {
 
           {/* 2 boutons compacts — décalés à droite, au-dessus de la fiche technique */}
           <div className="absolute bottom-[100px] lg:bottom-[140px] right-4 flex gap-1.5 z-20">
-            <button
-              disabled
-              className="h-[34px] px-3 bg-background/50 border border-border rounded-lg flex items-center gap-1.5 shadow-sm cursor-not-allowed opacity-50"
-            >
-              <Camera className="w-3.5 h-3.5 text-muted-foreground" />
-              <span className="text-[10px] font-medium text-muted-foreground">Bientôt</span>
-            </button>
+            <div className="relative">
+              <button
+                disabled
+                className="h-[34px] px-3 bg-background/50 border border-border rounded-lg flex items-center gap-1.5 shadow-sm cursor-not-allowed opacity-50"
+              >
+                <Camera className="w-3.5 h-3.5 text-muted-foreground" />
+                <span className="text-[10px] font-medium text-muted-foreground">Tester LuniK IA</span>
+              </button>
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 bg-muted/80 backdrop-blur-sm text-muted-foreground text-[8px] font-semibold uppercase tracking-[0.12em] px-1.5 py-px rounded-full whitespace-nowrap">
+                Bientôt
+              </span>
+            </div>
             <button
               onClick={() => setCloseUpOpen(true)}
               className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
