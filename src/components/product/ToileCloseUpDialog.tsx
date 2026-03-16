@@ -41,12 +41,6 @@ const ToileCloseUpDialog = ({ open, onOpenChange, toileLabel, photoUrl, hex }: T
             </div>
           )}
 
-          <button
-            onClick={() => onOpenChange(false)}
-            className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full p-2 border border-border hover:bg-background transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
 
           <div className="absolute bottom-0 left-0 right-0 bg-background/90 backdrop-blur-xl border-t border-border px-6 py-4">
             <p className="text-sm font-medium text-foreground">{toileLabel}</p>

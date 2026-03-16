@@ -154,13 +154,15 @@ const ConfigurateurPage = () => {
                 Bientôt
               </span>
             </div>
-            <button
-              onClick={() => setCloseUpOpen(true)}
-              className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
-            >
-              <ZoomIn className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-              <span className="text-[10px] font-medium text-foreground">Toile de près</span>
-            </button>
+            {activeStep !== "01" && (
+              <button
+                onClick={() => setCloseUpOpen(true)}
+                className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
+              >
+                <ZoomIn className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-medium text-foreground">Toile</span>
+              </button>
+            )}
           </div>
 
           <VisualizeAtHomeDialog
