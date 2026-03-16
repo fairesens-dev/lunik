@@ -67,7 +67,11 @@ const ImagePicker = ({ value, onChange, label, helper }: ImagePickerProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const path = file.name;
+    const safeName = file.name
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "_")
+      .replace(/_+/g, "_");
+    const path = safeName;
     const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: true });
     if (!error) {
       const url = getPublicUrl(path);

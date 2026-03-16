@@ -82,7 +82,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
                 <Link to="/suivi">
                   <Button
                     variant="ghost"
-                    size="icon"
+                    size="sm"
                     className={cn(
                       "h-10 w-10 rounded-full",
                       isTransparent
