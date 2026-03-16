@@ -57,7 +57,7 @@ const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
         <span className="text-sm font-medium">Recevoir mon devis par e-mail</span>
       </div>
       <p className="text-xs text-muted-foreground mb-3">
-        Recevez votre configuration détaillée et votre devis par email.
+        Recevez votre devis détaillé directement par email.
       </p>
       <div className="flex gap-2">
         <Input
