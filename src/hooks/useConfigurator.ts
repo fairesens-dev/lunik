@@ -34,6 +34,7 @@ export function useConfigurator() {
           badge: o.savingsLabel || undefined,
           tip: undefined,
           socialProof: undefined,
+          imageUrl: o.imageUrl,
           order: i + 1,
         }));
     }
