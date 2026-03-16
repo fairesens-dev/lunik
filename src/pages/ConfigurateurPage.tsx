@@ -412,7 +412,16 @@ const ConfigurateurPage = () => {
             )}
 
             <div className="mt-10 border-t border-border pt-8">
-              <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
+              <SaveConfigCTA
+                hasValidConfig={widthValid && basePrice !== null}
+                width={width}
+                projection={projection}
+                toileColor={{ label: toileColor }}
+                armatureColor={{ label: armatureColor }}
+                options={currentOptions}
+                price={price}
+                basePrice={basePrice}
+              />
             </div>
           </div>
 
