@@ -84,7 +84,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
                     variant="ghost"
                     size="sm"
                     className={cn(
-                      "h-10 w-10 rounded-full",
+                      "gap-1.5 rounded-full px-3",
                       isTransparent
                         ? "text-white/70 hover:text-white hover:bg-white/10"
                         : "text-muted-foreground hover:text-foreground"
