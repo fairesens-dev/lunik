@@ -84,7 +84,7 @@ function GeneralTab() {
 
   const saveSite = async () => {
     updateGlobal({ brandName });
-    await saveSetting("general", { siteUrl, currency, timezone });
+    await saveSetting("general", { siteUrl, currency, timezone, transactionalEmail });
     toast({ title: "Paramètres du site enregistrés" });
   };
 
