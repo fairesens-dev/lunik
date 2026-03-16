@@ -1,5 +1,5 @@
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { X, ZoomIn } from "lucide-react";
+import { ZoomIn } from "lucide-react";
 import { useState } from "react";
 
 interface ToileCloseUpDialogProps {
