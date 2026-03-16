@@ -129,6 +129,16 @@ const ContactWidget = () => {
     return () => window.removeEventListener("keydown", h);
   }, [isOpen, closeWidget]);
 
+  useEffect(() => {
+    if (screen !== "sav") return;
+
+    const frame = window.requestAnimationFrame(() => {
+      savEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [screen, savStep, savDone]);
+
   const handleOpen = () => {
     if (!hasOpened) { setHasOpened(true); sessionStorage.setItem("widget_opened", "true"); }
   };
@@ -362,13 +372,13 @@ const ContactWidget = () => {
 
               {/* ── SAV Screen ── */}
               {screen === "sav" && (
-                <div className="flex flex-col h-full">
-                  <div className="px-4 pt-2">
+                <div className="flex flex-col h-full min-h-0">
+                  <div className="px-4 pt-2 shrink-0">
                     <button onClick={() => resetScreen("menu" as WidgetScreen)} className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 mb-3">
                       <ArrowLeft className="w-3 h-3" /> Retour
                     </button>
                   </div>
-                  <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
+                  <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2 min-h-0">
                     {savDone ? (
                       <div className="text-center py-6 space-y-3">
                         <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto">
