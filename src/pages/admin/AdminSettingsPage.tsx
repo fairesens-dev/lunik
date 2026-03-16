@@ -48,6 +48,7 @@ function GeneralTab() {
   const [siteUrl, setSiteUrl] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [timezone, setTimezone] = useState("Europe/Paris");
+  const [transactionalEmail, setTransactionalEmail] = useState("");
 
   const [brandName, setBrandName] = useState(content.global.brandName);
   const [siret, setSiret] = useState(content.global.siret);
