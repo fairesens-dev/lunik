@@ -9,17 +9,16 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import { useToast } from "@/hooks/use-toast";
 import { useConfiguratorSettings, type ColorEntry, type OptionEntry } from "@/contexts/ConfiguratorSettingsContext";
 import { supabase } from "@/integrations/supabase/client";
-import { WIDTH_RANGES, PROJECTIONS, lookupPrice, getDefaultPriceGrid } from "@/lib/pricingTable";
+import { getDefaultPriceGrid, getDefaultWidthRanges, getDefaultProjections, type WidthRange } from "@/lib/pricingTable";
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 
 /* ═══════════════════════════════════════════════════════ */
 
 const AdminConfiguratorPage = () => {
-  const { settings, updatePricing, updateDimensions, reorderToileColors, reorderArmatureColors, updateOption, addOption, removeOption, addToileColor, removeToileColor, updateToileColor, addArmatureColor, removeArmatureColor, updateArmatureColor, updatePriceGrid } = useConfiguratorSettings();
+  const { settings, updatePricing, updateDimensions, reorderToileColors, reorderArmatureColors, updateOption, addOption, removeOption, addToileColor, removeToileColor, updateToileColor, addArmatureColor, removeArmatureColor, updateArmatureColor, updatePriceGrid, updateWidthRanges, updateProjections } = useConfiguratorSettings();
   const { toast } = useToast();
 
   return (
@@ -41,16 +40,23 @@ const AdminConfiguratorPage = () => {
       </div>
 
       <Tabs defaultValue="pricing" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="pricing">Tarification</TabsTrigger>
-          <TabsTrigger value="dimensions">Dimensions</TabsTrigger>
           <TabsTrigger value="toile">Couleurs de toile</TabsTrigger>
           <TabsTrigger value="armature">Couleurs armature</TabsTrigger>
           <TabsTrigger value="options">Options</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="pricing"><PricingTab settings={settings} onSave={updatePricing} onSaveGrid={updatePriceGrid} toast={toast} /></TabsContent>
-        <TabsContent value="dimensions"><DimensionsTab settings={settings} onSave={updateDimensions} toast={toast} /></TabsContent>
+        <TabsContent value="pricing">
+          <PricingTab
+            settings={settings}
+            onSave={updatePricing}
+            onSaveGrid={updatePriceGrid}
+            onSaveWidthRanges={updateWidthRanges}
+            onSaveProjections={updateProjections}
+            toast={toast}
+          />
+        </TabsContent>
         <TabsContent value="toile">
           <ColorsTab
             title="Coloris de toile disponibles"
@@ -87,18 +93,38 @@ const AdminConfiguratorPage = () => {
 export default AdminConfiguratorPage;
 
 /* ═══════════════════════════════════════════════════════
-   TAB 1 — TARIFICATION (matrice de prix)
+   TAB 1 — TARIFICATION (matrice de prix + dimensions dynamiques)
    ═══════════════════════════════════════════════════════ */
 
-function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; onSave: any; onSaveGrid: (grid: (number | null)[][]) => void; toast: any }) {
+interface PricingTabProps {
+  settings: any;
+  onSave: any;
+  onSaveGrid: (grid: (number | null)[][]) => void;
+  onSaveWidthRanges: (ranges: WidthRange[]) => void;
+  onSaveProjections: (projections: number[]) => void;
+  toast: any;
+}
+
+function PricingTab({ settings, onSave, onSaveGrid, onSaveWidthRanges, onSaveProjections, toast }: PricingTabProps) {
   const [grid, setGrid] = useState<(number | null)[][]>(settings.priceGrid ?? getDefaultPriceGrid());
+  const [widthRanges, setLocalWidthRanges] = useState<WidthRange[]>(settings.widthRanges ?? getDefaultWidthRanges());
+  const [projections, setLocalProjections] = useState<number[]>(settings.projections ?? getDefaultProjections());
   const [divisor, setDivisor] = useState(settings.pricing.installmentDivisor);
   const [dirty, setDirty] = useState(false);
+
+  // Add row/col dialog state
+  const [showAddRow, setShowAddRow] = useState(false);
+  const [newRowMin, setNewRowMin] = useState("");
+  const [newRowMax, setNewRowMax] = useState("");
+  const [showAddCol, setShowAddCol] = useState(false);
+  const [newColValue, setNewColValue] = useState("");
 
   // Sync when settings load from DB
   useEffect(() => {
     if (settings.priceGrid) setGrid(settings.priceGrid.map((r: any[]) => [...r]));
-  }, [settings.priceGrid]);
+    if (settings.widthRanges) setLocalWidthRanges(settings.widthRanges.map((r: WidthRange) => ({ ...r })));
+    if (settings.projections) setLocalProjections([...settings.projections]);
+  }, [settings.priceGrid, settings.widthRanges, settings.projections]);
 
   const updateCell = (wi: number, pi: number, value: string) => {
     const next = grid.map(r => [...r]);
@@ -114,9 +140,8 @@ function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; on
 
   const toggleCell = (wi: number, pi: number) => {
     const next = grid.map(r => [...r]);
-    const defaults = getDefaultPriceGrid();
     if (next[wi][pi] === null) {
-      next[wi][pi] = defaults[wi][pi] ?? 3000;
+      next[wi][pi] = 3000;
     } else {
       next[wi][pi] = null;
     }
@@ -124,13 +149,59 @@ function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; on
     setDirty(true);
   };
 
+  const addRow = () => {
+    const min = parseInt(newRowMin, 10);
+    const max = parseInt(newRowMax, 10);
+    if (isNaN(min) || isNaN(max) || min >= max) return;
+    const label = `${Math.floor(min / 10)} – ${Math.floor(max / 10)} cm`;
+    const newRange: WidthRange = { min, max, label };
+    const newRanges = [...widthRanges, newRange];
+    setLocalWidthRanges(newRanges);
+    setGrid([...grid, Array(projections.length).fill(null)]);
+    setShowAddRow(false);
+    setNewRowMin("");
+    setNewRowMax("");
+    setDirty(true);
+  };
+
+  const removeRow = (idx: number) => {
+    const newRanges = widthRanges.filter((_, i) => i !== idx);
+    const newGrid = grid.filter((_, i) => i !== idx);
+    setLocalWidthRanges(newRanges);
+    setGrid(newGrid);
+    setDirty(true);
+  };
+
+  const addCol = () => {
+    const val = parseInt(newColValue, 10);
+    if (isNaN(val) || val <= 0) return;
+    const newProj = [...projections, val];
+    setLocalProjections(newProj);
+    setGrid(grid.map(r => [...r, null]));
+    setShowAddCol(false);
+    setNewColValue("");
+    setDirty(true);
+  };
+
+  const removeCol = (idx: number) => {
+    const newProj = projections.filter((_, i) => i !== idx);
+    const newGrid = grid.map(r => r.filter((_, i) => i !== idx));
+    setLocalProjections(newProj);
+    setGrid(newGrid);
+    setDirty(true);
+  };
+
   const resetGrid = () => {
     setGrid(getDefaultPriceGrid());
+    setLocalWidthRanges(getDefaultWidthRanges());
+    setLocalProjections(getDefaultProjections());
     setDirty(true);
   };
 
   const saveAll = () => {
     onSaveGrid(grid);
+    onSaveWidthRanges(widthRanges);
+    onSaveProjections(projections);
     onSave({ ...settings.pricing, installmentDivisor: divisor });
     setDirty(false);
     toast({ title: "✅ Grille tarifaire sauvegardée" });
@@ -149,18 +220,65 @@ function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; on
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[140px] font-semibold">Largeur ↓ / Avancée →</TableHead>
-                  {PROJECTIONS.map(p => (
-                    <TableHead key={p} className="text-center font-semibold min-w-[100px]">{p / 100} cm</TableHead>
+                  {projections.map((p, pi) => (
+                    <TableHead key={pi} className="text-center font-semibold min-w-[100px]">
+                      <div className="flex items-center justify-center gap-1">
+                        <span>{p / 100} cm</span>
+                        <button
+                          onClick={() => removeCol(pi)}
+                          className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+                          title="Supprimer cette avancée"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </TableHead>
                   ))}
+                  <TableHead className="w-10">
+                    {showAddCol ? (
+                      <div className="flex items-center gap-1">
+                        <Input
+                          type="number"
+                          placeholder="mm"
+                          value={newColValue}
+                          onChange={e => setNewColValue(e.target.value)}
+                          className="h-8 w-20 text-xs"
+                          autoFocus
+                          onKeyDown={e => { if (e.key === "Enter") addCol(); if (e.key === "Escape") setShowAddCol(false); }}
+                        />
+                        <Button size="sm" variant="ghost" onClick={addCol} className="h-8 px-2"><Plus className="w-3 h-3" /></Button>
+                        <Button size="sm" variant="ghost" onClick={() => setShowAddCol(false)} className="h-8 px-1"><X className="w-3 h-3" /></Button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowAddCol(true)}
+                        className="w-8 h-8 rounded-md border border-dashed border-muted-foreground/30 flex items-center justify-center text-muted-foreground hover:bg-muted hover:border-muted-foreground/50 transition-colors"
+                        title="Ajouter une avancée"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {WIDTH_RANGES.map((range, wi) => (
-                  <TableRow key={range.label}>
-                    <TableCell className="font-medium text-sm whitespace-nowrap">{range.label}</TableCell>
-                    {PROJECTIONS.map((_, pi) => {
+                {widthRanges.map((range, wi) => (
+                  <TableRow key={wi}>
+                    <TableCell className="font-medium text-sm whitespace-nowrap">
+                      <div className="flex items-center gap-1">
+                        <span>{range.label}</span>
+                        <button
+                          onClick={() => removeRow(wi)}
+                          className="text-muted-foreground hover:text-destructive transition-colors ml-1"
+                          title="Supprimer cette largeur"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </TableCell>
+                    {projections.map((_, pi) => {
                       const val = grid[wi]?.[pi];
-                      const isNull = val === null;
+                      const isNull = val === null || val === undefined;
                       return (
                         <TableCell key={pi} className="p-1">
                           {isNull ? (
@@ -192,8 +310,45 @@ function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; on
                         </TableCell>
                       );
                     })}
+                    <TableCell />
                   </TableRow>
                 ))}
+                {/* Add row */}
+                <TableRow>
+                  <TableCell colSpan={projections.length + 2}>
+                    {showAddRow ? (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">Min (mm) :</span>
+                        <Input
+                          type="number"
+                          placeholder="ex: 6000"
+                          value={newRowMin}
+                          onChange={e => setNewRowMin(e.target.value)}
+                          className="h-8 w-24 text-xs"
+                          autoFocus
+                        />
+                        <span className="text-xs text-muted-foreground">Max (mm) :</span>
+                        <Input
+                          type="number"
+                          placeholder="ex: 6500"
+                          value={newRowMax}
+                          onChange={e => setNewRowMax(e.target.value)}
+                          className="h-8 w-24 text-xs"
+                          onKeyDown={e => { if (e.key === "Enter") addRow(); }}
+                        />
+                        <Button size="sm" variant="ghost" onClick={addRow} className="h-8 px-2"><Plus className="w-3 h-3 mr-1" /> Ajouter</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setShowAddRow(false)} className="h-8 px-1"><X className="w-3 h-3" /></Button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setShowAddRow(true)}
+                        className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" /> Ajouter une plage de largeur
+                      </button>
+                    )}
+                  </TableCell>
+                </TableRow>
               </TableBody>
             </Table>
           </div>
@@ -203,7 +358,7 @@ function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; on
               <Label className="text-sm">Paiement en N× sans frais</Label>
               <Input type="number" min={1} max={6} value={divisor} onChange={e => { setDivisor(Number(e.target.value)); setDirty(true); }} className="mt-1 w-24" />
             </div>
-            <Button variant="outline" onClick={resetGrid}>Réinitialiser les prix par défaut</Button>
+            <Button variant="outline" onClick={resetGrid}>Réinitialiser par défaut</Button>
             <Button onClick={saveAll} disabled={!dirty}>
               <Save className="w-4 h-4 mr-2" /> Sauvegarder
             </Button>
@@ -215,68 +370,7 @@ function PricingTab({ settings, onSave, onSaveGrid, toast }: { settings: any; on
 }
 
 /* ═══════════════════════════════════════════════════════
-   TAB 2 — DIMENSIONS
-   ═══════════════════════════════════════════════════════ */
-
-function DimensionsTab({ settings, onSave, toast }: { settings: any; onSave: any; toast: any }) {
-  const [wMin, setWMin] = useState(settings.dimensions.width.min);
-  const [wMax, setWMax] = useState(settings.dimensions.width.max);
-  const [wStep, setWStep] = useState(settings.dimensions.width.step);
-  const [pMin, setPMin] = useState(settings.dimensions.projection.min);
-  const [pMax, setPMax] = useState(settings.dimensions.projection.max);
-  const [pStep, setPStep] = useState(settings.dimensions.projection.step);
-
-  const wError = wMin >= wMax;
-  const pError = pMin >= pMax;
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Limites de dimensions</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Largeur */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">Largeur</h3>
-            <div><Label className="text-xs">Min (cm)</Label><Input type="number" value={wMin} onChange={e => setWMin(Number(e.target.value))} className="mt-1" /></div>
-            <div><Label className="text-xs">Max (cm)</Label><Input type="number" value={wMax} onChange={e => setWMax(Number(e.target.value))} className="mt-1" /></div>
-            <div><Label className="text-xs">Pas (cm)</Label><Input type="number" value={wStep} onChange={e => setWStep(Number(e.target.value))} className="mt-1" /></div>
-            {wError && <p className="text-xs text-red-500">Le minimum doit être inférieur au maximum</p>}
-          </div>
-          {/* Avancée */}
-          <div className="space-y-3">
-            <h3 className="font-semibold text-sm">Avancée</h3>
-            <div><Label className="text-xs">Min (cm)</Label><Input type="number" value={pMin} onChange={e => setPMin(Number(e.target.value))} className="mt-1" /></div>
-            <div><Label className="text-xs">Max (cm)</Label><Input type="number" value={pMax} onChange={e => setPMax(Number(e.target.value))} className="mt-1" /></div>
-            <div><Label className="text-xs">Pas (cm)</Label><Input type="number" value={pStep} onChange={e => setPStep(Number(e.target.value))} className="mt-1" /></div>
-            {pError && <p className="text-xs text-red-500">Le minimum doit être inférieur au maximum</p>}
-          </div>
-          {/* Diagram */}
-          <div className="flex flex-col items-center justify-center">
-            <div className="relative border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center" style={{ width: 180, height: 120 }}>
-              <div className="absolute -bottom-6 text-xs text-gray-500 font-medium">{wMin}–{wMax} cm</div>
-              <div className="absolute -right-14 text-xs text-gray-500 font-medium rotate-90 origin-left">{pMin}–{pMax} cm</div>
-              <span className="text-[10px] text-gray-400 uppercase tracking-wider">Vue de dessus</span>
-            </div>
-          </div>
-        </div>
-        <Button className="mt-6" disabled={wError || pError} onClick={() => {
-          onSave({
-            width: { min: wMin, max: wMax, step: wStep, unit: "cm" },
-            projection: { min: pMin, max: pMax, step: pStep, unit: "cm" },
-          });
-          toast({ title: "✅ Dimensions mises à jour" });
-        }}>
-          <Save className="w-4 h-4 mr-2" /> Sauvegarder
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
-/* ═══════════════════════════════════════════════════════
-   TAB 3 & 4 — COLORS (shared)
+   TAB 2 & 3 — COLORS (shared)
    ═══════════════════════════════════════════════════════ */
 
 function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPhotoUpload, onSave, onAdd, onRemove, onUpdate }: {
@@ -288,7 +382,6 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
   const [uploading, setUploading] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
-  // Sync local state when initialColors changes (e.g. after bucket loading)
   useEffect(() => {
     if (initialColors.length > 0 && local.length === 0) {
       setLocal(initialColors);
@@ -382,7 +475,6 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
         <CardDescription>{subtitle} — {activeCount} actifs sur {local.length} total</CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">
-        {/* Search + bulk actions */}
         <div className="flex items-center gap-3 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -397,7 +489,6 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
           <Button variant="outline" size="sm" onClick={() => toggleAll(false)}>Tout désactiver</Button>
         </div>
 
-        {/* Color grid */}
         <div className="max-h-[600px] overflow-y-auto space-y-1.5 pr-1">
           {filtered.map(({ color: c, originalIndex: i }) => (
             <div key={c.id} className={`flex items-center gap-3 border rounded-lg p-2.5 ${c.active ? "bg-white border-gray-100" : "bg-gray-50 border-gray-100 opacity-60"}`}>
@@ -413,7 +504,6 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
                     <button onClick={() => move(i, -1)} disabled={i === 0} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowUp className="w-3 h-3" /></button>
                     <button onClick={() => move(i, 1)} disabled={i === local.length - 1} className="text-gray-400 hover:text-gray-700 disabled:opacity-30"><ArrowDown className="w-3 h-3" /></button>
                   </div>
-                  {/* Swatch with photo support */}
                   <div
                     className="w-12 h-12 rounded border border-gray-200 shrink-0"
                     style={getSwatchStyle(c)}
@@ -453,7 +543,7 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
 }
 
 /* ═══════════════════════════════════════════════════════
-   TAB 5 — OPTIONS
+   TAB 4 — OPTIONS
    ═══════════════════════════════════════════════════════ */
 
 function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: any; onUpdate: any; onAdd: any; onRemove: any; toast: any }) {
@@ -565,7 +655,6 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
                     <Label className="text-xs">Description</Label>
                     <Textarea value={o.description} onChange={e => update(idx, "description", e.target.value)} className="mt-1" rows={2} />
                   </div>
-                  {/* Image upload */}
                   <div className="md:col-span-2">
                     <Label className="text-xs">Image (optionnelle)</Label>
                     <div className="flex items-center gap-3 mt-1">
@@ -609,7 +698,6 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
                     <Label className="text-xs">Mise en avant (highlight)</Label>
                   </div>
                 </div>
-                {/* includesIds */}
                 <div>
                   <Label className="text-xs text-gray-500">Inclut les options :</Label>
                   <div className="flex gap-4 mt-1">

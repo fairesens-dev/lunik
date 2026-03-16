@@ -10,7 +10,7 @@ export interface WidthRange {
   label: string;
 }
 
-export const WIDTH_RANGES: WidthRange[] = [
+const DEFAULT_WIDTH_RANGES: WidthRange[] = [
   { min: 1900, max: 2399, label: "190 – 239 cm" },
   { min: 2400, max: 2899, label: "240 – 289 cm" },
   { min: 2900, max: 3399, label: "290 – 339 cm" },
@@ -21,8 +21,30 @@ export const WIDTH_RANGES: WidthRange[] = [
   { min: 4801, max: 5920, label: "481 – 592 cm" },
 ];
 
-export const PROJECTIONS = [1500, 2000, 2500, 3000, 3500] as const;
-export type Projection = (typeof PROJECTIONS)[number];
+const DEFAULT_PROJECTIONS: number[] = [1500, 2000, 2500, 3000, 3500];
+
+let WIDTH_RANGES: WidthRange[] = DEFAULT_WIDTH_RANGES.map(r => ({ ...r }));
+let PROJECTIONS: number[] = [...DEFAULT_PROJECTIONS];
+
+export { WIDTH_RANGES, PROJECTIONS };
+
+export function setWidthRanges(ranges: WidthRange[]) {
+  WIDTH_RANGES.length = 0;
+  ranges.forEach(r => WIDTH_RANGES.push({ ...r }));
+}
+
+export function setProjections(projections: number[]) {
+  PROJECTIONS.length = 0;
+  projections.forEach(p => PROJECTIONS.push(p));
+}
+
+export function getDefaultWidthRanges(): WidthRange[] {
+  return DEFAULT_WIDTH_RANGES.map(r => ({ ...r }));
+}
+
+export function getDefaultProjections(): number[] {
+  return [...DEFAULT_PROJECTIONS];
+}
 
 // Grid: widthRangeIndex → projection → price TTC (€)
 // null = combination not available
@@ -133,7 +155,7 @@ function getWidthRangeIndex(widthMm: number): number {
 }
 
 function getProjectionIndex(projectionMm: number): number {
-  return PROJECTIONS.indexOf(projectionMm as Projection);
+  return PROJECTIONS.indexOf(projectionMm);
 }
 
 /** Look up the base TTC price for a given width (mm) and projection (mm). Returns null if invalid. */
@@ -142,14 +164,14 @@ export function lookupPrice(widthMm: number, projectionMm: number): number | nul
   if (wi === -1) return null;
   const pi = getProjectionIndex(projectionMm);
   if (pi === -1) return null;
-  return PRICE_GRID[wi][pi];
+  return PRICE_GRID[wi]?.[pi] ?? null;
 }
 
 /** Get valid projection values (mm) for a given width (mm). */
 export function getValidProjections(widthMm: number): number[] {
   const wi = getWidthRangeIndex(widthMm);
   if (wi === -1) return [];
-  return PROJECTIONS.filter((_, pi) => PRICE_GRID[wi][pi] !== null);
+  return PROJECTIONS.filter((_, pi) => PRICE_GRID[wi]?.[pi] !== null);
 }
 
 /** Check if a width (mm) is within any valid range. */
@@ -163,6 +185,15 @@ export function getWidthRangeLabel(widthMm: number): string | null {
   return r?.label ?? null;
 }
 
-/** Min / max width in cm */
-export const MIN_WIDTH_CM = Math.floor(WIDTH_RANGES[0].min / 10);
-export const MAX_WIDTH_CM = Math.floor(WIDTH_RANGES[WIDTH_RANGES.length - 1].max / 10);
+/** Min / max width in cm — computed dynamically */
+export function getMinWidthCm(): number {
+  return WIDTH_RANGES.length > 0 ? Math.floor(WIDTH_RANGES[0].min / 10) : 190;
+}
+
+export function getMaxWidthCm(): number {
+  return WIDTH_RANGES.length > 0 ? Math.floor(WIDTH_RANGES[WIDTH_RANGES.length - 1].max / 10) : 592;
+}
+
+/** @deprecated Use getMinWidthCm() / getMaxWidthCm() for dynamic values */
+export const MIN_WIDTH_CM = Math.floor(DEFAULT_WIDTH_RANGES[0].min / 10);
+export const MAX_WIDTH_CM = Math.floor(DEFAULT_WIDTH_RANGES[DEFAULT_WIDTH_RANGES.length - 1].max / 10);
