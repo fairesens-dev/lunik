@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +27,14 @@ serve(async (req) => {
     if (!resendApiKey) throw new Error("RESEND_API_KEY not configured");
 
     const resend = new Resend(resendApiKey);
-    const fromEmail = Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
+
+    // Read transactional email from DB, fallback to env
+    const supabaseAdmin = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+    );
+    const { data: generalSettings } = await supabaseAdmin.from("admin_settings").select("data").eq("id", "general").single();
+    const fromEmail = (generalSettings?.data as any)?.transactionalEmail || Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
     const fromName = Deno.env.get("FROM_NAME") || "LuniK";
 
     const cfg = cart.configuration || {};

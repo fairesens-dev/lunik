@@ -432,7 +432,9 @@ serve(async (req) => {
       throw new Error(`No recipient for email type: ${type}`);
     }
 
-    const fromEmail = Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
+    // Read transactional email from DB, fallback to env
+    const { data: generalSettings } = await supabaseAdmin.from("admin_settings").select("data").eq("id", "general").single();
+    const fromEmail = (generalSettings?.data as any)?.transactionalEmail || Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
     const fromName = Deno.env.get("FROM_NAME") || "Mon Store";
 
     // Send email via Resend
