@@ -8,20 +8,13 @@ const NormandySection = () => {
       <AnimatedSection>
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 min-h-[420px] md:min-h-[300px] flex flex-col">
           {/* SVG map as full background */}
-          <div className="absolute -inset-4 pointer-events-none">
+          <div className="absolute inset-0 pointer-events-none">
             <svg viewBox="0 0 500 500" className="w-full h-full" fill="none" preserveAspectRatio="xMidYMid slice">
               <defs>
                 <clipPath id="factory-circle-clip">
                   <circle cx="280" cy="100" r="55" />
                 </clipPath>
               </defs>
-
-              {/* France silhouette - larger, filling background */}
-              <path
-                d="M180 10 L200 8 L225 5 L250 12 L275 8 L300 15 L325 12 L350 20 L375 18 L400 30 L420 45 L435 65 L440 85 L438 105 L445 130 L442 155 L435 175 L428 195 L420 215 L425 240 L432 265 L435 290 L430 315 L418 340 L405 360 L390 378 L375 392 L355 405 L335 415 L315 425 L295 430 L275 428 L255 420 L235 410 L215 395 L198 380 L182 360 L170 340 L160 315 L152 290 L148 265 L150 240 L155 215 L150 190 L142 170 L135 150 L130 130 L132 110 L138 90 L148 72 L160 55 L172 40 L185 25 Z"
-                className="fill-primary/[0.05] stroke-primary/[0.10]"
-                strokeWidth="1.5"
-              />
 
               {/* Factory image in circle */}
               <image

@@ -34,7 +34,7 @@ const ProductFeaturesSection = () => {
                   <p className="text-muted-foreground text-sm leading-relaxed">{feature.body}</p>
                   <div className="space-y-1.5 pt-2">
                     {feature.specs.map((spec) => (
-                      <p key={spec} className="text-xs text-primary">→ {spec}</p>
+                      <p key={spec} className="text-sm text-primary">→ {spec}</p>
                     ))}
                   </div>
                 </div>
