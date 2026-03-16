@@ -1,8 +1,8 @@
-/* Configurator Settings Context — v2 */
+/* Configurator Settings Context — v3 */
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { parseToileColorLabel } from "@/lib/parseToileColorLabel";
-import { setPriceGrid, getDefaultPriceGrid } from "@/lib/pricingTable";
+import { setPriceGrid, getDefaultPriceGrid, setWidthRanges, setProjections, getDefaultWidthRanges, getDefaultProjections, type WidthRange } from "@/lib/pricingTable";
 
 /* ─── Types ──────────────────────────────────────────── */
 
@@ -54,6 +54,8 @@ export interface ConfiguratorSettings {
   armatureColors: ColorEntry[];
   options: OptionEntry[];
   priceGrid: (number | null)[][];
+  widthRanges: WidthRange[];
+  projections: number[];
 }
 
 /* ─── Defaults ───────────────────────────────────────── */
@@ -64,29 +66,18 @@ export const DEFAULT_SETTINGS: ConfiguratorSettings = {
     width: { min: 150, max: 600, step: 1, unit: "cm" },
     projection: { min: 100, max: 400, step: 1, unit: "cm" },
   },
-  toileColors: [], // Loaded dynamically from the toile-colors bucket
+  toileColors: [],
   armatureColors: [],
   options: [],
   priceGrid: getDefaultPriceGrid(),
+  widthRanges: getDefaultWidthRanges(),
+  projections: getDefaultProjections(),
 };
 
 /* ─── Supabase helpers ───────────────────────────────── */
 
 async function upsertSetting(id: string, data: unknown) {
   await supabase.from("configurator_settings" as any).upsert({ id, data } as any, { onConflict: "id" });
-}
-
-async function persistAll(s: ConfiguratorSettings) {
-  const entries = [
-    { id: "pricing", data: s.pricing },
-    { id: "dimensions", data: s.dimensions },
-    { id: "toileColors", data: s.toileColors },
-    { id: "armatureColors", data: s.armatureColors },
-    { id: "options", data: s.options },
-  ];
-  for (const e of entries) {
-    await upsertSetting(e.id, e.data);
-  }
 }
 
 /* ─── Context ────────────────────────────────────────── */
@@ -107,6 +98,8 @@ interface ConfiguratorSettingsContextType {
   addOption: (o: OptionEntry) => void;
   removeOption: (id: string) => void;
   updatePriceGrid: (grid: (number | null)[][]) => void;
+  updateWidthRanges: (ranges: WidthRange[]) => void;
+  updateProjections: (projections: number[]) => void;
   resetToDefaults: () => void;
 }
 
@@ -156,7 +149,7 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
           });
       }
 
-      // 3. Merge: if DB has toileColors entries, use those (admin may have toggled active).
+      // 3. Merge toile colors
       let toileColors = bucketColors;
       if (map.toileColors && Array.isArray(map.toileColors) && map.toileColors.length > 0) {
         const bucketMap = new Map(bucketColors.map(c => [c.id, c]));
@@ -172,7 +165,12 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       }
 
       const loadedGrid = map.priceGrid ?? DEFAULT_SETTINGS.priceGrid;
+      const loadedWidthRanges = map.widthRanges ?? DEFAULT_SETTINGS.widthRanges;
+      const loadedProjections = map.projections ?? DEFAULT_SETTINGS.projections;
+
       setPriceGrid(loadedGrid);
+      setWidthRanges(loadedWidthRanges);
+      setProjections(loadedProjections);
 
       setSettings({
         pricing: map.pricing ?? DEFAULT_SETTINGS.pricing,
@@ -181,6 +179,8 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
         armatureColors: map.armatureColors ?? DEFAULT_SETTINGS.armatureColors,
         options: map.options ?? DEFAULT_SETTINGS.options,
         priceGrid: loadedGrid,
+        widthRanges: loadedWidthRanges,
+        projections: loadedProjections,
       });
     })();
   }, []);
@@ -269,10 +269,36 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
     setSettings(s => { upsertSetting("priceGrid", grid); return { ...s, priceGrid: grid }; });
   }, []);
 
+  const updateWidthRangesCtx = useCallback((ranges: WidthRange[]) => {
+    setWidthRanges(ranges);
+    setSettings(s => { upsertSetting("widthRanges", ranges); return { ...s, widthRanges: ranges }; });
+  }, []);
+
+  const updateProjectionsCtx = useCallback((projections: number[]) => {
+    setProjections(projections);
+    setSettings(s => { upsertSetting("projections", projections); return { ...s, projections: projections }; });
+  }, []);
+
   const resetToDefaults = useCallback(() => {
-    setPriceGrid(DEFAULT_SETTINGS.priceGrid);
-    setSettings(DEFAULT_SETTINGS);
-    persistAll(DEFAULT_SETTINGS);
+    const defaults = {
+      ...DEFAULT_SETTINGS,
+      widthRanges: getDefaultWidthRanges(),
+      projections: getDefaultProjections(),
+      priceGrid: getDefaultPriceGrid(),
+    };
+    setPriceGrid(defaults.priceGrid);
+    setWidthRanges(defaults.widthRanges);
+    setProjections(defaults.projections);
+    setSettings(defaults);
+    // persist
+    upsertSetting("pricing", defaults.pricing);
+    upsertSetting("dimensions", defaults.dimensions);
+    upsertSetting("toileColors", defaults.toileColors);
+    upsertSetting("armatureColors", defaults.armatureColors);
+    upsertSetting("options", defaults.options);
+    upsertSetting("priceGrid", defaults.priceGrid);
+    upsertSetting("widthRanges", defaults.widthRanges);
+    upsertSetting("projections", defaults.projections);
   }, []);
 
   return (
@@ -280,7 +306,9 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       settings, updatePricing, updateDimensions,
       updateToileColor, addToileColor, removeToileColor, reorderToileColors,
       updateArmatureColor, addArmatureColor, removeArmatureColor, reorderArmatureColors,
-      updateOption, addOption, removeOption, updatePriceGrid, resetToDefaults,
+      updateOption, addOption, removeOption, updatePriceGrid,
+      updateWidthRanges: updateWidthRangesCtx, updateProjections: updateProjectionsCtx,
+      resetToDefaults,
     }}>
       {children}
     </ConfiguratorSettingsContext.Provider>
