@@ -48,6 +48,7 @@ function GeneralTab() {
   const [siteUrl, setSiteUrl] = useState("");
   const [currency, setCurrency] = useState("EUR");
   const [timezone, setTimezone] = useState("Europe/Paris");
+  const [transactionalEmail, setTransactionalEmail] = useState("");
 
   const [brandName, setBrandName] = useState(content.global.brandName);
   const [siret, setSiret] = useState(content.global.siret);
@@ -70,7 +71,7 @@ function GeneralTab() {
         loadSetting("company"),
         loadSetting("gdpr"),
       ]);
-      if (gen) { setSiteUrl(gen.siteUrl || ""); setCurrency(gen.currency || "EUR"); setTimezone(gen.timezone || "Europe/Paris"); }
+      if (gen) { setSiteUrl(gen.siteUrl || ""); setCurrency(gen.currency || "EUR"); setTimezone(gen.timezone || "Europe/Paris"); setTransactionalEmail(gen.transactionalEmail || ""); }
       if (comp) { setTva(comp.tva || ""); setBillingEmail(comp.billingEmail || ""); }
       if (gdpr) { setConsentText(gdpr.consentText || ""); setRetentionPeriod(gdpr.retentionPeriod || "2yr"); }
     })();
@@ -83,7 +84,7 @@ function GeneralTab() {
 
   const saveSite = async () => {
     updateGlobal({ brandName });
-    await saveSetting("general", { siteUrl, currency, timezone });
+    await saveSetting("general", { siteUrl, currency, timezone, transactionalEmail });
     toast({ title: "Paramètres du site enregistrés" });
   };
 
@@ -142,6 +143,11 @@ function GeneralTab() {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          <div className="space-y-2">
+            <Label>E-mail transactionnel</Label>
+            <Input type="email" value={transactionalEmail} onChange={e => setTransactionalEmail(e.target.value)} placeholder="notifications@votredomaine.fr" />
+            <p className="text-xs text-muted-foreground">Adresse d'expédition utilisée par Resend pour tous les e-mails transactionnels (devis, confirmations, relances…).</p>
           </div>
           <Button onClick={saveSite}>Enregistrer</Button>
         </CardContent>
