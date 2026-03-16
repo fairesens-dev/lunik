@@ -3,31 +3,50 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, Check, Loader2 } from "lucide-react";
 import { useCartAbandonment } from "@/hooks/useCartAbandonment";
-import { useCart } from "@/contexts/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 
 interface SaveConfigCTAProps {
   hasValidConfig: boolean;
+  width: number;
+  projection: number;
+  toileColor: { label: string };
+  armatureColor: { label: string };
+  options: { motorisation: boolean; led: boolean; packConnect: boolean };
+  price: number;
+  basePrice: number | null;
 }
 
-const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
+const SaveConfigCTA = ({ hasValidConfig, width, projection, toileColor, armatureColor, options, price, basePrice }: SaveConfigCTAProps) => {
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const { captureEmail } = useCartAbandonment();
-  const { item } = useCart();
 
   if (!hasValidConfig) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !email.includes("@") || !item) return;
+    if (!email || !email.includes("@")) return;
 
     setStatus("loading");
     try {
       captureEmail(email);
 
+      const cart = {
+        configuration: {
+          width,
+          projection,
+          toileColor,
+          armatureColor,
+          options,
+        },
+        pricing: {
+          base: basePrice ?? 0,
+          total: price,
+        },
+      };
+
       await supabase.functions.invoke("send-config-email", {
-        body: { email, cart: item },
+        body: { email, cart },
       });
 
       setStatus("done");
@@ -44,7 +63,7 @@ const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
           <span className="text-sm font-medium">Devis envoyé !</span>
         </div>
         <p className="text-xs text-muted-foreground">
-          Retrouvez-la dans votre boîte mail.
+          Retrouvez-le dans votre boîte mail.
         </p>
       </div>
     );

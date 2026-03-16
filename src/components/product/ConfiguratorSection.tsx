@@ -230,7 +230,16 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   </div>
                 </div>
 
-                <SaveConfigCTA hasValidConfig={widthValid && basePrice !== null} />
+                <SaveConfigCTA
+                  hasValidConfig={widthValid && basePrice !== null}
+                  width={width}
+                  projection={projection}
+                  toileColor={{ label: toileColor }}
+                  armatureColor={{ label: armatureColor }}
+                  options={{ motorisation, led, packConnect: pack }}
+                  price={price}
+                  basePrice={basePrice}
+                />
 
                 {/* Price & CTA */}
                 <div className="border-t border-border pt-8">
