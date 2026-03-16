@@ -212,8 +212,8 @@ const ConfigurateurPage = () => {
                     { label: "Garantie toile", value: "10 ans" },
                   ].map(item => (
                     <div key={item.label} className="bg-background/60 backdrop-blur-sm rounded-lg px-3 py-2">
-                      <p className="text-[10px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
-                      <p className="text-xs font-medium text-foreground mt-0.5">{item.value}</p>
+                      <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
+                      <p className="text-[11px] font-medium text-foreground mt-0.5">{item.value}</p>
                     </div>
                   ))}
                 </div>
