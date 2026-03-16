@@ -40,8 +40,8 @@ const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
     return (
       <div className="mt-8 border border-primary/20 bg-primary/5 p-5 text-center">
         <div className="flex items-center justify-center gap-2 text-primary mb-1">
-          <Check className="w-4 h-4" />
-          <span className="text-sm font-medium">Configuration envoyée !</span>
+         <Check className="w-4 h-4" />
+          <span className="text-sm font-medium">Devis envoyé !</span>
         </div>
         <p className="text-xs text-muted-foreground">
           Retrouvez-la dans votre boîte mail.
