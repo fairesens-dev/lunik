@@ -81,6 +81,9 @@ const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
           )}
         </Button>
       </div>
+      <p className="text-[10px] text-muted-foreground mt-2 leading-tight">
+        En soumettant ce formulaire, vous acceptez que vos coordonnées soient utilisées par LuniK et son usine partenaire dans le cadre d'une commande de store sur mesure ou à des fins promotionnelles. Vous pouvez vous désinscrire à tout moment.
+      </p>
       {status === "error" && (
         <p className="text-xs text-destructive mt-2">Erreur lors de l'envoi. Réessayez.</p>
       )}

@@ -110,7 +110,7 @@ const ExitIntentPopup = ({
                   <form onSubmit={handleSubmit} className="space-y-3">
                     <Input type="email" placeholder="votre@email.fr" value={email} onChange={(e) => setEmail(e.target.value)} required className="rounded-lg border-border h-11 text-sm" />
                     <Button type="submit" disabled={sending} variant="gradient" className="w-full rounded-full h-11 tracking-[0.1em] uppercase text-xs font-medium">
-                      {sending ? "Envoi..." : "Recevoir ma config →"}
+                      {sending ? "Envoi..." : "Télécharger mon devis →"}
                     </Button>
                   </form>
                 </>
