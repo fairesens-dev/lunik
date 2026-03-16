@@ -371,14 +371,14 @@ const ConfigurateurPage = () => {
                           {opt.badge}
                         </span>
                       )}
+                        {opt.imageUrl && (
+                          <img
+                            src={opt.imageUrl}
+                            alt={opt.label}
+                            className="w-full h-28 rounded-lg object-cover border border-border mb-2"
+                          />
+                        )}
                         <div className="flex items-center gap-4">
-                          {opt.imageUrl && (
-                            <img
-                              src={opt.imageUrl}
-                              alt={opt.label}
-                              className="w-10 h-10 rounded-lg object-cover border border-border shrink-0"
-                            />
-                          )}
                           <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
                           <div className="flex-1 min-w-0">
                             <p className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}>
