@@ -54,6 +54,9 @@ const activityIcons: Record<string, React.ReactNode> = {
   purchase: <ShoppingCart className="w-4 h-4" />,
   note: <StickyNote className="w-4 h-4" />,
   call: <PhoneCall className="w-4 h-4" />,
+  sav_request: <Wrench className="w-4 h-4" />,
+  callback_request: <PhoneCall className="w-4 h-4" />,
+  chatbot_conversation: <MessageCircle className="w-4 h-4" />,
 };
 
 const AdminContactDetailPage = () => {
