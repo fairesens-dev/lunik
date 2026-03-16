@@ -144,6 +144,11 @@ function GeneralTab() {
               </Select>
             </div>
           </div>
+          <div className="space-y-2">
+            <Label>E-mail transactionnel</Label>
+            <Input type="email" value={transactionalEmail} onChange={e => setTransactionalEmail(e.target.value)} placeholder="notifications@votredomaine.fr" />
+            <p className="text-xs text-muted-foreground">Adresse d'expédition utilisée par Resend pour tous les e-mails transactionnels (devis, confirmations, relances…).</p>
+          </div>
           <Button onClick={saveSite}>Enregistrer</Button>
         </CardContent>
       </Card>
