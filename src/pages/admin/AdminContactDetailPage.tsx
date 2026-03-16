@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   ArrowLeft, Mail, Phone, Building2, Briefcase, Save, Trash2, Plus,
-  StickyNote, PhoneCall, Eye, FileText, ShoppingCart, X,
+  StickyNote, PhoneCall, Eye, FileText, ShoppingCart, X, Wrench, MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -54,6 +54,9 @@ const activityIcons: Record<string, React.ReactNode> = {
   purchase: <ShoppingCart className="w-4 h-4" />,
   note: <StickyNote className="w-4 h-4" />,
   call: <PhoneCall className="w-4 h-4" />,
+  sav_request: <Wrench className="w-4 h-4" />,
+  callback_request: <PhoneCall className="w-4 h-4" />,
+  chatbot_conversation: <MessageCircle className="w-4 h-4" />,
 };
 
 const AdminContactDetailPage = () => {
@@ -313,7 +316,7 @@ const AdminContactDetailPage = () => {
                         <Select value={logForm.type} onValueChange={v => setLogForm({ ...logForm, type: v as any })}>
                           <SelectTrigger><SelectValue /></SelectTrigger>
                           <SelectContent>
-                            {["note","call","email_sent","sms_sent","form_submit","purchase","page_view"].map(t =>
+                            {["note","call","email_sent","sms_sent","form_submit","purchase","page_view","sav_request","callback_request","chatbot_conversation"].map(t =>
                               <SelectItem key={t} value={t}>{t}</SelectItem>)}
                           </SelectContent>
                         </Select>
@@ -344,6 +347,22 @@ const AdminContactDetailPage = () => {
                           </div>
                           {a.subject && <p className="text-sm font-medium font-sans mt-0.5">{a.subject}</p>}
                           {a.body && <p className="text-xs text-muted-foreground font-sans line-clamp-2">{a.body}</p>}
+                          {a.metadata && typeof a.metadata === "object" && !Array.isArray(a.metadata) && Object.keys(a.metadata as Record<string, unknown>).length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-1">
+                              {(a.metadata as Record<string, unknown>).order_number && (
+                                <Badge variant="outline" className="text-[10px] font-sans">Cmd: {String((a.metadata as Record<string, unknown>).order_number)}</Badge>
+                              )}
+                              {(a.metadata as Record<string, unknown>).problem_category && (
+                                <Badge variant="outline" className="text-[10px] font-sans">{String((a.metadata as Record<string, unknown>).problem_category)}</Badge>
+                              )}
+                              {(a.metadata as Record<string, unknown>).phone && (
+                                <Badge variant="outline" className="text-[10px] font-sans">📞 {String((a.metadata as Record<string, unknown>).phone)}</Badge>
+                              )}
+                              {(a.metadata as Record<string, unknown>).message_count && (
+                                <Badge variant="outline" className="text-[10px] font-sans">{String((a.metadata as Record<string, unknown>).message_count)} msgs</Badge>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     ))}
