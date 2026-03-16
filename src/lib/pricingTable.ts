@@ -64,6 +64,7 @@ export interface PricingOption {
   badge?: string;
   tip?: string;
   socialProof?: string;
+  imageUrl?: string;
   order: number; // display order (lower = first)
 }
 

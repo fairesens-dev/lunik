@@ -44,6 +44,7 @@ export interface OptionEntry {
   highlight: boolean;
   savingsLabel?: string;
   includesIds?: string[];
+  imageUrl?: string;
 }
 
 export interface ConfiguratorSettings {

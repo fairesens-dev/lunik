@@ -459,6 +459,7 @@ function ColorsTab({ title, subtitle, colors: initialColors, swatchType, showPho
 function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: any; onUpdate: any; onAdd: any; onRemove: any; toast: any }) {
   const [local, setLocal] = useState<OptionEntry[]>(settings.options);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<string | null>(null);
 
   const update = (idx: number, field: string, value: any) => {
     const next = [...local];
@@ -483,14 +484,41 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
     setDeleting(null);
   };
 
+  const handleImageUpload = async (idx: number, file: File) => {
+    const optionId = local[idx].id;
+    setUploading(optionId);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `options/${optionId}.${ext}`;
+      const { error } = await supabase.storage.from("product-photos").upload(path, file, { upsert: true });
+      if (error) throw error;
+      const { data: urlData } = supabase.storage.from("product-photos").getPublicUrl(path);
+      update(idx, "imageUrl", urlData.publicUrl);
+      toast({ title: "✅ Image uploadée" });
+    } catch (e: any) {
+      console.error("Upload error:", e);
+      toast({ title: "❌ Erreur d'upload", variant: "destructive" });
+    } finally {
+      setUploading(null);
+    }
+  };
+
+  const handleImageRemove = async (idx: number) => {
+    const o = local[idx];
+    if (o.imageUrl) {
+      const pathMatch = o.imageUrl.match(/product-photos\/(.+)$/);
+      if (pathMatch) {
+        await supabase.storage.from("product-photos").remove([pathMatch[1]]);
+      }
+    }
+    update(idx, "imageUrl", undefined);
+  };
+
   const save = () => {
-    // Replace all options in context
     local.forEach(o => onUpdate(o.id, o));
-    // Remove options no longer present
     settings.options.forEach((o: OptionEntry) => {
       if (!local.find(l => l.id === o.id)) onRemove(o.id);
     });
-    // Add new options
     local.forEach(o => {
       if (!settings.options.find((s: OptionEntry) => s.id === o.id)) onAdd(o);
     });
@@ -536,6 +564,41 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
                   <div className="md:col-span-2">
                     <Label className="text-xs">Description</Label>
                     <Textarea value={o.description} onChange={e => update(idx, "description", e.target.value)} className="mt-1" rows={2} />
+                  </div>
+                  {/* Image upload */}
+                  <div className="md:col-span-2">
+                    <Label className="text-xs">Image (optionnelle)</Label>
+                    <div className="flex items-center gap-3 mt-1">
+                      {o.imageUrl ? (
+                        <div className="relative group">
+                          <img src={o.imageUrl} alt={o.label} className="w-16 h-16 object-cover rounded-lg border border-gray-200" />
+                          <button
+                            onClick={() => handleImageRemove(idx)}
+                            className="absolute -top-1.5 -right-1.5 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <label className="w-16 h-16 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-gray-400 transition-colors">
+                          {uploading === o.id ? (
+                            <span className="text-[10px] text-gray-400">…</span>
+                          ) : (
+                            <>
+                              <Upload className="w-4 h-4 text-gray-400" />
+                              <span className="text-[9px] text-gray-400 mt-0.5">Photo</span>
+                            </>
+                          )}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={e => { if (e.target.files?.[0]) handleImageUpload(idx, e.target.files[0]); }}
+                          />
+                        </label>
+                      )}
+                      <p className="text-[10px] text-gray-400">Petite image affichée à côté de l'option dans le configurateur</p>
+                    </div>
                   </div>
                   <div>
                     <Label className="text-xs">Badge promo (optionnel)</Label>
