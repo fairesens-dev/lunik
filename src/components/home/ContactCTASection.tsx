@@ -42,9 +42,14 @@ const ContactCTASection = () => {
             >
               Nous appeler
             </Button>
-            <Button disabled className="bg-white/50 text-black/40 px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto cursor-not-allowed">
-              Bientôt
-            </Button>
+            <div className="relative inline-flex">
+              <Button disabled className="border-white/30 text-white/50 px-8 py-5 tracking-[0.15em] uppercase text-sm font-medium h-auto cursor-not-allowed bg-transparent border">
+                Tester
+              </Button>
+              <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-white/20 backdrop-blur-sm text-white text-[10px] font-semibold uppercase tracking-[0.15em] px-2.5 py-0.5 rounded-full">
+                Bientôt
+              </span>
+            </div>
           </div>
         </AnimatedSection>
       </div>
