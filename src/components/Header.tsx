@@ -91,6 +91,7 @@ const Header = ({ bannerOffset = false }: HeaderProps) => {
                     )}
                   >
                     <PackageSearch className="w-5 h-5" />
+                    <span className="text-xs tracking-wide">Suivi de commande</span>
                   </Button>
                 </Link>
               </TooltipTrigger>
