@@ -77,7 +77,7 @@ const SaveConfigCTA = ({ hasValidConfig }: SaveConfigCTAProps) => {
           {status === "loading" ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            "Recevoir ma config →"
+            "Télécharger mon devis →"
           )}
         </Button>
       </div>
