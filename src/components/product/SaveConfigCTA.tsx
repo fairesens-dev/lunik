@@ -31,6 +31,28 @@ const SaveConfigCTA = ({ hasValidConfig, width, projection, toileColor, armature
     try {
       captureEmail(email);
 
+      // Build options list from booleans
+      const optionsList: string[] = [];
+      if (options.motorisation) optionsList.push("Motorisation");
+      if (options.led) optionsList.push("LED");
+      if (options.packConnect) optionsList.push("Pack Connect");
+
+      // Insert lead into Supabase
+      await supabase.from("leads").insert({
+        first_name: "",
+        last_name: "",
+        email,
+        phone: "",
+        width,
+        projection,
+        toile_color: toileColor.label,
+        armature_color: armatureColor.label,
+        options: optionsList,
+        postal_code: "",
+        message: "DEVIS_EMAIL",
+        processed: false,
+      });
+
       const cart = {
         configuration: {
           width,
