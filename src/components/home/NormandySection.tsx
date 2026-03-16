@@ -9,12 +9,19 @@ const NormandySection = () => {
         <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-card via-card to-primary/[0.06] border border-border/60 min-h-[420px] md:min-h-[300px] flex flex-col">
           {/* SVG map as full background */}
           <div className="absolute inset-0 pointer-events-none">
-            <svg viewBox="0 0 500 440" className="w-full h-full opacity-100" fill="none" preserveAspectRatio="xMidYMid meet">
+            <svg viewBox="0 0 500 440" className="w-full h-full" fill="none" preserveAspectRatio="xMidYMid meet">
               <defs>
                 <clipPath id="factory-circle-clip">
                   <circle cx="320" cy="120" r="70" />
                 </clipPath>
               </defs>
+
+              {/* France silhouette */}
+              <path
+                d="M220 30 L260 25 L290 35 L310 30 L340 40 L370 38 L400 50 L420 65 L430 90 L425 120 L435 150 L430 180 L420 200 L410 230 L420 260 L430 290 L425 310 L410 330 L395 350 L380 370 L365 385 L340 400 L310 410 L280 405 L250 395 L220 380 L195 365 L175 345 L160 320 L150 295 L145 270 L148 245 L155 220 L150 195 L140 175 L130 155 L135 130 L145 110 L155 90 L170 70 L190 55 L205 42 Z"
+                className="fill-primary/[0.04] stroke-primary/[0.08]"
+                strokeWidth="1.5"
+              />
 
               {/* Factory image in circle */}
               <image
