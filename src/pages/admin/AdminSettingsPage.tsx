@@ -71,7 +71,7 @@ function GeneralTab() {
         loadSetting("company"),
         loadSetting("gdpr"),
       ]);
-      if (gen) { setSiteUrl(gen.siteUrl || ""); setCurrency(gen.currency || "EUR"); setTimezone(gen.timezone || "Europe/Paris"); }
+      if (gen) { setSiteUrl(gen.siteUrl || ""); setCurrency(gen.currency || "EUR"); setTimezone(gen.timezone || "Europe/Paris"); setTransactionalEmail(gen.transactionalEmail || ""); }
       if (comp) { setTva(comp.tva || ""); setBillingEmail(comp.billingEmail || ""); }
       if (gdpr) { setConsentText(gdpr.consentText || ""); setRetentionPeriod(gdpr.retentionPeriod || "2yr"); }
     })();
