@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/dialog";
 import {
   ArrowLeft, Mail, Phone, Building2, Briefcase, Save, Trash2, Plus,
-  StickyNote, PhoneCall, Eye, FileText, ShoppingCart, X,
+  StickyNote, PhoneCall, Eye, FileText, ShoppingCart, X, Wrench, MessageCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
