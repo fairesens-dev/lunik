@@ -129,6 +129,16 @@ const ContactWidget = () => {
     return () => window.removeEventListener("keydown", h);
   }, [isOpen, closeWidget]);
 
+  useEffect(() => {
+    if (screen !== "sav") return;
+
+    const frame = window.requestAnimationFrame(() => {
+      savEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [screen, savStep, savDone]);
+
   const handleOpen = () => {
     if (!hasOpened) { setHasOpened(true); sessionStorage.setItem("widget_opened", "true"); }
   };
