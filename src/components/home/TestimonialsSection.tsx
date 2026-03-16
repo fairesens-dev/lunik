@@ -82,11 +82,7 @@ const TestimonialsSection = () => {
                 Ce que nos clients<br />en pensent
               </h2>
             </div>
-            <div className="flex items-center gap-3 md:gap-4">
-              <span className="text-sm font-mono text-muted-foreground">
-                {String(currentIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}
-              </span>
-              <div className="flex gap-2">
+            <div className="flex gap-2">
                 <button
                   onClick={() => scroll("left")}
                   disabled={!canScrollLeft}
