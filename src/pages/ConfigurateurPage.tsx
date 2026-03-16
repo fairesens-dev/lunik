@@ -20,7 +20,7 @@ import ToileCloseUpDialog from "@/components/product/ToileCloseUpDialog";
 
 /* ── Témoignage pour la fiche technique ────────────────────────── */
 const TESTIMONIAL = {
-  quote: "« Après 3 étés, la toile n'a pas bougé d'un ton. Qualité Dickson irréprochable. »",
+  quote: "« Après 3 étés, la toile n'a pas bougé. Qualité irréprochable. »",
   author: "Isabelle, Montpellier",
   stars: 5,
 };
@@ -33,22 +33,42 @@ const ConfigurateurPage = () => {
   const { content } = useContent();
   const { productPage } = content;
 
-  useEffect(() => { setStage("configurateur"); }, [setStage]);
+  useEffect(() => {
+    setStage("configurateur");
+  }, [setStage]);
 
   const {
-    width, setWidth, widthValid, widthRangeLabel,
-    projection, setProjection, validProjections,
-    toileColor, setToileColor, armatureColor, setArmatureColor,
-    motorisation, led, pack,
-    selectedOptions, toggleOption,
-    surfaceArea, price, basePrice, installmentPrice, optionsSummary,
-    TOILE_COLORS, ARMATURE_COLORS, PRICING_OPTIONS, settings,
+    width,
+    setWidth,
+    widthValid,
+    widthRangeLabel,
+    projection,
+    setProjection,
+    validProjections,
+    toileColor,
+    setToileColor,
+    armatureColor,
+    setArmatureColor,
+    motorisation,
+    led,
+    pack,
+    selectedOptions,
+    toggleOption,
+    surfaceArea,
+    price,
+    basePrice,
+    installmentPrice,
+    optionsSummary,
+    TOILE_COLORS,
+    ARMATURE_COLORS,
+    PRICING_OPTIONS,
+    settings,
   } = configurator;
 
   const clampWidth = (v: number) => setWidth(Math.min(MAX_WIDTH_CM, Math.max(MIN_WIDTH_CM, v || MIN_WIDTH_CM)));
 
-  const selectedToile = TOILE_COLORS.find(c => c.name === toileColor);
-  const selectedArmature = ARMATURE_COLORS.find(c => c.name === armatureColor);
+  const selectedToile = TOILE_COLORS.find((c) => c.name === toileColor);
+  const selectedArmature = ARMATURE_COLORS.find((c) => c.name === armatureColor);
 
   const currentToile = { hex: selectedToile?.hex || "#fff", label: toileColor, photoUrl: selectedToile?.photoUrl };
   const currentArmature = { hex: selectedArmature?.hex || "#333", label: armatureColor };
@@ -64,8 +84,8 @@ const ConfigurateurPage = () => {
   };
 
   const handleOrder = () => {
-    const toileObj = TOILE_COLORS.find(c => c.name === toileColor);
-    const armatureObj = ARMATURE_COLORS.find(c => c.name === armatureColor);
+    const toileObj = TOILE_COLORS.find((c) => c.name === toileColor);
+    const armatureObj = ARMATURE_COLORS.find((c) => c.name === armatureColor);
 
     setItem({
       productId: "store-coffre",
@@ -95,11 +115,8 @@ const ConfigurateurPage = () => {
   const sortedOptions = [...PRICING_OPTIONS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
   // Contextual sticky bar button label & action
-  const stickyButtonLabel = activeStep === "01"
-    ? "Choisir mes couleurs"
-    : activeStep === "02"
-      ? "Personnaliser les options"
-      : "Commander";
+  const stickyButtonLabel =
+    activeStep === "01" ? "Choisir mes couleurs" : activeStep === "02" ? "Personnaliser les options" : "Commander";
 
   const stickyButtonAction = activeStep === "03" ? handleOrder : goNext;
 
@@ -113,7 +130,10 @@ const ConfigurateurPage = () => {
       {/* Mini header */}
       <header className="sticky top-0 z-50 h-16 bg-background/90 backdrop-blur-xl border-b border-border flex items-center px-4 lg:px-8">
         <div className="flex items-center gap-4 flex-1">
-          <Link to="/" className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors">
+          <Link
+            to="/"
+            className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
+          >
             <ArrowLeft className="w-4 h-4" />
             <span className="text-xs uppercase tracking-[0.15em] font-medium hidden sm:inline">Retour</span>
           </Link>
@@ -126,7 +146,6 @@ const ConfigurateurPage = () => {
 
       {/* Main layout */}
       <div className="grid grid-cols-1 lg:grid-cols-[3fr_2fr] bg-white">
-
         {/* LEFT — Visual panel */}
         <div className="bg-white h-[50vh] lg:h-[calc(100vh-64px)] lg:sticky lg:top-16 lg:self-start overflow-hidden relative flex flex-col">
           <div className="absolute inset-0">
@@ -204,13 +223,15 @@ const ConfigurateurPage = () => {
             <div className="flex items-start gap-6">
               {/* Specs */}
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">Fiche technique — Toile Dickson</p>
+                <p className="text-[11px] uppercase tracking-[0.2em] text-primary font-medium mb-2">
+                  Fiche technique — Toile Dickson
+                </p>
                 <div className="grid grid-cols-3 gap-2">
                   {[
                     { label: "Composition", value: "Acrylique teint masse" },
                     { label: "Certification", value: "OEKO-TEX classe II" },
                     { label: "Garantie toile", value: "10 ans" },
-                  ].map(item => (
+                  ].map((item) => (
                     <div key={item.label} className="bg-background/60 backdrop-blur-sm rounded-lg px-3 py-2">
                       <p className="text-[9px] text-muted-foreground uppercase tracking-wider">{item.label}</p>
                       <p className="text-[11px] font-medium text-foreground mt-0.5">{item.value}</p>
@@ -235,7 +256,6 @@ const ConfigurateurPage = () => {
         {/* RIGHT — Config panel */}
         <div className="bg-background border-l border-border flex flex-col">
           <div className="flex-1 overflow-y-auto p-6 lg:p-10 space-y-0">
-
             {/* Step indicators */}
             <div className="flex gap-2 mb-8">
               {(["01", "02", "03"] as const).map((step, i) => {
@@ -259,7 +279,9 @@ const ConfigurateurPage = () => {
             {/* 01 Dimensions */}
             {activeStep === "01" && (
               <div className="space-y-4">
-                <p className="text-xs text-muted-foreground">Le prix s'adapte en temps réel · Motorisation SOMFY incluse</p>
+                <p className="text-xs text-muted-foreground">
+                  Le prix s'adapte en temps réel · Motorisation SOMFY incluse
+                </p>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-xs text-muted-foreground mb-1 block">Largeur (cm)</label>
@@ -274,7 +296,9 @@ const ConfigurateurPage = () => {
                       className="rounded-lg"
                     />
                     {!widthValid && width > 0 && (
-                      <p className="text-[11px] text-destructive mt-1">Largeur hors plage ({MIN_WIDTH_CM}–{MAX_WIDTH_CM} cm)</p>
+                      <p className="text-[11px] text-destructive mt-1">
+                        Largeur hors plage ({MIN_WIDTH_CM}–{MAX_WIDTH_CM} cm)
+                      </p>
                     )}
                     {widthRangeLabel && (
                       <p className="text-[11px] text-muted-foreground mt-1">Plage : {widthRangeLabel}</p>
@@ -288,15 +312,21 @@ const ConfigurateurPage = () => {
                       </SelectTrigger>
                       <SelectContent>
                         {validProjections.map((p) => (
-                          <SelectItem key={p} value={String(p)}>{p / 10} cm</SelectItem>
+                          <SelectItem key={p} value={String(p)}>
+                            {p / 10} cm
+                          </SelectItem>
                         ))}
                       </SelectContent>
                     </Select>
                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">Surface : <strong>{surfaceArea} m²</strong></p>
+                <p className="text-xs text-muted-foreground">
+                  Surface : <strong>{surfaceArea} m²</strong>
+                </p>
                 {basePrice !== null && (
-                  <p className="text-xs text-primary font-medium">Prix de base : {basePrice.toLocaleString("fr-FR")} € TTC</p>
+                  <p className="text-xs text-primary font-medium">
+                    Prix de base : {basePrice.toLocaleString("fr-FR")} € TTC
+                  </p>
                 )}
               </div>
             )}
@@ -306,7 +336,9 @@ const ConfigurateurPage = () => {
               <div className="space-y-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Toile</p>
-                  <p className="text-xs text-muted-foreground mb-4">Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Orchestra by Dickson · {TOILE_COLORS.length} coloris
+                  </p>
                   <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
                   <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
                 </div>
@@ -318,10 +350,16 @@ const ConfigurateurPage = () => {
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
                   <div className="grid grid-cols-4 gap-3">
                     {ARMATURE_COLORS.map((c) => (
-                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-1.5 group">
+                      <button
+                        key={c.name}
+                        onClick={() => setArmatureColor(c.name)}
+                        className="flex flex-col items-center gap-1.5 group"
+                      >
                         <div
                           className={`w-full aspect-[11/4] rounded-sm border-2 relative transition-all ${
-                            armatureColor === c.name ? "border-primary shadow-md ring-2 ring-primary/30" : "border-border group-hover:border-primary/50"
+                            armatureColor === c.name
+                              ? "border-primary shadow-md ring-2 ring-primary/30"
+                              : "border-border group-hover:border-primary/50"
                           }`}
                           style={{ backgroundColor: c.hex }}
                         >
@@ -331,7 +369,9 @@ const ConfigurateurPage = () => {
                             </div>
                           )}
                         </div>
-                        <span className="text-[9px] text-muted-foreground text-center leading-tight w-full truncate">{c.name}</span>
+                        <span className="text-[9px] text-muted-foreground text-center leading-tight w-full truncate">
+                          {c.name}
+                        </span>
                       </button>
                     ))}
                   </div>
@@ -342,7 +382,9 @@ const ConfigurateurPage = () => {
             {/* 03 Options — refonte marketing */}
             {activeStep === "03" && (
               <div className="space-y-3">
-                <p className="text-xs text-muted-foreground mb-4">Motorisation SOMFY incluse de série · Personnalisez votre store</p>
+                <p className="text-xs text-muted-foreground mb-4">
+                  Motorisation SOMFY incluse de série · Personnalisez votre store
+                </p>
                 {sortedOptions.map((opt) => {
                   const checked = selectedOptions.has(opt.id);
                   const isReduction = opt.price < 0;
@@ -371,37 +413,44 @@ const ConfigurateurPage = () => {
                           {opt.badge}
                         </span>
                       )}
-                        {opt.imageUrl && (
-                          <img
-                            src={opt.imageUrl}
-                            alt={opt.label}
-                            className="w-full h-28 rounded-lg object-cover border border-border mb-2"
-                          />
-                        )}
-                        <div className="flex items-center gap-4">
-                          <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
-                          <div className="flex-1 min-w-0">
-                            <p className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}>
-                              {opt.label}
+                      {opt.imageUrl && (
+                        <img
+                          src={opt.imageUrl}
+                          alt={opt.label}
+                          className="w-full h-28 rounded-lg object-cover border border-border mb-2"
+                        />
+                      )}
+                      <div className="flex items-center gap-4">
+                        <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
+                        <div className="flex-1 min-w-0">
+                          <p
+                            className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}
+                          >
+                            {opt.label}
+                          </p>
+                          <p className="text-xs text-muted-foreground">{opt.description}</p>
+                          {opt.socialProof && !isManual && (
+                            <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
+                              <Star className="w-3 h-3 fill-primary text-primary" />
+                              {opt.socialProof}
                             </p>
-                            <p className="text-xs text-muted-foreground">{opt.description}</p>
-                            {opt.socialProof && !isManual && (
-                              <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
-                                <Star className="w-3 h-3 fill-primary text-primary" />
-                                {opt.socialProof}
-                              </p>
-                            )}
-                          </div>
+                          )}
+                        </div>
                         <div className="text-right shrink-0">
-                          <span className={`text-sm font-semibold whitespace-nowrap ${
-                            isReduction ? "text-muted-foreground" : "text-foreground"
-                          }`}>
-                            {isReduction ? "" : "+"}{opt.price.toLocaleString("fr-FR")} €
+                          <span
+                            className={`text-sm font-semibold whitespace-nowrap ${
+                              isReduction ? "text-muted-foreground" : "text-foreground"
+                            }`}
+                          >
+                            {isReduction ? "" : "+"}
+                            {opt.price.toLocaleString("fr-FR")} €
                           </span>
                         </div>
                       </div>
                       {opt.tip && (
-                        <p className={`text-[11px] pl-14 italic ${isManual ? "text-muted-foreground" : "text-foreground/60"}`}>
+                        <p
+                          className={`text-[11px] pl-14 italic ${isManual ? "text-muted-foreground" : "text-foreground/60"}`}
+                        >
                           {opt.tip}
                         </p>
                       )}
@@ -428,7 +477,9 @@ const ConfigurateurPage = () => {
           {/* Sticky price bar — contextual button */}
           <div className="sticky bottom-0 border-t border-border bg-background/95 backdrop-blur-xl p-3 sm:p-4 lg:p-6">
             {basePrice === null ? (
-              <p className="text-sm text-destructive text-center">Sélectionnez des dimensions valides pour voir le prix.</p>
+              <p className="text-sm text-destructive text-center">
+                Sélectionnez des dimensions valides pour voir le prix.
+              </p>
             ) : (
               <div className="flex items-center gap-3 sm:gap-4">
                 <div className="flex-1 min-w-0">
@@ -436,7 +487,8 @@ const ConfigurateurPage = () => {
                     {price.toLocaleString("fr-FR")} €
                   </p>
                   <p className="text-[10px] sm:text-xs text-muted-foreground mt-1 truncate">
-                    soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {settings.pricing.installmentDivisor}× sans frais
+                    soit {installmentPrice.toLocaleString("fr-FR")} €/mois en {settings.pricing.installmentDivisor}×
+                    sans frais
                   </p>
                 </div>
                 <Button
@@ -451,7 +503,6 @@ const ConfigurateurPage = () => {
           </div>
         </div>
       </div>
-
     </>
   );
 };
