@@ -160,23 +160,28 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">03 — {productPage.stepLabels[2] || "COULEUR DE L'ARMATURE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
                   <div className="flex flex-wrap gap-4">
-                    {ARMATURE_COLORS.map((c) => (
-                      <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
-                        <div
-                          className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
-                            armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
-                          }`}
-                          style={{ backgroundColor: c.hex }}
-                        >
-                          {armatureColor === c.name && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
-                            </div>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
-                      </button>
-                    ))}
+                    {ARMATURE_COLORS.map((c) => {
+                      const swatchStyle: React.CSSProperties = c.photoUrl
+                        ? { backgroundImage: `url(${c.photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" }
+                        : { backgroundColor: c.hex };
+                      return (
+                        <button key={c.name} onClick={() => setArmatureColor(c.name)} className="flex flex-col items-center gap-2 group">
+                          <div
+                            className={`w-20 h-8 rounded-lg border-2 relative transition-all ${
+                              armatureColor === c.name ? "border-primary shadow-md" : "border-border group-hover:border-primary/50"
+                            }`}
+                            style={swatchStyle}
+                          >
+                            {armatureColor === c.name && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Check className="w-4 h-4 text-primary-foreground drop-shadow" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-[10px] text-muted-foreground text-center leading-tight max-w-[80px]">{c.name}</span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

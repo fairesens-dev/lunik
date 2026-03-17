@@ -18,7 +18,7 @@ export function useConfigurator() {
   const activeArmatureColors = useMemo(() => settings.armatureColors.filter(c => c.active), [settings.armatureColors]);
 
   const TOILE_COLORS_COMPAT = useMemo(() => activeToileColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors, photoUrl: c.photoUrl })), [activeToileColors]);
-  const ARMATURE_COLORS_COMPAT = useMemo(() => activeArmatureColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors })), [activeArmatureColors]);
+  const ARMATURE_COLORS_COMPAT = useMemo(() => activeArmatureColors.map(c => ({ name: c.label, hex: c.hex, type: c.type, colors: c.colors, photoUrl: c.photoUrl })), [activeArmatureColors]);
 
   // Use admin options if available, otherwise fallback to hardcoded
   const RESOLVED_OPTIONS: PricingOption[] = useMemo(() => {
