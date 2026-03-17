@@ -72,6 +72,16 @@ serve(async (req) => {
         metadata: { order_number: data.order_number, problem_category: data.problem_category },
       });
 
+      // Insert into leads table
+      await supabase.from("leads").insert({
+        first_name: data.email.split("@")[0],
+        last_name: "",
+        email: data.email,
+        phone: data.phone || "",
+        message: `SAV:${data.problem_category} - ${data.problem_detail}`,
+        processed: false,
+      });
+
       // Look up the order by ref and update it
       let orderFound = false;
       let orderStatus = "";
@@ -171,6 +181,17 @@ serve(async (req) => {
         contact_id: contactId,
         event_name: "callback_requested",
         event_category: "lead",
+      });
+
+      // Insert into leads table
+      await supabase.from("leads").insert({
+        first_name: data.first_name || "Inconnu",
+        last_name: "",
+        email,
+        phone: data.phone || "",
+        message: "RAPPEL",
+        postal_code: data.city || "",
+        processed: false,
       });
 
       return new Response(JSON.stringify({ success: true }), {

@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Package, MessageSquare, Settings2,
   FileEdit, BarChart3, Wrench, LogOut, Bell, ExternalLink,
-  Menu, X, ChevronRight, ShoppingCart, Tag, Users, Mail, Layers, Target,
+  Menu, X, ChevronRight, Tag, Users, Mail, Layers, Target,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -16,9 +16,8 @@ const navGroups = [
     items: [
       { to: "/admin/dashboard", icon: LayoutDashboard, label: "Tableau de bord" },
       { to: "/admin/commandes", icon: Package, label: "Commandes" },
-      { to: "/admin/paniers-abandonnes", icon: ShoppingCart, label: "Paniers abandonnés" },
       { to: "/admin/leads", icon: MessageSquare, label: "Leads", badge: 3 },
-      { to: "/admin/contacts", icon: Users, label: "Contacts" },
+      { to: "/admin/contacts", icon: Users, label: "Clients" },
     ],
   },
   {
@@ -49,13 +48,12 @@ const navGroups = [
 const routeTitles: Record<string, string> = {
   "/admin/dashboard": "Tableau de bord",
   "/admin/commandes": "Commandes",
-  "/admin/paniers-abandonnes": "Paniers abandonnés",
   "/admin/leads": "Leads",
   "/admin/configurateur": "Configurateur",
   "/admin/contenu": "Contenu",
   "/admin/marketing": "Marketing",
   "/admin/tracking": "Tracking",
-  "/admin/contacts": "Contacts",
+  "/admin/contacts": "Clients",
   "/admin/campaigns": "Campagnes",
   "/admin/scoring": "Scoring",
   "/admin/modals": "Modals",
