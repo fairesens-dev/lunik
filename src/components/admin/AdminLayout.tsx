@@ -48,7 +48,6 @@ const navGroups = [
 const routeTitles: Record<string, string> = {
   "/admin/dashboard": "Tableau de bord",
   "/admin/commandes": "Commandes",
-  "/admin/paniers-abandonnes": "Paniers abandonnés",
   "/admin/leads": "Leads",
   "/admin/configurateur": "Configurateur",
   "/admin/contenu": "Contenu",
