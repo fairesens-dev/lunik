@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
+import trustpilotBadge from "@/assets/trustpilot-badge.webp";
 import { useTrustpilot } from "@/hooks/useTrustpilot";
 import { useContent } from "@/contexts/ContentContext";
 import { Star, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
