@@ -10,6 +10,7 @@ interface ToileColor {
   type?: string;
   colors?: string[];
   photoUrl?: string;
+  refCode?: string;
 }
 
 interface ToileColorSelectorProps {
