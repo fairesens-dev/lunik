@@ -1,7 +1,7 @@
 /* Configurator Settings Context — v3 */
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { parseToileColorLabel } from "@/lib/parseToileColorLabel";
+import { parseToileColorLabel, parseToileRefCode } from "@/lib/parseToileColorLabel";
 import { setPriceGrid, getDefaultPriceGrid, setWidthRanges, setProjections, getDefaultWidthRanges, getDefaultProjections, type WidthRange } from "@/lib/pricingTable";
 
 /* ─── Types ──────────────────────────────────────────── */
