@@ -106,15 +106,48 @@ export function useConfigurator() {
 
   const installmentPrice = useMemo(() => Math.round(price / (settings.pricing.installmentDivisor || 3)), [price, settings.pricing.installmentDivisor]);
 
-  // Toggle an option
+  // Toggle an option with incompatibility logic
   const toggleOption = (id: string) => {
     setSelectedOptions(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+        // Remove incompatible options (bidirectional)
+        const toggled = RESOLVED_OPTIONS.find(o => o.id === id);
+        if (toggled?.incompatibleWith) {
+          for (const incompId of toggled.incompatibleWith) next.delete(incompId);
+        }
+        // Also check other options that declare this one as incompatible
+        for (const opt of RESOLVED_OPTIONS) {
+          if (opt.id !== id && opt.incompatibleWith?.includes(id) && next.has(opt.id)) {
+            next.delete(opt.id);
+          }
+        }
+      }
       return next;
     });
   };
+
+  // Build incompatibility map for UI hints
+  const getIncompatibleReason = useMemo(() => {
+    return (optId: string): string | null => {
+      for (const sel of Array.from(safeSelectedOptions)) {
+        const selOpt = RESOLVED_OPTIONS.find(o => o.id === sel);
+        if (selOpt?.incompatibleWith?.includes(optId)) return selOpt.label;
+      }
+      const opt = RESOLVED_OPTIONS.find(o => o.id === optId);
+      if (opt?.incompatibleWith) {
+        for (const incompId of opt.incompatibleWith) {
+          if (safeSelectedOptions.has(incompId)) {
+            return RESOLVED_OPTIONS.find(o => o.id === incompId)?.label || null;
+          }
+        }
+      }
+      return null;
+    };
+  }, [safeSelectedOptions, RESOLVED_OPTIONS]);
 
   // Surface area for display
   const surfaceArea = useMemo(() => parseFloat(((widthCm / 100) * (projectionMm / 1000)).toFixed(2)), [widthCm, projectionMm]);
