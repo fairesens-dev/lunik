@@ -30,6 +30,7 @@ export interface ColorEntry {
   label: string;
   active: boolean;
   photoUrl?: string;
+  refCode?: string;
   type?: "solid" | "textured" | "striped";
   colors?: string[];
 }
