@@ -103,7 +103,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                       )}
                     </div>
                     <span className="text-[9px] text-muted-foreground text-center leading-tight w-full truncate">
-                      {c.name}
+                      {c.name}{c.refCode && ` (${c.refCode})`}
                     </span>
                   </button>
                 ))}
