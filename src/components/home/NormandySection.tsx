@@ -19,8 +19,8 @@ const NormandySection = () => {
             alt="Atelier LuniK Perpignan"
             className="absolute inset-0 w-full h-full object-cover hidden md:block"
           />
-          {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 bg-black/40" />
+          {/* Gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 md:bg-gradient-to-r md:from-black/60 md:to-transparent" />
 
           {/* Content - centered on mobile, right-third on desktop */}
           <div className="relative z-10 flex items-end justify-center md:justify-end p-6 md:p-8 flex-1">
