@@ -40,7 +40,7 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
   const currentOptions = { motorisation, led, packConnect: pack };
 
   return (
-    <section id="configurator" className="py-16 lg:py-20 bg-background">
+    <section id="configurator" className="py-16 lg:py-20 bg-white">
       <div className="max-w-[1280px] mx-auto px-6 lg:px-12">
         {/* Intro */}
         <AnimatedSection>
