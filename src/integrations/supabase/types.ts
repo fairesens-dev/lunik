@@ -421,6 +421,42 @@ export type Database = {
           },
         ]
       }
+      generated_visuals: {
+        Row: {
+          armature_color_hex: string
+          cache_key: string
+          created_at: string
+          id: string
+          led: boolean
+          public_url: string
+          storage_path: string
+          toile_color_hex: string
+          toile_photo_url: string | null
+        }
+        Insert: {
+          armature_color_hex: string
+          cache_key: string
+          created_at?: string
+          id?: string
+          led?: boolean
+          public_url: string
+          storage_path: string
+          toile_color_hex: string
+          toile_photo_url?: string | null
+        }
+        Update: {
+          armature_color_hex?: string
+          cache_key?: string
+          created_at?: string
+          id?: string
+          led?: boolean
+          public_url?: string
+          storage_path?: string
+          toile_color_hex?: string
+          toile_photo_url?: string | null
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           armature_color: string | null
