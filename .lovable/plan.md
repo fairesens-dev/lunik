@@ -1,189 +1,100 @@
 
 
-## Plan : Rebranding Total LuniK — Direction Solaire & Moderne
+# Plan : Système de cache d'images avec édition sur image de base
 
-### Tendances 2026 integrées
-- **Warm maximalism** : palettes chaudes (ambre/safran/corail) remplaçant les tons froids/sage
-- **Rounded UI** : `border-radius` généreux partout (boutons, cartes, inputs) — fin de l'ère sharp/brutalist
-- **Micro-interactions** : hover effects plus expressifs, transitions fluides
-- **Gradients subtils** : fonds avec gradients warm, pas aplats
-- **Typography contrast** : titres très gras + body léger, tailles plus grandes
-- **Dark sections inversées** : sections hero/CTA avec fond sombre + accents lumineux
-- **Glass morphism léger** : header translucide avec blur
+## Problème
+Chaque sélection de couleur génère une image from scratch via l'IA, ce qui coûte cher en crédits. Aucune persistance entre sessions.
 
----
-
-### 1. Nouvelle palette de couleurs (`src/index.css`)
-
-Remplacement complet des CSS variables :
+## Architecture proposée
 
 ```text
-AVANT (sage/ecru)              →  APRÈS (solaire/ambre)
-─────────────────────────────────────────────────────────
---primary: 100 24% 30% (sage)  →  35 95% 55% (ambre doré #F5A623)
---accent-light: 100 18% 55%    →  25 90% 58% (orange chaud #E8742A)
---background: 37 33% 93%       →  40 40% 97% (crème chaud #FAF7F2)
---card: 50 20% 97%             →  35 35% 95% (sable clair #F5F0E8)
---foreground: 0 0% 10%         →  20 15% 12% (brun profond)
---muted-fg: 0 0% 42%           →  25 10% 45% (brun moyen)
---border: 30 16% 87%           →  30 25% 88% (sable border)
---ring: 100 24% 30%            →  35 95% 55% (ambre)
---destructive: inchangé
+┌─ Frontend (DynamicProductVisual) ─┐
+│  appelle generate-store-image      │
+│  avec toileHex, armatureHex, led   │
+└──────────┬─────────────────────────┘
+           ▼
+┌─ Edge Function ───────────────────┐
+│ 1. Lookup dans generated_visuals  │
+│    → trouvé ? retourne l'URL      │
+│ 2. Sinon : envoie image de base   │
+│    + prompt d'édition à Gemini    │
+│ 3. Upload résultat dans Storage   │
+│ 4. Insert dans generated_visuals  │
+│ 5. Retourne l'URL publique        │
+└───────────────────────────────────┘
 ```
 
-Mode dark ajusté avec ambre/orange en accents lumineux sur fond sombre.
+## Étapes
 
-### 2. Typographie (`tailwind.config.ts` + `index.css`)
+### 1. Uploader l'image de base
+L'utilisateur devra fournir le fichier "Store Coffre Rayy LUNIK (67).jpg". On le stockera dans le bucket `product-photos` sous `base/store-base.jpg`.
 
-- Headlines : **"Playfair Display"** (plus moderne que Cormorant Garamond, plus de poids)
-- Body : **"DM Sans"** (plus rond et chaleureux qu'Inter)
-- Import Google Fonts dans `index.html`
-- `--radius: 0rem` → `--radius: 0.75rem` (tout arrondi)
+### 2. Créer la table `generated_visuals`
+```sql
+CREATE TABLE public.generated_visuals (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  cache_key text UNIQUE NOT NULL,
+  toile_color_hex text NOT NULL,
+  armature_color_hex text NOT NULL,
+  led boolean NOT NULL DEFAULT false,
+  toile_photo_url text,
+  storage_path text NOT NULL,
+  public_url text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
 
-### 3. Boutons (`src/components/ui/button.tsx`)
+ALTER TABLE public.generated_visuals ENABLE ROW LEVEL SECURITY;
 
-- `rounded-md` → `rounded-full` pour les CTA principaux
-- Nouveau variant "gradient" : `bg-gradient-to-r from-amber-500 to-orange-500 text-white`
-- Padding plus généreux, shadow sur hover
-- Suppression de `rounded-none` dans TOUS les composants (Header, Hero, Configurator, Footer, etc.)
+-- Lecture publique (le configurateur est public)
+CREATE POLICY "Public can read generated_visuals"
+  ON public.generated_visuals FOR SELECT TO public
+  USING (true);
 
-### 4. Header (`src/components/Header.tsx`)
+-- Insert/delete réservés aux edge functions (service role)
+CREATE POLICY "Service role can insert generated_visuals"
+  ON public.generated_visuals FOR INSERT TO service_role
+  WITH CHECK (true);
+```
 
-- Background : glass morphism `bg-background/80 backdrop-blur-xl`
-- Logo : potentiellement teinter avec les nouvelles couleurs (via CSS filter ou nouveau logo)
-- CTA header : bouton gradient arrondi avec micro-shadow
-- Mobile menu : fond gradient warm au lieu d'aplat
+Le `cache_key` sera : `{toileHex}-{armatureHex}-{led}-{toilePhotoUrl||""}`.
 
-### 5. Hero Section (`src/components/home/HeroSection.tsx`)
+### 3. Modifier l'Edge Function `generate-store-image`
 
-- Fond gauche : gradient radial warm (ambre → crème) au lieu d'aplat
-- Badge "4.9/5 Trustpilot" : pastille arrondie avec fond ambre/10
-- CTA : bouton gradient arrondi + shadow glow ambre
-- Overline : couleur ambre au lieu de sage
-- Trust badges en bas : icônes rondes avec fond ambre clair
+**Nouveau flux :**
+1. Construire le `cache_key`
+2. Query `generated_visuals` avec le service role client — si trouvé, retourner `public_url`
+3. Sinon, récupérer l'URL publique de l'image de base depuis le bucket `product-photos/base/store-base.jpg`
+4. Appeler Gemini en mode **édition d'image** (envoyer l'image de base + prompt d'édition) au lieu de générer from scratch
+5. Décoder le base64, uploader dans `product-photos/generated/{cache_key}.png`
+6. Insérer dans `generated_visuals`
+7. Retourner l'URL publique
 
-### 6. Marquee Section (`src/components/home/MarqueeSection.tsx`)
+**Prompt d'édition** (au lieu de génération) :
+```
+Edit this photograph of a retractable awning:
+- Change the fabric/canvas color to {toileColorLabel} ({toileColorHex})
+- Change the aluminum frame color to {armatureColorLabel} ({armatureColorHex})
+- {LED instruction}
+Keep everything else identical. Do not add text or watermarks.
+```
 
-- Background : `bg-gradient-to-r from-amber-500 via-orange-400 to-amber-500`
-- Texte blanc
+Si `toilePhotoUrl` est fourni (motif/rayure), l'image de la toile est aussi envoyée en référence.
 
-### 7. Product Highlight (`src/components/home/ProductHighlightSection.tsx`)
+### 4. Simplifier le Frontend `DynamicProductVisual.tsx`
 
-- Badge "Fabriqué en France" : fond arrondi gradient au lieu de bg-primary/10
-- Bouton CTA gradient arrondi
-- Image : `rounded-2xl` avec shadow
+- Supprimer le cache in-memory `imageCache` (le cache est maintenant côté serveur)
+- Le composant appelle toujours l'edge function, mais celle-ci retourne instantanément si l'image est en cache
+- Garder le debounce de 800ms
 
-### 8. Features Section (`src/components/product/ProductFeaturesSection.tsx`)
+### 5. Nettoyage
 
-- Icônes dans cercles avec fond ambre/10
-- Cartes avec `rounded-xl` et subtle shadow
+- Le bucket `product-photos` a déjà un sous-dossier. On ajoute `generated/` pour les images générées et `base/` pour l'image source.
 
-### 9. Fabric Section (`src/components/home/FabricSection.tsx`)
+## Détails techniques
 
-- Checkmarks : couleur ambre
-- Image : `rounded-2xl`
-- Specs : badges arrondis
-
-### 10. Values Section (`src/components/home/ValuesSection.tsx`)
-
-- Cercles icônes : gradient ambre au lieu de bg-primary/10
-- Cartes avec hover lift effect
-
-### 11. Configurateur (`src/components/product/ConfiguratorSection.tsx`)
-
-- Card : `rounded-2xl` avec shadow-lg
-- Badge "Configurateur" : pastille gradient ambre
-- Inputs : `rounded-lg`
-- Options switches : accent ambre
-- Prix : grande typo ambre/orange
-- CTA "Commander" : bouton gradient full-width avec glow
-- Trust badges : pastilles arrondies
-
-### 12. Gallery Section (`src/components/home/GallerySection.tsx`)
-
-- Images : `rounded-xl` avec overlay gradient warm
-- Caption : fond avec blur + rounded
-
-### 13. Testimonials (`src/components/home/TestimonialsSection.tsx`)
-
-- Cartes : `rounded-xl shadow-md`
-- Avatar : cercle avec border ambre
-- Navigation arrows : cercles avec fond gradient
-
-### 14. Process Section (`src/components/home/ProcessSection.tsx`)
-
-- Steps : cercles numérotés avec gradient ambre au lieu d'emojis
-- Ligne de connexion : gradient ambre
-- Texte step : style badge arrondi
-
-### 15. FAQ Section (`src/components/home/FAQSection.tsx`)
-
-- Accordion : `rounded-xl` avec hover state ambre
-
-### 16. Contact CTA (`src/components/home/ContactCTASection.tsx`)
-
-- Background : gradient dark → ambre subtil au lieu de gris
-- Boutons arrondis
-
-### 17. Footer (`src/components/Footer.tsx`)
-
-- Background : brun profond chaud au lieu de noir pur
-- Accents ambre pour les liens hover
-- Badge "Fabriqué en France" arrondi avec border ambre
-
-### 18. Contact Widget (`src/components/ContactWidget.tsx`)
-
-- FAB : gradient ambre arrondi avec glow
-- Popup : `rounded-2xl`
-- Header : gradient ambre
-
-### 19. Exit Intent Popup (`src/components/ExitIntentPopup.tsx`)
-
-- Modal : `rounded-2xl`
-- CTA : gradient button
-- Background overlay : teinté chaud
-
-### 20. Promo Banner (`src/components/PromoBanner.tsx`)
-
-- Style : gradient ambre → orange
-
-### 21. Cookie Banner (`src/components/CookieBanner.tsx`)
-
-- Arrondi, bouton accent ambre
-
----
-
-### Fichiers modifiés (22 fichiers)
-
-| Fichier | Changements |
-|---|---|
-| `index.html` | Google Fonts (Playfair Display + DM Sans) |
-| `src/index.css` | Palette complète (CSS variables) + radius |
-| `tailwind.config.ts` | fontFamily, nouveaux keyframes |
-| `src/components/ui/button.tsx` | Nouveau variant "gradient", rounded |
-| `src/components/Header.tsx` | Glass morphism, bouton gradient |
-| `src/components/home/HeroSection.tsx` | Gradient fond, CTA gradient, badges |
-| `src/components/home/MarqueeSection.tsx` | Fond gradient ambre |
-| `src/components/home/ProductHighlightSection.tsx` | Arrondis, badge, CTA |
-| `src/components/home/FabricSection.tsx` | Arrondis, checks ambre |
-| `src/components/home/ValuesSection.tsx` | Icônes gradient, hover lift |
-| `src/components/product/ProductFeaturesSection.tsx` | Cartes arrondies |
-| `src/components/product/ConfiguratorSection.tsx` | Card arrondie, gradient CTA, inputs |
-| `src/components/home/GallerySection.tsx` | Images arrondies |
-| `src/components/home/TestimonialsSection.tsx` | Cartes arrondies, avatars |
-| `src/components/home/ProcessSection.tsx` | Steps numérotés, gradient |
-| `src/components/home/FAQSection.tsx` | Accordion arrondi |
-| `src/components/home/ContactCTASection.tsx` | Gradient fond, boutons |
-| `src/components/Footer.tsx` | Brun chaud, accents ambre |
-| `src/components/ContactWidget.tsx` | FAB gradient, popup arrondie |
-| `src/components/ExitIntentPopup.tsx` | Modal arrondie, CTA gradient |
-| `src/components/PromoBanner.tsx` | Gradient |
-| `src/components/CookieBanner.tsx` | Arrondis |
-
-### Approche d'implémentation
-
-Phase 1 : Fondations (index.html, index.css, tailwind.config.ts, button.tsx) — palette + typo + radius
-Phase 2 : Layout (Header, Footer, Layout, PromoBanner, CookieBanner)
-Phase 3 : Sections home (Hero → Contact CTA, dans l'ordre de la page)
-Phase 4 : Configurateur + widgets (ConfiguratorSection, ContactWidget, ExitIntentPopup)
+- **Modèle** : `google/gemini-2.5-flash-image` en mode édition (image + texte en entrée)
+- **Stockage** : bucket `product-photos` (déjà public)
+- **Table** : `generated_visuals` avec index unique sur `cache_key`
+- **Service role** : l'edge function utilise `SUPABASE_SERVICE_ROLE_KEY` pour insérer dans la table (RLS bloque les inserts anonymes)
+- **Coût** : une seule génération par combinaison couleur/armature/LED, puis gratuit à vie
 
