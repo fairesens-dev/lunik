@@ -181,6 +181,7 @@ export function useConfigurator() {
     toggleOption,
     // Compat flags for visual
     motorisation, led, pack,
+    getIncompatibleReason,
     handleMotorisationToggle: () => {},
     handleLedToggle: () => {},
     handlePackToggle: () => {},
