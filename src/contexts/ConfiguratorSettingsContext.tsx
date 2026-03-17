@@ -45,6 +45,8 @@ export interface OptionEntry {
   highlight: boolean;
   savingsLabel?: string;
   includesIds?: string[];
+  incompatibleWith?: string[];
+  defaultSelected?: boolean;
   imageUrl?: string;
   tip?: string;
   socialProof?: string;

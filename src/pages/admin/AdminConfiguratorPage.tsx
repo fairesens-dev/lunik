@@ -564,6 +564,13 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
     setLocal(next);
   };
 
+  const toggleIncompatible = (idx: number, targetId: string) => {
+    const next = [...local];
+    const ids = next[idx].incompatibleWith || [];
+    next[idx].incompatibleWith = ids.includes(targetId) ? ids.filter(i => i !== targetId) : [...ids, targetId];
+    setLocal(next);
+  };
+
   const addNew = () => {
     const id = `option-${Date.now()}`;
     setLocal([...local, { id, icon: "🔧", label: "Nouvelle option", description: "", price: 0, active: true, highlight: false }]);
@@ -693,17 +700,32 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
                     <Label className="text-xs">Badge promo (optionnel)</Label>
                     <Input value={o.savingsLabel || ""} onChange={e => update(idx, "savingsLabel", e.target.value || undefined)} className="mt-1" placeholder="ex: ÉCONOMISEZ 90 €" />
                   </div>
-                  <div className="flex items-center gap-3 pt-5">
+                <div className="flex items-center gap-3 pt-5">
                     <Checkbox checked={o.highlight} onCheckedChange={v => update(idx, "highlight", !!v)} />
                     <Label className="text-xs">Mise en avant (highlight)</Label>
+                  </div>
+                  <div className="flex items-center gap-3 pt-2">
+                    <Checkbox checked={o.defaultSelected || false} onCheckedChange={v => update(idx, "defaultSelected", !!v)} />
+                    <Label className="text-xs">Cochée par défaut (incluse)</Label>
                   </div>
                 </div>
                 <div>
                   <Label className="text-xs text-gray-500">Inclut les options :</Label>
-                  <div className="flex gap-4 mt-1">
+                  <div className="flex gap-4 mt-1 flex-wrap">
                     {local.filter(other => other.id !== o.id).map(other => (
                       <label key={other.id} className="flex items-center gap-1.5 text-xs">
                         <Checkbox checked={(o.includesIds || []).includes(other.id)} onCheckedChange={() => toggleInclude(idx, other.id)} />
+                        {other.label}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-red-500">Incompatible avec :</Label>
+                  <div className="flex gap-4 mt-1 flex-wrap">
+                    {local.filter(other => other.id !== o.id).map(other => (
+                      <label key={other.id} className="flex items-center gap-1.5 text-xs">
+                        <Checkbox checked={(o.incompatibleWith || []).includes(other.id)} onCheckedChange={() => toggleIncompatible(idx, other.id)} />
                         {other.label}
                       </label>
                     ))}

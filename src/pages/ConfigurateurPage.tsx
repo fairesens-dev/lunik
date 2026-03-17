@@ -54,6 +54,7 @@ const ConfigurateurPage = () => {
     pack,
     selectedOptions,
     toggleOption,
+    getIncompatibleReason,
     surfaceArea,
     price,
     basePrice,
@@ -390,6 +391,8 @@ const ConfigurateurPage = () => {
                   const isReduction = opt.price < 0;
                   const isPremium = opt.highlight || (opt.badge && !isReduction);
                   const isManual = opt.id === "manoeuvre-manuelle";
+                  const incompatibleWith = getIncompatibleReason(opt.id);
+                  const isBlocked = !checked && !!incompatibleWith;
 
                   return (
                     <div
@@ -427,8 +430,16 @@ const ConfigurateurPage = () => {
                             className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}
                           >
                             {opt.label}
+                            {opt.defaultSelected && opt.price === 0 && (
+                              <span className="ml-2 text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">INCLUS</span>
+                            )}
                           </p>
                           <p className="text-xs text-muted-foreground">{opt.description}</p>
+                          {isBlocked && (
+                            <p className="text-[11px] text-amber-600 mt-0.5 flex items-center gap-1">
+                              ⚠ Incompatible avec {incompatibleWith}
+                            </p>
+                          )}
                           {opt.socialProof && !isManual && (
                             <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
                               <Star className="w-3 h-3 fill-primary text-primary" />
@@ -442,8 +453,7 @@ const ConfigurateurPage = () => {
                               isReduction ? "text-muted-foreground" : "text-foreground"
                             }`}
                           >
-                            {isReduction ? "" : "+"}
-                            {opt.price.toLocaleString("fr-FR")} €
+                            {opt.price === 0 ? "Inclus" : `${isReduction ? "" : "+"}${opt.price.toLocaleString("fr-FR")} €`}
                           </span>
                         </div>
                       </div>
