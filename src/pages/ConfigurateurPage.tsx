@@ -335,17 +335,6 @@ const ConfigurateurPage = () => {
             {activeStep === "02" && (
               <div className="space-y-6">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Toile</p>
-                  <p className="text-xs text-muted-foreground mb-4">
-                    Orchestra by Dickson · {TOILE_COLORS.length} coloris
-                  </p>
-                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
-                  <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
-                </div>
-
-                <div className="border-t border-border/50" />
-
-                <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Armature</p>
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
                   <div className="grid grid-cols-4 gap-3">
@@ -375,6 +364,17 @@ const ConfigurateurPage = () => {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                <div className="border-t border-border/50" />
+
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground mb-1">Toile</p>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Orchestra by Dickson · {TOILE_COLORS.length} coloris
+                  </p>
+                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
+                  <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
                 </div>
               </div>
             )}
