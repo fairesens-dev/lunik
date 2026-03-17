@@ -44,6 +44,8 @@ const NormandySection = () => {
             </div>
           </div>
         </div>
+      </AnimatedSection>
+    </div>
   );
 };
 
