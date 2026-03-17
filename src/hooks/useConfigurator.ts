@@ -49,8 +49,24 @@ export function useConfigurator() {
   const [toileColor, setToileColor] = useState(activeToileColors[0]?.label || "Blanc Écru");
   const [armatureColor, setArmatureColor] = useState(activeArmatureColors[0]?.label || "Blanc RAL 9016");
 
-  // Options — set of selected option IDs
-  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(new Set());
+  // Options — set of selected option IDs, init with defaultSelected
+  const defaultSelectedIds = useMemo(() => {
+    const ids = new Set<string>();
+    for (const opt of RESOLVED_OPTIONS) {
+      if (opt.defaultSelected) ids.add(opt.id);
+    }
+    return ids;
+  }, [RESOLVED_OPTIONS]);
+
+  const [selectedOptions, setSelectedOptions] = useState<Set<string>>(defaultSelectedIds);
+
+  // Sync defaults when RESOLVED_OPTIONS change (e.g. after admin settings load)
+  useEffect(() => {
+    setSelectedOptions(prev => {
+      if (prev.size === 0 && defaultSelectedIds.size > 0) return defaultSelectedIds;
+      return prev;
+    });
+  }, [defaultSelectedIds]);
 
   const widthMm = widthCm * 10;
 
