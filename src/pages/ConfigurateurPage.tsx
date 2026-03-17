@@ -345,6 +345,7 @@ const ConfigurateurPage = () => {
                     <span className="flex items-center gap-1"><RotateCcw className="w-3 h-3 text-primary" /><strong>Inclinaison</strong> ≥ 15°</span>
                   </div>
                 </div>
+              </div>
             )}
 
             {/* 02 Couleurs (Toile + Armature) */}
