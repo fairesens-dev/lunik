@@ -470,18 +470,35 @@ const ConfigurateurPage = () => {
               </div>
             )}
 
-            <div className="mt-10 border-t border-border pt-8">
-              <SaveConfigCTA
-                hasValidConfig={widthValid && basePrice !== null}
-                width={width}
-                projection={projection}
-                toileColor={{ label: toileColor }}
-                armatureColor={{ label: armatureColor }}
-                options={currentOptions}
-                price={price}
-                basePrice={basePrice}
-              />
-            </div>
+            {activeStep === "01" ? (
+              <div className="mt-10 border-t border-border pt-8">
+                <div className="border border-border rounded-xl bg-secondary/30 p-5 space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Ruler className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-foreground">Astuces pour bien mesurer</span>
+                  </div>
+                  <ul className="text-xs text-muted-foreground space-y-2">
+                    <li>→ Prévoyez un débord de <strong>~40 cm</strong> de chaque côté de la zone à ombrager</li>
+                    <li>→ L'avancée correspond à la profondeur d'ombre souhaitée au sol</li>
+                    <li>→ Hauteur de pose recommandée : <strong>~2 m minimum</strong> sous le coffre</li>
+                    <li>→ Inclinaison standard : environ <strong>15°</strong> pour un bon écoulement de l'eau</li>
+                  </ul>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-10 border-t border-border pt-8">
+                <SaveConfigCTA
+                  hasValidConfig={widthValid && basePrice !== null}
+                  width={width}
+                  projection={projection}
+                  toileColor={{ label: toileColor }}
+                  armatureColor={{ label: armatureColor }}
+                  options={currentOptions}
+                  price={price}
+                  basePrice={basePrice}
+                />
+              </div>
+            )}
           </div>
 
           {/* Sticky price bar — contextual button */}
