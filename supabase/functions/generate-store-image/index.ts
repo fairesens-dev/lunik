@@ -40,9 +40,21 @@ serve(async (req) => {
       });
     }
 
-    // 2. Get base image public URL
-    const { data: baseUrlData } = supabase.storage.from(BUCKET).getPublicUrl(BASE_IMAGE_PATH);
-    const baseImageUrl = baseUrlData.publicUrl;
+    // 2. Download base image and convert to base64 (Gemini can't always fetch URLs)
+    const { data: baseFileData, error: baseFileError } = await supabase.storage
+      .from(BUCKET)
+      .download(BASE_IMAGE_PATH);
+
+    if (baseFileError || !baseFileData) {
+      console.error("Base image not found in storage:", baseFileError);
+      return new Response(JSON.stringify({ error: "Base image not found. Please upload store-base.jpg to product-photos/base/" }), {
+        status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const baseImageBuffer = new Uint8Array(await baseFileData.arrayBuffer());
+    const baseImageB64 = btoa(String.fromCharCode(...baseImageBuffer));
+    const baseImageUrl = `data:image/jpeg;base64,${baseImageB64}`;
 
     // 3. Call Gemini to edit the base image
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
