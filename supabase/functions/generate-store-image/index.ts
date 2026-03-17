@@ -52,9 +52,17 @@ serve(async (req) => {
       });
     }
 
-    const baseImageBuffer = new Uint8Array(await baseFileData.arrayBuffer());
-    const baseImageB64 = btoa(String.fromCharCode(...baseImageBuffer));
-    const baseImageUrl = `data:image/jpeg;base64,${baseImageB64}`;
+    // Convert to base64 in chunks to avoid stack overflow
+    const bytes = new Uint8Array(await baseFileData.arrayBuffer());
+    const CHUNK = 8192;
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += CHUNK) {
+      const slice = bytes.subarray(i, Math.min(i + CHUNK, bytes.length));
+      for (let j = 0; j < slice.length; j++) {
+        binary += String.fromCharCode(slice[j]);
+      }
+    }
+    const baseImageUrl = `data:image/jpeg;base64,${btoa(binary)}`;
 
     // 3. Call Gemini to edit the base image
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
