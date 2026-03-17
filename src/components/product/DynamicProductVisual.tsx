@@ -15,13 +15,6 @@ interface DynamicProductVisualProps {
   onLedToggle?: (led: boolean) => void;
 }
 
-// In-memory cache for generated images
-const imageCache = new Map<string, string>();
-
-function cacheKey(toileHex: string, armatureHex: string, led: boolean, photoUrl?: string) {
-  return `${toileHex}-${armatureHex}-${led}-${photoUrl || ""}`;
-}
-
 const DynamicProductVisual = ({
   toileColor,
   armatureColor,
@@ -39,18 +32,6 @@ const DynamicProductVisual = ({
   const abortRef = useRef<AbortController>();
 
   const generateImage = useCallback(async (toileHex: string, toileLabel: string, armatureHex: string, armatureLabel: string, led: boolean, photoUrl?: string) => {
-    const key = cacheKey(toileHex, armatureHex, led, photoUrl);
-
-    // Check cache first
-    if (imageCache.has(key)) {
-      setImageUrl(imageCache.get(key)!);
-      setImageLoaded(true);
-      setLoading(false);
-      setError(false);
-      return;
-    }
-
-    // Abort previous request
     abortRef.current?.abort();
     abortRef.current = new AbortController();
 
@@ -72,9 +53,7 @@ const DynamicProductVisual = ({
 
       if (fnError) throw fnError;
       if (data?.imageUrl) {
-        imageCache.set(key, data.imageUrl);
         setImageUrl(data.imageUrl);
-        // Don't set loading=false yet — wait for onLoad
         setError(false);
       } else {
         throw new Error("No image returned");
@@ -121,7 +100,7 @@ const DynamicProductVisual = ({
       )}
       style={fillContainer ? undefined : { aspectRatio: "1.5/2" }}
     >
-      {/* Loading skeleton — shown until image is fully loaded */}
+      {/* Loading skeleton */}
       {!isVisible && !error && (
         <div className="absolute inset-0 z-10">
           <Skeleton className="absolute inset-0 w-full h-full" />
@@ -134,7 +113,7 @@ const DynamicProductVisual = ({
         </div>
       )}
 
-      {/* AI-generated image (hidden until onLoad fires) */}
+      {/* Image */}
       {imageUrl && (
         <img
           src={imageUrl}
