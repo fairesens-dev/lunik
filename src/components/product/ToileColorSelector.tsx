@@ -61,7 +61,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
         className="w-full"
       >
         {categorized.map((group) => (
-          <AccordionItem key={group.category} value={group.category} className="border-border">
+          <AccordionItem key={group.category} value={group.category} className="border-border last:border-b-0">
             <AccordionTrigger className="text-sm py-3 hover:no-underline">
               <span className="flex items-center gap-2">
                 <span className="font-medium">{CATEGORY_LABELS[group.category]}</span>
