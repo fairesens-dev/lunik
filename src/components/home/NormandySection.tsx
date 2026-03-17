@@ -24,7 +24,7 @@ const NormandySection = () => {
 
           {/* Content - centered on mobile, right-third on desktop */}
           <div className="relative z-10 flex items-end md:items-center justify-center md:justify-start p-6 md:p-8 flex-1">
-            <div className="max-w-sm text-center md:text-left md:w-1/3">
+            <div className="max-w-sm text-center md:text-left">
               <div className="flex items-center gap-2 mb-3 justify-center md:justify-start">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                   <MapPin className="w-4 h-4 text-white" />
