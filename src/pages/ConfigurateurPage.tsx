@@ -165,7 +165,7 @@ const ConfigurateurPage = () => {
             <div className="relative">
               <button
                 disabled
-                className="h-[34px] px-3 bg-background/60 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm cursor-not-allowed opacity-70"
+                className="h-[34px] px-3 bg-background/60 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm cursor-not-allowed opacity-100"
               >
                 <Camera className="w-3.5 h-3.5 text-muted-foreground" />
                 <span className="text-[10px] font-medium text-muted-foreground">Tester LuniK IA</span>
