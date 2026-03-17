@@ -254,7 +254,7 @@ const ConfigurateurPage = () => {
         </div>
 
         {/* RIGHT — Config panel */}
-        <div className="bg-background border-l border-border flex flex-col">
+        <div className="bg-white border-l border-border flex flex-col">
           <div className="flex-1 overflow-y-auto p-6 lg:p-10 space-y-0">
             {/* Step indicators */}
             <div className="flex gap-2 mb-8">
