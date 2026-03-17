@@ -10,6 +10,7 @@ interface ToileColor {
   type?: string;
   colors?: string[];
   photoUrl?: string;
+  refCode?: string;
 }
 
 interface ToileColorSelectorProps {
@@ -102,7 +103,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                       )}
                     </div>
                     <span className="text-[9px] text-muted-foreground text-center leading-tight w-full truncate">
-                      {c.name}
+                      {c.name}{c.refCode && ` (${c.refCode})`}
                     </span>
                   </button>
                 ))}
@@ -125,7 +126,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                 />
               </div>
               <div className="p-4 text-center">
-                <p className="text-sm font-medium">{lightboxColor.name}</p>
+                <p className="text-sm font-medium">{lightboxColor.name}{lightboxColor.refCode && ` (${lightboxColor.refCode})`}</p>
                 <button
                   onClick={() => {
                     onSelect(lightboxColor.name);

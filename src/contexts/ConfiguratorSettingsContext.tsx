@@ -1,7 +1,7 @@
 /* Configurator Settings Context — v3 */
 import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { parseToileColorLabel } from "@/lib/parseToileColorLabel";
+import { parseToileColorLabel, parseToileRefCode } from "@/lib/parseToileColorLabel";
 import { setPriceGrid, getDefaultPriceGrid, setWidthRanges, setProjections, getDefaultWidthRanges, getDefaultProjections, type WidthRange } from "@/lib/pricingTable";
 
 /* ─── Types ──────────────────────────────────────────── */
@@ -30,6 +30,7 @@ export interface ColorEntry {
   label: string;
   active: boolean;
   photoUrl?: string;
+  refCode?: string;
   type?: "solid" | "textured" | "striped";
   colors?: string[];
 }
@@ -147,7 +148,8 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
             const id = f.name.replace(/\.[^.]+$/, "");
             const label = parseToileColorLabel(f.name);
             const photoUrl = `${SUPABASE_URL}/storage/v1/object/public/toile-colors/${encodeURIComponent(f.name)}`;
-            return { id, hex: "#888", label, active: true, type: "solid" as const, photoUrl };
+            const refCode = parseToileRefCode(f.name);
+            return { id, hex: "#888", label, active: true, type: "solid" as const, photoUrl, refCode };
           });
       }
 
