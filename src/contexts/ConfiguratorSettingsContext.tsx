@@ -164,8 +164,18 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
           photoUrl: dbColor.photoUrl || bucketMap.get(dbColor.id)?.photoUrl,
           refCode: dbColor.refCode || bucketMap.get(dbColor.id)?.refCode,
         }));
+        const normalizeLabel = (l: string) => l.toLowerCase().trim();
         for (const bc of bucketColors) {
-          if (!toileColors.find(tc => tc.id === bc.id)) {
+          const existingById = toileColors.find(tc => tc.id === bc.id);
+          if (existingById) continue;
+
+          const existingByLabel = toileColors.find(
+            tc => normalizeLabel(tc.label) === normalizeLabel(bc.label)
+          );
+          if (existingByLabel) {
+            existingByLabel.photoUrl = existingByLabel.photoUrl || bc.photoUrl;
+            existingByLabel.refCode = existingByLabel.refCode || bc.refCode;
+          } else {
             toileColors.push(bc);
           }
         }
