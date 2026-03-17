@@ -162,6 +162,7 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
         toileColors = (map.toileColors as ColorEntry[]).map(dbColor => ({
           ...dbColor,
           photoUrl: dbColor.photoUrl || bucketMap.get(dbColor.id)?.photoUrl,
+          refCode: dbColor.refCode || bucketMap.get(dbColor.id)?.refCode,
         }));
         for (const bc of bucketColors) {
           if (!toileColors.find(tc => tc.id === bc.id)) {
