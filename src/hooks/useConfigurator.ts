@@ -32,8 +32,8 @@ export function useConfigurator() {
           price: o.price,
           highlight: o.highlight,
           badge: o.savingsLabel || undefined,
-          tip: undefined,
-          socialProof: undefined,
+          tip: o.tip || undefined,
+          socialProof: o.socialProof || undefined,
           imageUrl: o.imageUrl,
           order: i + 1,
         }));

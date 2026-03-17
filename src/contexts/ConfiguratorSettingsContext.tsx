@@ -45,6 +45,8 @@ export interface OptionEntry {
   savingsLabel?: string;
   includesIds?: string[];
   imageUrl?: string;
+  tip?: string;
+  socialProof?: string;
 }
 
 export interface ConfiguratorSettings {
