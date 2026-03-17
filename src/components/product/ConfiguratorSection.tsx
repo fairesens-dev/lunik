@@ -158,9 +158,17 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                   </div>
                 </div>
 
-                {/* 02 Armature */}
+                {/* 02 Toile */}
                 <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[2] || "COULEUR DE L'ARMATURE"}</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">02 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
+                  <p className="text-xs text-muted-foreground mb-4">Toile Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
+                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
+                  <p className="text-xs text-muted-foreground italic mt-3">Sélectionnée : {toileColor}</p>
+                </div>
+
+                {/* 03 Armature */}
+                <div>
+                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">03 — {productPage.stepLabels[2] || "COULEUR DE L'ARMATURE"}</p>
                   <p className="text-xs text-muted-foreground mb-4">Aluminium thermolaqué · Sans entretien</p>
                   <div className="flex flex-wrap gap-4">
                     {ARMATURE_COLORS.map((c) => {
@@ -186,14 +194,6 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                       );
                     })}
                   </div>
-                </div>
-
-                {/* 03 Toile */}
-                <div>
-                  <p className="text-xs uppercase tracking-[0.2em] text-primary font-medium mb-1">03 — {productPage.stepLabels[1] || "COULEUR DE TOILE"}</p>
-                  <p className="text-xs text-muted-foreground mb-4">Toile Orchestra by Dickson · {TOILE_COLORS.length} coloris</p>
-                  <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
-                  <p className="text-xs text-muted-foreground italic mt-3">Sélectionnée : {toileColor}</p>
                 </div>
 
                 {/* 04 Options */}
