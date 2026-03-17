@@ -224,6 +224,17 @@ const ConfiguratorSection = (props: ConfiguratorProps) => {
                           {opt.tip && (
                             <p className="text-[11px] text-primary/80 italic pl-14">{opt.tip}</p>
                           )}
+                          {opt.socialProof && (
+                            <p className="text-[11px] text-primary font-medium pl-14 flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3" />
+                              {opt.socialProof}
+                            </p>
+                          )}
+                          {opt.price > 500 && (
+                            <p className="text-[10px] text-muted-foreground pl-14">
+                              soit ~{Math.round(opt.price / 12)} €/mois en 12×
+                            </p>
+                          )}
                         </div>
                       );
                     })}
