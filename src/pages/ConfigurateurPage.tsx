@@ -54,6 +54,7 @@ const ConfigurateurPage = () => {
     pack,
     selectedOptions,
     toggleOption,
+    getIncompatibleReason,
     surfaceArea,
     price,
     basePrice,
