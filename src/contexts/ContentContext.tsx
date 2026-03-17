@@ -234,7 +234,7 @@ const defaultContent: SiteContent = {
     socialInstagram: "https://instagram.com/",
     socialFacebook: "https://facebook.com/",
     socialPinterest: "https://pinterest.com/",
-    trustpilotUrl: "https://fr.trustpilot.com/",
+    trustpilotUrl: "https://fr.trustpilot.com/review/rayy.fr",
   },
   homepage: {
     heroTitle: "Vivez dehors,\nsans compromis.",
