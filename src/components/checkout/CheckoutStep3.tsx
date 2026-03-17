@@ -163,6 +163,7 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-8 w-full">
+      <div className="min-w-0">
       <div className="space-y-8 w-full min-w-0">
         <h3 className="font-serif text-xl">Paiement</h3>
 
@@ -331,9 +332,11 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
         </div>
       </div>
 
-      <div className="lg:hidden">
+      <div className="lg:hidden mt-8">
         <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
       </div>
+      </div>
+
       <div className="hidden lg:block">
         <div className="sticky top-8">
           <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />

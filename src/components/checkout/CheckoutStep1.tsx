@@ -88,6 +88,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-8 w-full">
+      <div className="min-w-0">
       {/* LEFT – Form */}
       <form onSubmit={handleSubmit(onNext)} className="space-y-8 w-full min-w-0">
         {/* Coordonnées */}
@@ -281,10 +282,13 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
         </Button>
       </form>
 
-      {/* RIGHT – Summary (mobile: after form, desktop: sticky sidebar) */}
-      <div className="lg:hidden">
+      {/* Mobile summary */}
+      <div className="lg:hidden mt-8">
         <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
       </div>
+      </div>
+
+      {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <div className="sticky top-8">
           <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
