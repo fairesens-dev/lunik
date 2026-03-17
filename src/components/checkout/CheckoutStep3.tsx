@@ -332,9 +332,11 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
         </div>
       </div>
 
-      <div className="lg:hidden">
+      <div className="lg:hidden mt-8">
         <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
       </div>
+      </div>
+
       <div className="hidden lg:block">
         <div className="sticky top-8">
           <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
