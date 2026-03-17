@@ -36,6 +36,8 @@ export function useConfigurator() {
           socialProof: o.socialProof || undefined,
           imageUrl: o.imageUrl,
           order: i + 1,
+          defaultSelected: o.defaultSelected,
+          incompatibleWith: o.incompatibleWith,
         }));
     }
     return FALLBACK_PRICING_OPTIONS;
