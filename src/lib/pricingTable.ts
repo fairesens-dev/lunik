@@ -94,6 +94,17 @@ export interface PricingOption {
 
 export const PRICING_OPTIONS: PricingOption[] = [
   {
+    id: "motorisation-somfy",
+    label: "Motorisation SOMFY io",
+    description: "Motorisation radio SOMFY io incluse de série : télécommande, smartphone et assistants vocaux",
+    price: 0,
+    highlight: true,
+    badge: "INCLUS",
+    defaultSelected: true,
+    incompatibleWith: ["manoeuvre-manuelle"],
+    order: 0,
+  },
+  {
     id: "led-coffre",
     label: "Éclairage LED sous coffre SOMFY",
     description: "Éclairage d'ambiance intégré sous le coffre du store, pilotable depuis votre télécommande",
@@ -146,6 +157,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     description: "Remplace la motorisation SOMFY incluse de série (réduction de 619 €)",
     price: -619,
     tip: "Attention : retire la motorisation SOMFY incluse de série. Recommandé uniquement pour les petites largeurs.",
+    incompatibleWith: ["motorisation-somfy"],
     order: 6,
   },
 ];

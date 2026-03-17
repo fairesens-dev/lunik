@@ -161,7 +161,7 @@ export function useConfigurator() {
   }, [safeSelectedOptions, RESOLVED_OPTIONS]);
 
   // Compat: motorisation/led/pack booleans for DynamicProductVisual
-  const motorisation = !safeSelectedOptions.has("manoeuvre-manuelle");
+  const motorisation = safeSelectedOptions.has("motorisation-somfy");
   const led = safeSelectedOptions.has("led-coffre") || safeSelectedOptions.has("led-bras");
   const pack = false;
 
