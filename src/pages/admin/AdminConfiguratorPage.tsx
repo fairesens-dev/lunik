@@ -564,6 +564,13 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
     setLocal(next);
   };
 
+  const toggleIncompatible = (idx: number, targetId: string) => {
+    const next = [...local];
+    const ids = next[idx].incompatibleWith || [];
+    next[idx].incompatibleWith = ids.includes(targetId) ? ids.filter(i => i !== targetId) : [...ids, targetId];
+    setLocal(next);
+  };
+
   const addNew = () => {
     const id = `option-${Date.now()}`;
     setLocal([...local, { id, icon: "🔧", label: "Nouvelle option", description: "", price: 0, active: true, highlight: false }]);
