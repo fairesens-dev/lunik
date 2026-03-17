@@ -88,6 +88,8 @@ export interface PricingOption {
   socialProof?: string;
   imageUrl?: string;
   order: number; // display order (lower = first)
+  defaultSelected?: boolean;
+  incompatibleWith?: string[];
 }
 
 export const PRICING_OPTIONS: PricingOption[] = [
