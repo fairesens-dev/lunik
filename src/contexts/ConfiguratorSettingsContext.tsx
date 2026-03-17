@@ -156,6 +156,31 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
       }
 
       // 3. Merge toile colors
+      const normalizeLabel = (label: string) => label.toLowerCase().trim();
+      const mergeDuplicateToileColors = (colors: ColorEntry[]) => {
+        const deduped = new Map<string, ColorEntry>();
+
+        for (const color of colors) {
+          const key = normalizeLabel(color.label || color.id);
+          const existing = deduped.get(key);
+
+          if (existing) {
+            deduped.set(key, {
+              ...existing,
+              photoUrl: existing.photoUrl || color.photoUrl,
+              refCode: existing.refCode || color.refCode,
+              type: existing.type || color.type,
+              colors: existing.colors || color.colors,
+            });
+            continue;
+          }
+
+          deduped.set(key, color);
+        }
+
+        return Array.from(deduped.values());
+      };
+
       let toileColors = bucketColors;
       if (map.toileColors && Array.isArray(map.toileColors) && map.toileColors.length > 0) {
         const bucketMap = new Map(bucketColors.map(c => [c.id, c]));
@@ -164,7 +189,7 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
           photoUrl: dbColor.photoUrl || bucketMap.get(dbColor.id)?.photoUrl,
           refCode: dbColor.refCode || bucketMap.get(dbColor.id)?.refCode,
         }));
-        const normalizeLabel = (l: string) => l.toLowerCase().trim();
+
         for (const bc of bucketColors) {
           const existingById = toileColors.find(tc => tc.id === bc.id);
           if (existingById) continue;
@@ -180,6 +205,8 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
           }
         }
       }
+
+      toileColors = mergeDuplicateToileColors(toileColors);
 
       const loadedGrid = map.priceGrid ?? DEFAULT_SETTINGS.priceGrid;
       const loadedWidthRanges = map.widthRanges ?? DEFAULT_SETTINGS.widthRanges;
