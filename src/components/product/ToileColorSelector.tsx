@@ -126,7 +126,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                 />
               </div>
               <div className="p-4 text-center">
-                <p className="text-sm font-medium">{lightboxColor.name}</p>
+                <p className="text-sm font-medium">{lightboxColor.name}{lightboxColor.refCode && ` (${lightboxColor.refCode})`}</p>
                 <button
                   onClick={() => {
                     onSelect(lightboxColor.name);

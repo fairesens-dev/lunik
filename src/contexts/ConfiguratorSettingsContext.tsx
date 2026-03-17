@@ -148,7 +148,8 @@ export const ConfiguratorSettingsProvider: React.FC<{ children: React.ReactNode 
             const id = f.name.replace(/\.[^.]+$/, "");
             const label = parseToileColorLabel(f.name);
             const photoUrl = `${SUPABASE_URL}/storage/v1/object/public/toile-colors/${encodeURIComponent(f.name)}`;
-            return { id, hex: "#888", label, active: true, type: "solid" as const, photoUrl };
+            const refCode = parseToileRefCode(f.name);
+            return { id, hex: "#888", label, active: true, type: "solid" as const, photoUrl, refCode };
           });
       }
 

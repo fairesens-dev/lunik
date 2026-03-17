@@ -13,6 +13,21 @@ const NOISE = new Set([
   "hi", "orc", "rvbjpglr", "rvb", "jpg", "lr", "sur", "laize", "120",
 ]);
 
+export function parseToileRefCode(filename: string): string | undefined {
+  const base = filename.replace(/\.[^.]+$/, "");
+  const parts = base.split("_");
+  if (
+    parts.length >= 5 &&
+    parts[0].toLowerCase() === "hi" &&
+    parts[1].toLowerCase() === "orc" &&
+    /^[a-zA-Z0-9]+$/.test(parts[2]) &&
+    parts[3] === "120"
+  ) {
+    return parts[2].toUpperCase();
+  }
+  return undefined;
+}
+
 export function parseToileColorLabel(filename: string): string {
   // Remove extension
   const base = filename.replace(/\.[^.]+$/, "");
