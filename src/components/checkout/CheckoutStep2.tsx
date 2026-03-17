@@ -79,7 +79,7 @@ const CheckoutStep2 = ({ onNext, onBack }: Props) => {
       </div>
       </div>
 
-      <div className="hidden lg:block">
+      <div className="hidden lg:block min-w-0">
         <div className="sticky top-8">
           <OrderSummary item={item} deliveryOption={delivery} />
         </div>
