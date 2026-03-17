@@ -486,7 +486,7 @@ const ConfigurateurPage = () => {
                 </div>
               </div>
             ) : (
-              <div className="mt-10 border-t border-border pt-8">
+              <div className="mt-10 pt-8">
                 <SaveConfigCTA
                   hasValidConfig={widthValid && basePrice !== null}
                   width={width}
