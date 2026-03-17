@@ -73,7 +73,7 @@ const TestimonialsSection = () => {
     <section className="pt-6 pb-20 lg:pt-6 lg:pb-28 bg-background text-foreground">
       <div className="max-w-[1400px] mx-auto px-6 lg:px-16">
         <AnimatedSection>
-          <div className="flex items-end justify-between mb-12">
+          <div className="flex items-end justify-between mb-8">
             <div>
               <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground font-medium mb-4">
                 Avis vérifiés
@@ -99,6 +99,30 @@ const TestimonialsSection = () => {
               </button>
             </div>
           </div>
+
+          {/* Trustpilot Badge */}
+          <a
+            href="https://fr.trustpilot.com/review/rayy.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-wrap items-center gap-3 mb-10 group"
+          >
+            <svg viewBox="0 0 126 31" className="h-5 w-auto" aria-label="Trustpilot">
+              <path
+                d="M33.3 0h-6.2L23 10.8 18.6 0H0l15.3 10.8L9.6 31 23 20.2 36.4 31l-5.7-20.2L33.3 0zm46.5 13.8H68.1l-3.6-11.3-3.6 11.3H49.2l9.5 6.9-3.6 11.3 9.5-6.9 9.5 6.9-3.6-11.3 9.5-6.9zm17.8 0h-11.7l-3.6-11.3-3.6 11.3H66.9l9.5 6.9-3.6 11.3 9.5-6.9 9.5 6.9-3.6-11.3 9.5-6.9zm17.9 0H103.8l-3.6-11.3-3.6 11.3H84.9l9.5 6.9-3.6 11.3 9.5-6.9 9.5 6.9-3.6-11.3 9.5-6.9zm17.8 0h-11.7l-3.6-11.3-3.6 11.3h-11.7l9.5 6.9-3.6 11.3 9.5-6.9 9.5 6.9-3.6-11.3 9.5-6.9z"
+                fill="#00b67a"
+              />
+            </svg>
+            <div className="flex gap-0.5">
+              {[1, 2, 3, 4, 5].map(i => (
+                <Star key={i} className="w-4 h-4 fill-[#00b67a] text-[#00b67a]" />
+              ))}
+            </div>
+            <span className="text-sm text-muted-foreground">
+              <strong className="text-foreground">4.8/5</strong> · 233 avis vérifiés · <span className="text-[#00b67a] font-semibold">Excellent</span>
+            </span>
+            <span className="text-xs text-primary group-hover:underline">Voir les avis →</span>
+          </a>
         </AnimatedSection>
 
         <div
