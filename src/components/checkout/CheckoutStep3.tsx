@@ -146,11 +146,15 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
         // Normal store order flow
         if (!item) throw new Error("Aucun article dans le panier");
 
-        const options: string[] = [];
-        if (item.configuration.options.packConnect) options.push("Pack Connect");
-        else {
-          if (item.configuration.options.motorisation) options.push("Motorisation");
-          if (item.configuration.options.led) options.push("LED");
+        const options: string[] = item.configuration.selectedOptions
+          ? item.configuration.selectedOptions.map((opt) => opt.label)
+          : [];
+        if (options.length === 0) {
+          if (item.configuration.options.packConnect) options.push("Pack Connect");
+          else {
+            if (item.configuration.options.motorisation) options.push("Motorisation");
+            if (item.configuration.options.led) options.push("LED");
+          }
         }
 
         const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {

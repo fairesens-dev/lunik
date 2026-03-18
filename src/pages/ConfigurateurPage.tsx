@@ -95,6 +95,18 @@ const ConfigurateurPage = () => {
     const toileObj = TOILE_COLORS.find((c) => c.name === toileColor);
     const armatureObj = ARMATURE_COLORS.find((c) => c.name === armatureColor);
 
+    // Build detailed selected options list
+    const selectedOptionsList = PRICING_OPTIONS
+      .filter((opt) => selectedOptions.has(opt.id))
+      .map((opt) => ({
+        id: opt.id,
+        label: opt.label,
+        price: opt.price,
+        category: opt.category,
+      }));
+
+    const optionsTotal = selectedOptionsList.reduce((sum, o) => sum + o.price, 0);
+
     setItem({
       productId: "store-coffre",
       productName: "Store Coffre Sur-Mesure",
@@ -105,12 +117,14 @@ const ConfigurateurPage = () => {
         toileColor: { id: toileColor, hex: toileObj?.hex || "#fff", label: toileColor },
         armatureColor: { id: armatureColor, hex: armatureObj?.hex || "#333", label: armatureColor },
         options: { motorisation, led, packConnect: pack },
+        selectedOptions: selectedOptionsList,
       },
       pricing: {
         base: basePrice ?? 0,
         motorisation: 0,
         led: 0,
         packConnect: 0,
+        optionsTotal,
         total: price,
       },
       quantity: 1,
