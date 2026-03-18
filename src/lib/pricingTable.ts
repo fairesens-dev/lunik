@@ -90,6 +90,7 @@ export interface PricingOption {
   order: number; // display order (lower = first)
   defaultSelected?: boolean;
   incompatibleWith?: string[];
+  category?: string;
 }
 
 export const PRICING_OPTIONS: PricingOption[] = [
