@@ -26,7 +26,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { generateInvoicePDF } from "@/lib/generateInvoice";
 
-const STATUS_OPTIONS = ["Nouveau", "En fabrication", "Expédié", "Livré", "Annulé"];
+const STATUS_OPTIONS = ["Nouveau", "En fabrication", "Prêt à expédier", "Expédié", "Livré", "Annulé"];
 
 const statusColor: Record<string, string> = {
   Nouveau: "bg-blue-100 text-blue-700 border-blue-200",
