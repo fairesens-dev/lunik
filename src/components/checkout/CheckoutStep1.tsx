@@ -61,8 +61,9 @@ interface Props {
   isSampleOrder?: boolean;
 }
 
-const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0 }: Props) => {
+const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0, isSampleOrder = false }: Props) => {
   const { item } = useCart();
+  const sampleCart = useSampleCart();
   const [noteOpen, setNoteOpen] = useState(false);
 
   const {
