@@ -414,6 +414,16 @@ const ConfigurateurPage = () => {
                   </div>
                 </div>
 
+                {sampleEnabled && (
+                  <button
+                    onClick={() => setSampleModalOpen(true)}
+                    className="flex items-center gap-2 text-xs text-primary hover:underline mt-2"
+                  >
+                    <Palette className="w-3.5 h-3.5" />
+                    📦 Besoin de voir les coloris en vrai ? Commandez des échantillons
+                  </button>
+                )}
+
                 <div className="border-t border-border/50" />
 
                 <div>
