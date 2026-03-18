@@ -394,7 +394,7 @@ const ConfigurateurPage = () => {
                         className="flex flex-col items-center gap-1.5 group"
                       >
                         <div
-                          className={`w-full aspect-[11/4] rounded-sm border-2 relative transition-all ${
+                          className={`w-full aspect-[11/5] sm:aspect-[11/4] rounded-sm border-2 relative transition-all ${
                             armatureColor === c.name
                               ? "border-primary shadow-md ring-2 ring-primary/30"
                               : "border-border group-hover:border-primary/50"
