@@ -1,4 +1,5 @@
 import { useNavigate, Link } from "react-router-dom";
+import { useMemo } from "react";
 
 import { Check, ArrowLeft, Lock, Truck, Shield, Camera, ZoomIn, Star, ChevronRight, Ruler, Lightbulb, ArrowLeftRight, ArrowUpDown, RotateCcw } from "lucide-react";
 import MeasurementDiagram from "@/components/product/MeasurementDiagram";
@@ -116,6 +117,21 @@ const ConfigurateurPage = () => {
 
   // Sort options by order field
   const sortedOptions = [...PRICING_OPTIONS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+
+  // Group options by category for step 03
+  const groupedOptions = useMemo(() => {
+    const groups: { category: string; options: typeof sortedOptions }[] = [];
+    const catMap = new Map<string, typeof sortedOptions>();
+    for (const opt of sortedOptions) {
+      const cat = opt.category || "Autres";
+      if (!catMap.has(cat)) {
+        catMap.set(cat, []);
+        groups.push({ category: cat, options: catMap.get(cat)! });
+      }
+      catMap.get(cat)!.push(opt);
+    }
+    return groups;
+  }, [sortedOptions]);
 
   // Contextual sticky bar button label & action
   const stickyButtonLabel =
@@ -414,91 +430,96 @@ const ConfigurateurPage = () => {
 
             {/* 03 Options — refonte marketing */}
             {activeStep === "03" && (
-              <div className="space-y-3">
+              <div className="space-y-5">
                 <p className="text-xs text-muted-foreground mb-4">
                   Motorisation SOMFY incluse de série · Personnalisez votre store
                 </p>
-                {sortedOptions.map((opt) => {
-                  const checked = selectedOptions.has(opt.id);
-                  const isReduction = opt.price < 0;
-                  const isPremium = opt.highlight || (opt.badge && !isReduction);
-                  const isManual = opt.id === "manoeuvre-manuelle";
-                  const incompatibleWith = getIncompatibleReason(opt.id);
-                  const isBlocked = !checked && !!incompatibleWith;
+                {groupedOptions.map((group) => (
+                  <div key={group.category} className="space-y-3">
+                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-foreground">{group.category}</p>
+                    {group.options.map((opt) => {
+                      const checked = selectedOptions.has(opt.id);
+                      const isReduction = opt.price < 0;
+                      const isPremium = opt.highlight || (opt.badge && !isReduction);
+                      const isManual = opt.id === "manoeuvre-manuelle";
+                      const incompatibleWith = getIncompatibleReason(opt.id);
+                      const isBlocked = !checked && !!incompatibleWith;
 
-                  return (
-                    <div
-                      key={opt.id}
-                      className={`border rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden transition-all ${
-                        isManual
-                          ? checked
-                            ? "border-muted-foreground/30 bg-muted/30"
-                            : "border-border/60 bg-muted/10 opacity-80"
-                          : checked
-                            ? isPremium
-                              ? "border-primary ring-1 ring-primary/20 bg-gradient-to-r from-primary/[0.04] to-transparent"
-                              : "border-primary ring-1 ring-primary/20 bg-primary/[0.02]"
-                            : isPremium
-                              ? "border-primary/40 bg-primary/[0.02] hover:border-primary/60"
-                              : "border-border hover:border-border/80"
-                      }`}
-                    >
-                      {opt.badge && !isManual && (
-                        <span className="absolute -top-0.5 right-3 text-[9px] px-2.5 py-0.5 uppercase tracking-wider font-bold rounded-b-lg bg-primary text-primary-foreground">
-                          {opt.badge}
-                        </span>
-                      )}
-                      {opt.imageUrl && (
-                        <img
-                          src={opt.imageUrl}
-                          alt={opt.label}
-                          className="w-full h-28 rounded-lg object-cover border border-border mb-2"
-                        />
-                      )}
-                      <div className="flex items-center gap-4">
-                        <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
-                        <div className="flex-1 min-w-0">
-                          <p
-                            className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}
-                          >
-                            {opt.label}
-                            {opt.defaultSelected && opt.price === 0 && (
-                              <span className="ml-2 text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">INCLUS</span>
-                            )}
-                          </p>
-                          <p className="text-xs text-muted-foreground">{opt.description}</p>
-                          {isBlocked && (
-                            <p className="text-[11px] text-amber-600 mt-0.5 flex items-center gap-1">
-                              ⚠ Incompatible avec {incompatibleWith}
-                            </p>
-                          )}
-                          {opt.socialProof && !isManual && (
-                            <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
-                              <Star className="w-3 h-3 fill-primary text-primary" />
-                              {opt.socialProof}
-                            </p>
-                          )}
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span
-                            className={`text-sm font-semibold whitespace-nowrap ${
-                              isReduction ? "text-muted-foreground" : "text-foreground"
-                            }`}
-                          >
-                            {opt.price === 0 ? "Inclus" : `${isReduction ? "" : "+"}${opt.price.toLocaleString("fr-FR")} €`}
-                          </span>
-                        </div>
-                      </div>
-                      {opt.tip && (
-                        <p
-                          className={`text-[11px] pl-14 italic ${isManual ? "text-muted-foreground" : "text-foreground/60"}`}
+                      return (
+                        <div
+                          key={opt.id}
+                          className={`border rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden transition-all ${
+                            isManual
+                              ? checked
+                                ? "border-muted-foreground/30 bg-muted/30"
+                                : "border-border/60 bg-muted/10 opacity-80"
+                              : checked
+                                ? isPremium
+                                  ? "border-primary ring-1 ring-primary/20 bg-gradient-to-r from-primary/[0.04] to-transparent"
+                                  : "border-primary ring-1 ring-primary/20 bg-primary/[0.02]"
+                                : isPremium
+                                  ? "border-primary/40 bg-primary/[0.02] hover:border-primary/60"
+                                  : "border-border hover:border-border/80"
+                          }`}
                         >
-                          {opt.tip}
-                        </p>
-                      )}
-                    </div>
-                  );
-                })}
+                          {opt.badge && !isManual && (
+                            <span className="absolute -top-0.5 right-3 text-[9px] px-2.5 py-0.5 uppercase tracking-wider font-bold rounded-b-lg bg-primary text-primary-foreground">
+                              {opt.badge}
+                            </span>
+                          )}
+                          {opt.imageUrl && (
+                            <img
+                              src={opt.imageUrl}
+                              alt={opt.label}
+                              className="w-full h-28 rounded-lg object-cover border border-border mb-2"
+                            />
+                          )}
+                          <div className="flex items-center gap-4">
+                            <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
+                            <div className="flex-1 min-w-0">
+                              <p
+                                className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}
+                              >
+                                {opt.label}
+                                {opt.defaultSelected && opt.price === 0 && (
+                                  <span className="ml-2 text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">INCLUS</span>
+                                )}
+                              </p>
+                              <p className="text-xs text-muted-foreground">{opt.description}</p>
+                              {isBlocked && (
+                                <p className="text-[11px] text-amber-600 mt-0.5 flex items-center gap-1">
+                                  ⚠ Incompatible avec {incompatibleWith}
+                                </p>
+                              )}
+                              {opt.socialProof && !isManual && (
+                                <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
+                                  <Star className="w-3 h-3 fill-primary text-primary" />
+                                  {opt.socialProof}
+                                </p>
+                              )}
+                            </div>
+                            <div className="text-right shrink-0">
+                              <span
+                                className={`text-sm font-semibold whitespace-nowrap ${
+                                  isReduction ? "text-muted-foreground" : "text-foreground"
+                                }`}
+                              >
+                                {opt.price === 0 ? "Inclus" : `${isReduction ? "" : "+"}${opt.price.toLocaleString("fr-FR")} €`}
+                              </span>
+                            </div>
+                          </div>
+                          {opt.tip && (
+                            <p
+                              className={`text-[11px] pl-14 italic ${isManual ? "text-muted-foreground" : "text-foreground/60"}`}
+                            >
+                              {opt.tip}
+                            </p>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                ))}
               </div>
             )}
 

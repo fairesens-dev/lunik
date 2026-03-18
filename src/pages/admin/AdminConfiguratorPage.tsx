@@ -700,6 +700,10 @@ function OptionsTab({ settings, onUpdate, onAdd, onRemove, toast }: { settings: 
                     <Label className="text-xs">Badge promo (optionnel)</Label>
                     <Input value={o.savingsLabel || ""} onChange={e => update(idx, "savingsLabel", e.target.value || undefined)} className="mt-1" placeholder="ex: ÉCONOMISEZ 90 €" />
                   </div>
+                  <div>
+                    <Label className="text-xs">Catégorie</Label>
+                    <Input value={o.category || ""} onChange={e => update(idx, "category", e.target.value || undefined)} className="mt-1" placeholder="ex: Motorisation, Éclairage, Accessoires" />
+                  </div>
                 <div className="flex items-center gap-3 pt-5">
                     <Checkbox checked={o.highlight} onCheckedChange={v => update(idx, "highlight", !!v)} />
                     <Label className="text-xs">Mise en avant (highlight)</Label>

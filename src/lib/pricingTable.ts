@@ -90,6 +90,7 @@ export interface PricingOption {
   order: number; // display order (lower = first)
   defaultSelected?: boolean;
   incompatibleWith?: string[];
+  category?: string;
 }
 
 export const PRICING_OPTIONS: PricingOption[] = [
@@ -103,6 +104,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     defaultSelected: true,
     incompatibleWith: ["manoeuvre-manuelle"],
     order: 0,
+    category: "Motorisation",
   },
   {
     id: "led-coffre",
@@ -114,6 +116,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     tip: "« L'éclairage LED a transformé nos soirées d'été, on ne s'en passe plus. » — Marie, Lyon",
     socialProof: "78% des clients choisissent cette option",
     order: 1,
+    category: "Éclairage",
   },
   {
     id: "led-bras",
@@ -124,6 +127,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     tip: "« L'effet est bluffant, tous nos invités nous demandent la référence. » — Thomas, Bordeaux",
     socialProof: "Option la mieux notée par nos clients",
     order: 2,
+    category: "Éclairage",
   },
   {
     id: "capteur-vent",
@@ -135,6 +139,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     tip: "« Indispensable si vous n'êtes pas toujours à la maison, ça m'a sauvé le store. » — Pascal, Nantes",
     socialProof: "Recommandé par 9 installateurs sur 10",
     order: 3,
+    category: "Automatismes",
   },
   {
     id: "pose-plafond",
@@ -143,6 +148,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     price: 289,
     tip: "Idéal si vous ne disposez pas de façade porteuse pour la fixation murale",
     order: 4,
+    category: "Accessoires",
   },
   {
     id: "radio-csi",
@@ -150,6 +156,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     description: "Commande radio SOMFY CSI pour pilotage avancé et intégration domotique",
     price: 199,
     order: 5,
+    category: "Accessoires",
   },
   {
     id: "manoeuvre-manuelle",
@@ -158,6 +165,7 @@ export const PRICING_OPTIONS: PricingOption[] = [
     price: -619,
     tip: "Attention : retire la motorisation SOMFY incluse de série. Recommandé uniquement pour les petites largeurs.",
     incompatibleWith: ["motorisation-somfy"],
+    category: "Accessoires",
     order: 6,
   },
 ];

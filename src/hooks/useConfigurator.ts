@@ -38,6 +38,7 @@ export function useConfigurator() {
           order: i + 1,
           defaultSelected: o.defaultSelected,
           incompatibleWith: o.incompatibleWith,
+          category: o.category,
         }));
     }
     return FALLBACK_PRICING_OPTIONS;
