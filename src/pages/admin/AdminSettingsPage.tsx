@@ -738,6 +738,82 @@ function NotificationsTab() {
   );
 }
 
+// ── Samples Settings Card ──────────────────────────────
+
+function SamplesSettingsCard() {
+  const { toast } = useToast();
+  const [enabled, setEnabled] = useState(false);
+  const [unitPrice, setUnitPrice] = useState("2.00");
+  const [shippingCost, setShippingCost] = useState("0");
+  const [maxSamples, setMaxSamples] = useState("");
+  const [promoMessage, setPromoMessage] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    (async () => {
+      const d = await loadSetting("samples");
+      if (d) {
+        setEnabled(d.enabled ?? false);
+        setUnitPrice(String(d.unitPrice ?? "2.00"));
+        setShippingCost(String(d.shippingCost ?? "0"));
+        setMaxSamples(d.maxSamples != null ? String(d.maxSamples) : "");
+        setPromoMessage(d.promoMessage ?? "");
+      }
+      setLoading(false);
+    })();
+  }, []);
+
+  const save = async () => {
+    await saveSetting("samples", {
+      enabled,
+      unitPrice: parseFloat(unitPrice) || 2,
+      shippingCost: parseFloat(shippingCost) || 0,
+      maxSamples: maxSamples ? parseInt(maxSamples) : null,
+      promoMessage,
+    });
+    toast({ title: "Paramètres échantillons enregistrés" });
+  };
+
+  if (loading) return null;
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">🎨 Échantillons de toile</CardTitle>
+            <CardDescription>Permettez aux clients de commander des échantillons de coloris Dickson</CardDescription>
+          </div>
+          <Switch checked={enabled} onCheckedChange={setEnabled} />
+        </div>
+      </CardHeader>
+      {enabled && (
+        <CardContent className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Prix par échantillon (€ TTC)</Label>
+              <Input type="number" step="0.01" min="0" value={unitPrice} onChange={e => setUnitPrice(e.target.value)} placeholder="2.00" />
+            </div>
+            <div className="space-y-2">
+              <Label>Frais de livraison (€ TTC)</Label>
+              <Input type="number" step="0.01" min="0" value={shippingCost} onChange={e => setShippingCost(e.target.value)} placeholder="0 = offert" />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Nombre max. d'échantillons par commande</Label>
+            <Input type="number" min="1" value={maxSamples} onChange={e => setMaxSamples(e.target.value)} placeholder="Vide = illimité" />
+          </div>
+          <div className="space-y-2">
+            <Label>Message promotionnel</Label>
+            <Textarea value={promoMessage} onChange={e => setPromoMessage(e.target.value)} placeholder="Ex: Livraison offerte dès 5 échantillons commandés !" rows={2} />
+          </div>
+          <Button onClick={save} variant="outline" className="w-full">Enregistrer les paramètres échantillons</Button>
+        </CardContent>
+      )}
+    </Card>
+  );
+}
+
 // ── Tab 6: Paiement ────────────────────────────────────
 
 interface PaymentMethodsSettings {

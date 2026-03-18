@@ -476,6 +476,11 @@ function getEmailConfig(type: EmailType, order: any, extra?: any): { subject: st
       html: savRequestedTemplate(order, extra),
       to: order.client_email,
     },
+    samples_confirmation: {
+      subject: `🎨 Vos échantillons de toile sont en chemin ! — Réf. ${order.ref} | LuniK`,
+      html: samplesConfirmationTemplate(order),
+      to: order.client_email,
+    },
   };
 
   return configs[type] || null;

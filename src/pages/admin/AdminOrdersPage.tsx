@@ -191,7 +191,11 @@ const AdminOrdersPage = () => {
                     {o.orderType === "samples" && <Badge className="ml-1.5 bg-purple-100 text-purple-700 text-[9px]" variant="secondary">Échantillons</Badge>}
                   </TableCell>
                   <TableCell className="text-xs"><div>{o.client.name}</div><div className="text-gray-400">{o.client.email}</div></TableCell>
-                  <TableCell className="text-xs">{o.width}×{o.projection} cm · {o.toileColor} · {o.armatureColor}</TableCell>
+                  <TableCell className="text-xs">
+                    {o.orderType === "samples"
+                      ? `${(o.sampleItems || []).length} échantillon${(o.sampleItems || []).length > 1 ? "s" : ""}`
+                      : `${o.width}×${o.projection} cm · ${o.toileColor} · ${o.armatureColor}`}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       {o.options.length === 0 && <span className="text-xs text-gray-400">—</span>}
