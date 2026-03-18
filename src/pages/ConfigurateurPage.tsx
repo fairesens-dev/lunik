@@ -196,6 +196,15 @@ const ConfigurateurPage = () => {
                 Bientôt
               </span>
             </div>
+            {sampleEnabled && (
+              <button
+                onClick={() => setSampleModalOpen(true)}
+                className="h-[34px] px-3 bg-background/80 backdrop-blur-sm border border-border rounded-lg flex items-center gap-1.5 shadow-sm hover:bg-background hover:shadow-md transition-all group"
+              >
+                <Palette className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+                <span className="text-[10px] font-medium text-foreground">Échantillons</span>
+              </button>
+            )}
             {activeStep !== "01" && (
               <button
                 onClick={() => setCloseUpOpen(true)}
@@ -404,6 +413,16 @@ const ConfigurateurPage = () => {
                     ))}
                   </div>
                 </div>
+
+                {sampleEnabled && (
+                  <button
+                    onClick={() => setSampleModalOpen(true)}
+                    className="flex items-center gap-2 text-xs text-primary hover:underline mt-2"
+                  >
+                    <Palette className="w-3.5 h-3.5" />
+                    📦 Besoin de voir les coloris en vrai ? Commandez des échantillons
+                  </button>
+                )}
 
                 <div className="border-t border-border/50" />
 

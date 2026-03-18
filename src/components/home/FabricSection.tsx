@@ -1,6 +1,9 @@
+import { useState } from "react";
 import AnimatedSection from "@/components/AnimatedSection";
-import { Check } from "lucide-react";
+import { Check, Palette } from "lucide-react";
 import { useContent } from "@/contexts/ContentContext";
+import { useSampleCart } from "@/contexts/SampleCartContext";
+import SampleOrderModal from "@/components/samples/SampleOrderModal";
 
 const specs = [
   { label: "Composition", value: "100 % acrylique teint masse" },
@@ -22,6 +25,8 @@ const benefits = [
 const FabricSection = () => {
   const { content } = useContent();
   const fabricImage = content.homepage.fabricSectionImage || "/images/store-toile-detail.webp";
+  const { enabled: sampleEnabled } = useSampleCart();
+  const [sampleModalOpen, setSampleModalOpen] = useState(false);
 
   return (
     <section className="py-16 lg:py-20 bg-card">
@@ -64,6 +69,16 @@ const FabricSection = () => {
                 ))}
               </div>
 
+              {sampleEnabled && (
+                <button
+                  onClick={() => setSampleModalOpen(true)}
+                  className="flex items-center gap-2 text-sm text-primary hover:underline font-medium mt-2"
+                >
+                  <Palette className="w-4 h-4" />
+                  📦 Commandez des échantillons de toile gratuits
+                </button>
+              )}
+
               <div className="border-t border-border pt-6 mt-6">
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {specs.map((s) => (
@@ -78,6 +93,8 @@ const FabricSection = () => {
           </AnimatedSection>
         </div>
       </div>
+
+      <SampleOrderModal open={sampleModalOpen} onOpenChange={setSampleModalOpen} />
     </section>
   );
 };
