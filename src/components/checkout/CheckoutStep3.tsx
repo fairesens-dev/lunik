@@ -400,14 +400,45 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
         </div>
       </div>
 
-      <div className="lg:hidden mt-8">
-        <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
-      </div>
+      {!isSampleOrder && item && (
+        <>
+        <div className="lg:hidden mt-8">
+          <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
+        </div>
+        </>
+      )}
+      {isSampleOrder && (
+        <div className="lg:hidden mt-8">
+          <div className="border border-border rounded-lg p-5 space-y-3">
+            <p className="font-serif text-lg">Récapitulatif</p>
+            {sampleCart.items.map((s) => (
+              <div key={s.name} className="flex items-center gap-2 text-sm">
+                <span className="w-4 h-4 rounded border" style={{ backgroundColor: s.hex }} />
+                <span>{s.name}</span>
+              </div>
+            ))}
+            <p className="text-sm font-semibold border-t pt-2">Total : {total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €</p>
+          </div>
+        </div>
+      )}
       </div>
 
       <div className="hidden lg:block min-w-0">
         <div className="sticky top-8">
-          <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
+          {!isSampleOrder && item ? (
+            <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
+          ) : (
+            <div className="border border-border rounded-lg p-5 space-y-3">
+              <p className="font-serif text-lg">Récapitulatif</p>
+              {sampleCart.items.map((s) => (
+                <div key={s.name} className="flex items-center gap-2 text-sm">
+                  <span className="w-4 h-4 rounded border" style={{ backgroundColor: s.hex }} />
+                  <span>{s.name}</span>
+                </div>
+              ))}
+              <p className="text-sm font-semibold border-t pt-2">Total : {total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
