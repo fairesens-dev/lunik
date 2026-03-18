@@ -23,7 +23,14 @@ const SampleOrderModal = ({ open, onOpenChange }: SampleOrderModalProps) => {
   const { items, addItem, removeItem, isInCart, totalItems, unitPrice, shippingCost, totalAmount, promoMessage, maxSamples } = useSampleCart();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const toileColors = settings.toileColors.filter((c) => c.active);
+  // Map ColorEntry to a shape compatible with categorizeAndSortColors (needs `name`)
+  const toileColors = useMemo(() =>
+    settings.toileColors.filter((c) => c.active).map((c) => ({
+      ...c,
+      name: c.label,
+    })),
+    [settings.toileColors]
+  );
 
   const categorized = useMemo(() => categorizeAndSortColors(toileColors), [toileColors]);
 
