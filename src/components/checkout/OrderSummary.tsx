@@ -94,17 +94,22 @@ const OrderSummary = ({ item, deliveryOption = "standard", compact = false, prom
         <p className="text-xs text-muted-foreground mt-1">
           {cfg.width} × {cfg.projection} cm · Toile {cfg.toileColor.label} · Armature {cfg.armatureColor.label}
         </p>
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {cfg.options.motorisation && !cfg.options.packConnect && (
-            <span className="text-xs bg-secondary px-2 py-0.5">⚡ Motorisation +{pricing.motorisation} €</span>
-          )}
-          {cfg.options.led && !cfg.options.packConnect && (
-            <span className="text-xs bg-secondary px-2 py-0.5">💡 LED +{pricing.led} €</span>
-          )}
-          {cfg.options.packConnect && (
-            <span className="text-xs bg-secondary px-2 py-0.5">🎁 Pack Connect +{pricing.packConnect} €</span>
-          )}
-        </div>
+        {(() => {
+          const displayOptions = cfg.selectedOptions || [
+            ...(cfg.options.motorisation && pricing.motorisation > 0 ? [{ id: "motorisation", label: "Motorisation", price: pricing.motorisation }] : []),
+            ...(cfg.options.led && pricing.led > 0 ? [{ id: "led", label: "LED", price: pricing.led }] : []),
+            ...(cfg.options.packConnect && pricing.packConnect > 0 ? [{ id: "pack", label: "Pack Connect", price: pricing.packConnect }] : []),
+          ];
+          return displayOptions.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5 mt-2">
+              {displayOptions.map((opt) => (
+                <span key={opt.id} className="text-xs bg-secondary px-2 py-0.5">
+                  {opt.label} {opt.price > 0 ? `+${opt.price.toLocaleString("fr-FR")} €` : opt.price < 0 ? `${opt.price.toLocaleString("fr-FR")} €` : "inclus"}
+                </span>
+              ))}
+            </div>
+          ) : null;
+        })()}
       </div>
 
       <div className="border-t border-border pt-4 space-y-2 text-sm">
@@ -112,24 +117,19 @@ const OrderSummary = ({ item, deliveryOption = "standard", compact = false, prom
           <span className="text-muted-foreground">Base store</span>
           <span>{pricing.base.toLocaleString("fr-FR")} €</span>
         </div>
-        {pricing.motorisation > 0 && !cfg.options.packConnect && (
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Motorisation</span>
-            <span>+{pricing.motorisation} €</span>
-          </div>
-        )}
-        {pricing.led > 0 && !cfg.options.packConnect && (
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">LED</span>
-            <span>+{pricing.led} €</span>
-          </div>
-        )}
-        {pricing.packConnect > 0 && (
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Pack Connect</span>
-            <span>+{pricing.packConnect} €</span>
-          </div>
-        )}
+        {(() => {
+          const displayOptions = cfg.selectedOptions || [
+            ...(cfg.options.motorisation && pricing.motorisation > 0 ? [{ id: "motorisation", label: "Motorisation", price: pricing.motorisation }] : []),
+            ...(cfg.options.led && pricing.led > 0 ? [{ id: "led", label: "LED", price: pricing.led }] : []),
+            ...(cfg.options.packConnect && pricing.packConnect > 0 ? [{ id: "pack", label: "Pack Connect", price: pricing.packConnect }] : []),
+          ];
+          return displayOptions.filter(o => o.price !== 0).map((opt) => (
+            <div key={opt.id} className="flex justify-between">
+              <span className="text-muted-foreground">{opt.label}</span>
+              <span>{opt.price > 0 ? "+" : ""}{opt.price.toLocaleString("fr-FR")} €</span>
+            </div>
+          ));
+        })()}
         <div className="flex justify-between">
           <span className="text-muted-foreground">Livraison</span>
           <span className="text-primary font-medium">

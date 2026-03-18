@@ -1,5 +1,12 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 
+export interface CartItemOption {
+  id: string;
+  label: string;
+  price: number;
+  category?: string;
+}
+
 export interface CartItemConfig {
   width: number;
   projection: number;
@@ -11,6 +18,7 @@ export interface CartItemConfig {
     led: boolean;
     packConnect: boolean;
   };
+  selectedOptions?: CartItemOption[];
 }
 
 export interface CartItemPricing {
@@ -18,6 +26,7 @@ export interface CartItemPricing {
   motorisation: number;
   led: number;
   packConnect: number;
+  optionsTotal?: number;
   total: number;
 }
 
