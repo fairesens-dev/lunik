@@ -125,6 +125,7 @@ const CheckoutPage = () => {
             onPromoApplied={(code, discount) => { setPromoCode(code); setPromoDiscount(discount); }}
             promoCode={promoCode}
             promoDiscount={promoDiscount}
+            isSampleOrder={isSampleOrder}
           />
         )}
         {!isSampleOrder && step === 2 && <CheckoutStep2 onNext={handleStep2} onBack={() => setStep(1)} />}

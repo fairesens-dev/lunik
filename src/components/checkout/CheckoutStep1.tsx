@@ -10,7 +10,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import OrderSummary from "./OrderSummary";
+import SampleOrderSummary from "./SampleOrderSummary";
 import { useCart } from "@/contexts/CartContext";
+import { useSampleCart } from "@/contexts/SampleCartContext";
 import { useState } from "react";
 
 const step1Schema = z.object({
@@ -56,10 +58,12 @@ interface Props {
   onPromoApplied?: (code: string, discount: number) => void;
   promoCode?: string;
   promoDiscount?: number;
+  isSampleOrder?: boolean;
 }
 
-const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0 }: Props) => {
+const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0, isSampleOrder = false }: Props) => {
   const { item } = useCart();
+  const sampleCart = useSampleCart();
   const [noteOpen, setNoteOpen] = useState(false);
 
   const {
@@ -84,7 +88,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
   const civility = watch("civility");
   const differentDelivery = watch("differentDelivery");
 
-  if (!item) return null;
+  if (!isSampleOrder && !item) return null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-8 w-full">
@@ -278,20 +282,40 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
           type="submit"
           className="w-full py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium h-auto"
         >
-          Continuer vers la livraison →
+          {isSampleOrder ? "Continuer vers le paiement →" : "Continuer vers la livraison →"}
         </Button>
       </form>
 
       {/* Mobile summary */}
       <div className="lg:hidden mt-8">
-        <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+        {isSampleOrder ? (
+          <SampleOrderSummary
+            items={sampleCart.items}
+            unitPrice={sampleCart.unitPrice}
+            shippingCost={sampleCart.shippingCost}
+            totalAmount={sampleCart.totalAmount}
+            promoMessage={sampleCart.promoMessage}
+          />
+        ) : (
+          <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+        )}
       </div>
       </div>
 
       {/* Desktop sidebar */}
       <div className="hidden lg:block min-w-0">
         <div className="sticky top-8">
-          <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+          {isSampleOrder ? (
+            <SampleOrderSummary
+              items={sampleCart.items}
+              unitPrice={sampleCart.unitPrice}
+              shippingCost={sampleCart.shippingCost}
+              totalAmount={sampleCart.totalAmount}
+              promoMessage={sampleCart.promoMessage}
+            />
+          ) : (
+            <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+          )}
         </div>
       </div>
     </div>
