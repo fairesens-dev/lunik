@@ -421,6 +421,36 @@ export type Database = {
           },
         ]
       }
+      email_templates: {
+        Row: {
+          cta_text_override: string | null
+          footer_note_override: string | null
+          id: string
+          intro_text_override: string | null
+          is_active: boolean | null
+          subject_override: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          cta_text_override?: string | null
+          footer_note_override?: string | null
+          id: string
+          intro_text_override?: string | null
+          is_active?: boolean | null
+          subject_override?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          cta_text_override?: string | null
+          footer_note_override?: string | null
+          id?: string
+          intro_text_override?: string | null
+          is_active?: boolean | null
+          subject_override?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       generated_visuals: {
         Row: {
           armature_color_hex: string
