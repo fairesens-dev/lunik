@@ -5,7 +5,7 @@ import { Check, ArrowLeft, Lock, Truck, Shield, Camera, ZoomIn, Star, ChevronRig
 import MeasurementDiagram from "@/components/product/MeasurementDiagram";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DynamicProductVisual from "@/components/product/DynamicProductVisual";
 import SaveConfigCTA from "@/components/product/SaveConfigCTA";
@@ -283,7 +283,7 @@ const ConfigurateurPage = () => {
                   <button
                     key={step}
                     onClick={() => setActiveStep(step)}
-                    className={`flex-1 py-2 rounded-lg text-xs font-medium uppercase tracking-[0.1em] transition-all border ${
+                    className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-medium uppercase tracking-[0.1em] transition-all border ${
                       activeStep === step
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-border text-muted-foreground hover:border-primary/30"
@@ -394,7 +394,7 @@ const ConfigurateurPage = () => {
                         className="flex flex-col items-center gap-1.5 group"
                       >
                         <div
-                          className={`w-full aspect-[11/4] rounded-sm border-2 relative transition-all ${
+                          className={`w-full aspect-[11/5] sm:aspect-[11/4] rounded-sm border-2 relative transition-all ${
                             armatureColor === c.name
                               ? "border-primary shadow-md ring-2 ring-primary/30"
                               : "border-border group-hover:border-primary/50"
@@ -448,15 +448,14 @@ const ConfigurateurPage = () => {
                       return (
                         <div
                           key={opt.id}
-                          className={`border rounded-xl p-4 flex flex-col gap-2 relative overflow-hidden transition-all ${
+                          onClick={() => !isBlocked && toggleOption(opt.id)}
+                          className={`border rounded-xl p-4 relative overflow-hidden transition-all cursor-pointer ${
                             isManual
                               ? checked
                                 ? "border-muted-foreground/30 bg-muted/30"
                                 : "border-border/60 bg-muted/10 opacity-80"
                               : checked
-                                ? isPremium
-                                  ? "border-primary ring-1 ring-primary/20 bg-gradient-to-r from-primary/[0.04] to-transparent"
-                                  : "border-primary ring-1 ring-primary/20 bg-primary/[0.02]"
+                                ? "border-green-500/60 ring-1 ring-green-500/20 bg-green-50/40"
                                 : isPremium
                                   ? "border-primary/40 bg-primary/[0.02] hover:border-primary/60"
                                   : "border-border hover:border-border/80"
@@ -467,54 +466,57 @@ const ConfigurateurPage = () => {
                               {opt.badge}
                             </span>
                           )}
-                          {opt.imageUrl && (
-                            <img
-                              src={opt.imageUrl}
-                              alt={opt.label}
-                              className="w-full h-28 rounded-lg object-cover border border-border mb-2"
-                            />
-                          )}
-                          <div className="flex items-center gap-4">
-                            <Switch checked={checked} onCheckedChange={() => toggleOption(opt.id)} />
-                            <div className="flex-1 min-w-0">
-                              <p
-                                className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}
-                              >
-                                {opt.label}
-                                {opt.defaultSelected && opt.price === 0 && (
-                                  <span className="ml-2 text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">INCLUS</span>
-                                )}
-                              </p>
-                              <p className="text-xs text-muted-foreground">{opt.description}</p>
-                              {isBlocked && (
-                                <p className="text-[11px] text-amber-600 mt-0.5 flex items-center gap-1">
-                                  ⚠ Incompatible avec {incompatibleWith}
+                          <div className="flex flex-col md:flex-row gap-3">
+                            {opt.imageUrl && (
+                              <img
+                                src={opt.imageUrl}
+                                alt={opt.label}
+                                className="w-full md:w-20 md:h-20 h-28 rounded-lg object-cover border border-border shrink-0"
+                              />
+                            )}
+                            <div className="flex-1 min-w-0 flex flex-col gap-1">
+                              <div className="flex items-center gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <p
+                                    className={`text-sm font-medium ${isManual ? "text-muted-foreground" : "text-foreground"}`}
+                                  >
+                                    {opt.label}
+                                    {opt.defaultSelected && opt.price === 0 && (
+                                      <span className="ml-2 text-[10px] font-semibold text-primary bg-primary/10 px-1.5 py-0.5 rounded-full">INCLUS</span>
+                                    )}
+                                  </p>
+                                  <p className="text-xs text-muted-foreground">{opt.description}</p>
+                                  {isBlocked && (
+                                    <p className="text-[11px] text-amber-600 mt-0.5 flex items-center gap-1">
+                                      ⚠ Incompatible avec {incompatibleWith}
+                                    </p>
+                                  )}
+                                  {opt.socialProof && !isManual && (
+                                    <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
+                                      <Star className="w-3 h-3 fill-primary text-primary" />
+                                      {opt.socialProof}
+                                    </p>
+                                  )}
+                                </div>
+                                <div className="text-right shrink-0">
+                                  <span
+                                    className={`text-sm font-semibold whitespace-nowrap ${
+                                      isReduction ? "text-muted-foreground" : "text-foreground"
+                                    }`}
+                                  >
+                                    {opt.price === 0 ? "Inclus" : `${isReduction ? "" : "+"}${opt.price.toLocaleString("fr-FR")} €`}
+                                  </span>
+                                </div>
+                              </div>
+                              {opt.tip && (
+                                <p
+                                  className={`text-[11px] italic ${isManual ? "text-muted-foreground" : "text-foreground/60"}`}
+                                >
+                                  {opt.tip}
                                 </p>
                               )}
-                              {opt.socialProof && !isManual && (
-                                <p className="text-[11px] text-primary font-medium mt-1 flex items-center gap-1">
-                                  <Star className="w-3 h-3 fill-primary text-primary" />
-                                  {opt.socialProof}
-                                </p>
-                              )}
-                            </div>
-                            <div className="text-right shrink-0">
-                              <span
-                                className={`text-sm font-semibold whitespace-nowrap ${
-                                  isReduction ? "text-muted-foreground" : "text-foreground"
-                                }`}
-                              >
-                                {opt.price === 0 ? "Inclus" : `${isReduction ? "" : "+"}${opt.price.toLocaleString("fr-FR")} €`}
-                              </span>
                             </div>
                           </div>
-                          {opt.tip && (
-                            <p
-                              className={`text-[11px] pl-14 italic ${isManual ? "text-muted-foreground" : "text-foreground/60"}`}
-                            >
-                              {opt.tip}
-                            </p>
-                          )}
                         </div>
                       );
                     })}

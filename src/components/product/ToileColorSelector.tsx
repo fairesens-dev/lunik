@@ -78,7 +78,7 @@ const ToileColorSelector = ({ colors, selected, onSelect }: ToileColorSelectorPr
                     title={c.name}
                   >
                     <div
-                      className={`w-full aspect-[11/4] border-2 relative transition-all rounded-sm ${
+                      className={`w-full aspect-[11/5] sm:aspect-[11/4] border-2 relative transition-all rounded-sm ${
                         selected === c.name
                           ? "border-primary shadow-md ring-2 ring-primary/30"
                           : "border-border group-hover:border-primary/50"
