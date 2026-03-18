@@ -305,7 +305,17 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
       {/* Desktop sidebar */}
       <div className="hidden lg:block min-w-0">
         <div className="sticky top-8">
-          <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+          {isSampleOrder ? (
+            <SampleOrderSummary
+              items={sampleCart.items}
+              unitPrice={sampleCart.unitPrice}
+              shippingCost={sampleCart.shippingCost}
+              totalAmount={sampleCart.totalAmount}
+              promoMessage={sampleCart.promoMessage}
+            />
+          ) : (
+            <OrderSummary item={item} promoCode={promoCode} promoDiscount={promoDiscount} onPromoApplied={onPromoApplied} />
+          )}
         </div>
       </div>
     </div>
