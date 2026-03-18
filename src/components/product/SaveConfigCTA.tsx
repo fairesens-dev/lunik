@@ -118,7 +118,10 @@ const SaveConfigCTA = ({ hasValidConfig, width, projection, toileColor, armature
           {status === "loading" ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : (
-            "Télécharger mon devis →"
+            <>
+              <span className="hidden sm:inline">Télécharger mon devis →</span>
+              <span className="sm:hidden">Télécharger</span>
+            </>
           )}
         </Button>
       </div>
