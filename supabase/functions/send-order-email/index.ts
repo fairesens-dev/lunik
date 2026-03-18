@@ -442,7 +442,7 @@ ${contactBlock("Besoin urgent ? Appelez-nous directement au 03 68 38 10 30")}
 
 // ─── TEMPLATE MAP ──────────────────────────────────────────────────
 
-type EmailType = "order_received" | "in_production" | "ready_to_ship" | "in_delivery" | "delivered" | "sav_requested";
+type EmailType = "order_received" | "in_production" | "ready_to_ship" | "in_delivery" | "delivered" | "sav_requested" | "samples_confirmation";
 
 function getEmailConfig(type: EmailType, order: any, extra?: any): { subject: string; html: string; to: string } | null {
   const configs: Record<EmailType, { subject: string; html: string; to: string }> = {
