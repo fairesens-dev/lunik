@@ -585,6 +585,7 @@ const ConfigurateurPage = () => {
           </div>
         </div>
       </div>
+      <SampleOrderModal open={sampleModalOpen} onOpenChange={setSampleModalOpen} />
     </>
   );
 };
