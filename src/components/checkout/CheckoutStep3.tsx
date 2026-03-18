@@ -83,60 +83,122 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     setError("");
 
     try {
-      const options: string[] = [];
-      if (item.configuration.options.packConnect) options.push("Pack Connect");
-      else {
-        if (item.configuration.options.motorisation) options.push("Motorisation");
-        if (item.configuration.options.led) options.push("LED");
-      }
-
       const ref = generateRef();
 
-      const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          amount: total,
-          ref,
-          customerEmail: contactData.email,
-          customerName: `${contactData.firstName} ${contactData.lastName}`,
-          productName: item.productName,
-          description: `${item.configuration.width}×${item.configuration.projection}cm · Toile ${item.configuration.toileColor.label} · ${item.configuration.armatureColor.label}`,
-          paymentMethod,
-          promoCode: promoCode || undefined,
-          promoDiscount: promoDiscount || undefined,
-          orderData: {
-            ref,
-            client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
-            client_email: contactData.email,
-            client_phone: contactData.phone,
-            client_postal_code: contactData.postalCode,
-            client_address: contactData.address,
-            client_address2: contactData.address2 || "",
-            client_city: contactData.city,
-            client_country: contactData.country,
-            civility: contactData.civility,
-            width: item.configuration.width,
-            projection: item.configuration.projection,
-            toile_color: item.configuration.toileColor.label,
-            armature_color: item.configuration.armatureColor.label,
-            options,
+      if (isSampleOrder) {
+        // Sample order flow
+        const sampleNames = sampleCart.items.map((s) => s.name).join(", ");
+        const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
+          body: {
             amount: total,
-            delivery_option: deliveryOption,
-            payment_method: paymentMethod,
-            message: contactData.note || "",
-            newsletter_optin: contactData.newsletter || false,
+            ref,
+            customerEmail: contactData.email,
+            customerName: `${contactData.firstName} ${contactData.lastName}`,
+            productName: "Échantillons de toile Dickson",
+            description: `${sampleCart.totalItems} coloris : ${sampleNames}`,
+            paymentMethod,
+            promoCode: promoCode || undefined,
+            promoDiscount: promoDiscount || undefined,
+            orderType: "samples",
+            orderData: {
+              ref,
+              client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
+              client_email: contactData.email,
+              client_phone: contactData.phone,
+              client_postal_code: contactData.postalCode,
+              client_address: contactData.address,
+              client_address2: contactData.address2 || "",
+              client_city: contactData.city,
+              client_country: contactData.country,
+              civility: contactData.civility,
+              width: 0,
+              projection: 0,
+              toile_color: "",
+              armature_color: "",
+              options: [],
+              amount: total,
+              delivery_option: "colissimo",
+              payment_method: paymentMethod,
+              message: contactData.note || "",
+              newsletter_optin: contactData.newsletter || false,
+              order_type: "samples",
+              sample_items: sampleCart.items.map((s) => ({
+                name: s.name,
+                hex: s.hex,
+                refCode: s.refCode,
+                type: s.type,
+              })),
+            },
           },
-        },
-      });
+        });
 
-      if (fnError) throw new Error(fnError.message);
+        if (fnError) throw new Error(fnError.message);
 
-      if (data?.url) {
-        window.location.href = data.url;
-      } else if (data?.redirect) {
-        clearCart();
-        navigate(`${data.redirect}`);
+        if (data?.url) {
+          window.location.href = data.url;
+        } else if (data?.redirect) {
+          sampleCart.clearCart();
+          navigate(`${data.redirect}`);
+        } else {
+          throw new Error("Aucune URL de paiement retournée");
+        }
       } else {
-        throw new Error("Aucune URL de paiement retournée");
+        // Normal store order flow
+        if (!item) throw new Error("Aucun article dans le panier");
+
+        const options: string[] = [];
+        if (item.configuration.options.packConnect) options.push("Pack Connect");
+        else {
+          if (item.configuration.options.motorisation) options.push("Motorisation");
+          if (item.configuration.options.led) options.push("LED");
+        }
+
+        const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
+          body: {
+            amount: total,
+            ref,
+            customerEmail: contactData.email,
+            customerName: `${contactData.firstName} ${contactData.lastName}`,
+            productName: item.productName,
+            description: `${item.configuration.width}×${item.configuration.projection}cm · Toile ${item.configuration.toileColor.label} · ${item.configuration.armatureColor.label}`,
+            paymentMethod,
+            promoCode: promoCode || undefined,
+            promoDiscount: promoDiscount || undefined,
+            orderData: {
+              ref,
+              client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
+              client_email: contactData.email,
+              client_phone: contactData.phone,
+              client_postal_code: contactData.postalCode,
+              client_address: contactData.address,
+              client_address2: contactData.address2 || "",
+              client_city: contactData.city,
+              client_country: contactData.country,
+              civility: contactData.civility,
+              width: item.configuration.width,
+              projection: item.configuration.projection,
+              toile_color: item.configuration.toileColor.label,
+              armature_color: item.configuration.armatureColor.label,
+              options,
+              amount: total,
+              delivery_option: deliveryOption,
+              payment_method: paymentMethod,
+              message: contactData.note || "",
+              newsletter_optin: contactData.newsletter || false,
+            },
+          },
+        });
+
+        if (fnError) throw new Error(fnError.message);
+
+        if (data?.url) {
+          window.location.href = data.url;
+        } else if (data?.redirect) {
+          clearCart();
+          navigate(`${data.redirect}`);
+        } else {
+          throw new Error("Aucune URL de paiement retournée");
+        }
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Erreur inattendue";
