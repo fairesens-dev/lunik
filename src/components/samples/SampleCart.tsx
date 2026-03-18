@@ -1,8 +1,7 @@
-import { X } from "lucide-react";
-import type { SampleItem } from "@/contexts/SampleCartContext";
+import { Gift } from "lucide-react";
 
 interface SampleCartProps {
-  items: SampleItem[];
+  items: { name: string }[];
   unitPrice: number;
   shippingCost: number;
   totalAmount: number;
@@ -10,7 +9,7 @@ interface SampleCartProps {
   onRemove: (name: string) => void;
 }
 
-const SampleCart = ({ items, unitPrice, shippingCost, totalAmount, promoMessage, onRemove }: SampleCartProps) => {
+const SampleCart = ({ items, unitPrice, shippingCost, totalAmount, promoMessage }: SampleCartProps) => {
   const formatPrice = (n: number) => n.toLocaleString("fr-FR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   if (items.length === 0) {
@@ -23,27 +22,17 @@ const SampleCart = ({ items, unitPrice, shippingCost, totalAmount, promoMessage,
 
   return (
     <div className="bg-[#f9f7f4] border-t border-[#e8e2d8] p-4 space-y-3">
-      {/* Chips */}
-      <div className="flex flex-wrap gap-2">
-        {items.map((item) => {
-          const swatchStyle: React.CSSProperties =
-            item.type === "striped" && item.colors && item.colors.length >= 2
-              ? { background: `repeating-linear-gradient(45deg, ${item.colors[0]}, ${item.colors[0]} 4px, ${item.colors[1]} 4px, ${item.colors[1]} 8px)` }
-              : { backgroundColor: item.hex };
-
-          return (
-            <span
-              key={item.name}
-              className="inline-flex items-center gap-1.5 bg-[#e8f5e9] border border-[#4A5E3A]/30 rounded-full px-2.5 py-1 text-xs text-foreground"
-            >
-              <span className="w-3 h-3 rounded-full border border-border flex-shrink-0" style={swatchStyle} />
-              <span className="truncate max-w-[120px]">{item.name}</span>
-              <button onClick={() => onRemove(item.name)} className="hover:text-destructive transition-colors">
-                <X className="w-3 h-3" />
-              </button>
-            </span>
-          );
-        })}
+      {/* Marketing block */}
+      <div className="flex items-start gap-2.5 bg-[#e8f5e9]/60 border border-[#4A5E3A]/20 rounded-lg px-3 py-2.5">
+        <Gift className="w-4 h-4 text-[#4A5E3A] mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="text-[13px] font-semibold text-[#4A5E3A]">
+            Échantillons offerts pour tout achat d'un store LuniK
+          </p>
+          <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">
+            La commande d'échantillons génère un avoir du même montant, utilisable lors de votre commande de store LuniK.
+          </p>
+        </div>
       </div>
 
       {/* Pricing */}
