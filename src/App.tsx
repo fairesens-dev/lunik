@@ -8,6 +8,7 @@ import { ConfiguratorSettingsProvider } from "@/contexts/ConfiguratorSettingsCon
 import { ContentProvider } from "@/contexts/ContentContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ContactWidgetProvider } from "@/contexts/ContactWidgetContext";
+import { SampleCartProvider } from "@/contexts/SampleCartContext";
 import ScrollToTop from "./components/ScrollToTop";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
