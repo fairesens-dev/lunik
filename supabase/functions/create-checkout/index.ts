@@ -118,7 +118,7 @@ serve(async (req) => {
           }
         };
 
-        sendEmail("order_received");
+        sendEmail(orderType === "samples" ? "samples_confirmation" : "order_received");
       }
 
       return insertedOrder;
