@@ -53,11 +53,12 @@ const TRACKING_STAGES = [
 const CARRIERS = ["Geodis", "TNT", "Chronopost", "DPD", "GLS", "Colissimo", "Autre"];
 
 const TRANSACTIONAL_EMAILS = [
-  { key: "confirmation", label: "Confirmation commande" },
-  { key: "fabrication", label: "Accusé fabrication" },
-  { key: "expedition", label: "Email expédition" },
-  { key: "livraison", label: "Email livraison" },
-  { key: "satisfaction", label: "Email satisfaction" },
+  { key: "order_received", label: "Commande reçue" },
+  { key: "in_production", label: "En production" },
+  { key: "ready_to_ship", label: "Prêt à expédier" },
+  { key: "in_delivery", label: "Livraison en cours" },
+  { key: "delivered", label: "Livré" },
+  { key: "sav_requested", label: "Demande SAV" },
 ];
 
 // Armature color hex map
