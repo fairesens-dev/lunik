@@ -186,7 +186,10 @@ const AdminOrdersPage = () => {
               {paginated.map(o => (
                 <TableRow key={o.id}>
                   <TableCell><Checkbox checked={selected.has(o.id)} onCheckedChange={(c) => { const n = new Set(selected); if (c) n.add(o.id); else n.delete(o.id); setSelected(n); }} /></TableCell>
-                  <TableCell className="text-xs font-mono">{o.ref}</TableCell>
+                  <TableCell className="text-xs font-mono">
+                    {o.ref}
+                    {o.orderType === "samples" && <Badge className="ml-1.5 bg-purple-100 text-purple-700 text-[9px]" variant="secondary">Échantillons</Badge>}
+                  </TableCell>
                   <TableCell className="text-xs"><div>{o.client.name}</div><div className="text-gray-400">{o.client.email}</div></TableCell>
                   <TableCell className="text-xs">{o.width}×{o.projection} cm · {o.toileColor} · {o.armatureColor}</TableCell>
                   <TableCell>
