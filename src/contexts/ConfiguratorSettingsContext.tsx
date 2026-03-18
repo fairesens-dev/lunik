@@ -50,6 +50,7 @@ export interface OptionEntry {
   imageUrl?: string;
   tip?: string;
   socialProof?: string;
+  category?: string;
 }
 
 export interface ConfiguratorSettings {

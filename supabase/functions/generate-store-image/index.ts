@@ -69,7 +69,7 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const ledInstruction = led
-      ? "Add a warm white LED strip light running along the underside of the front bar, casting a soft ambient glow. Evening/dusk atmosphere."
+      ? "Transform the entire scene to a nighttime/evening atmosphere with a dark sky. Add a warm white LED strip light running along the UNDERSIDE OF THE MAIN CASSETTE HOUSING (coffre), close to the wall — NOT at the front bar tip. The LED casts a soft downward ambient glow illuminating the terrace below. The overall mood should be cozy evening lighting."
       : "Keep the daytime bright natural sunlight. No LED lighting.";
 
     const fabricReference = toilePhotoUrl
