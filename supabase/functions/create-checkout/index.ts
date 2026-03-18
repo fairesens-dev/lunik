@@ -185,6 +185,8 @@ serve(async (req) => {
         stripe_payment_intent_id: session.id,
         status: "Nouveau",
         status_history: [{ status: "Nouveau", date: new Date().toISOString() }],
+        order_type: orderData.order_type || "store",
+        sample_items: orderData.sample_items || null,
       }).select("id").single();
 
       if (insertError) {
