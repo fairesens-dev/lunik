@@ -38,7 +38,8 @@ const ConfigurateurPage = () => {
   const { setStage } = useCartAbandonment();
   const { content } = useContent();
   const { productPage } = content;
-
+  const { enabled: sampleEnabled } = useSampleCart();
+  const [sampleModalOpen, setSampleModalOpen] = useState(false);
   useEffect(() => {
     setStage("configurateur");
   }, [setStage]);
