@@ -57,7 +57,18 @@ const CheckoutPage = () => {
 
   const handleStep2 = (delivery: string) => {
     setDeliveryOption(delivery);
-    setStep(3);
+    setStep(isSampleOrder ? 2 : 3);
+    window.scrollTo(0, 0);
+  };
+
+  // For samples, after step 1 go to payment directly (step becomes 2 which maps to payment)
+  const handleStep1Samples = (data: Step1Data) => {
+    setContactData(data);
+    if (isSampleOrder) {
+      setStep(2); // step 2 = payment for samples
+    } else {
+      setStep(2);
+    }
     window.scrollTo(0, 0);
   };
 
