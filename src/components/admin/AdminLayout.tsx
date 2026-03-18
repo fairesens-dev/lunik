@@ -56,6 +56,7 @@ const routeTitles: Record<string, string> = {
   "/admin/tracking": "Tracking",
   "/admin/contacts": "Clients",
   "/admin/campaigns": "Campagnes",
+  "/admin/emails": "E-mails",
   "/admin/scoring": "Scoring",
   "/admin/modals": "Modals",
   "/admin/parametres": "Paramètres",
