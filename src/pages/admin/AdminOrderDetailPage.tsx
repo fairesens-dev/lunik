@@ -447,6 +447,35 @@ const AdminOrderDetailPage = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               {/* Product row with generated image */}
+              {order.order_type === "samples" ? (
+                <>
+                  <div className="flex gap-4 items-start">
+                    <div className="w-20 h-20 bg-purple-50 rounded overflow-hidden flex items-center justify-center shrink-0">
+                      <Package className="w-8 h-8 text-purple-400" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm">Échantillons de toile Dickson</p>
+                      <Badge className="bg-purple-100 text-purple-700 text-[10px] mt-1" variant="secondary">Échantillons</Badge>
+                    </div>
+                  </div>
+
+                  {/* Sample items list */}
+                  <div className="border rounded-md overflow-hidden text-sm">
+                    <div className="px-3 py-2 bg-gray-50 font-medium text-xs text-muted-foreground uppercase tracking-wide">Coloris commandés ({((order.sample_items as any[]) || []).length})</div>
+                    {((order.sample_items as any[]) || []).map((item: any, i: number) => (
+                      <div key={i} className="flex items-center gap-3 px-3 py-2 border-t">
+                        <span
+                          className="w-5 h-5 rounded border shrink-0"
+                          style={{ backgroundColor: item.hex || '#ccc' }}
+                        />
+                        <span className="text-sm">{item.name}</span>
+                        {item.refCode && <span className="text-xs text-muted-foreground">({item.refCode})</span>}
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <>
               <div className="flex gap-4 items-start">
                 <div className="w-20 h-20 bg-stone-200 rounded overflow-hidden flex items-center justify-center shrink-0">
                   {storeImageLoading ? (
@@ -503,6 +532,8 @@ const AdminOrderDetailPage = () => {
                   ))}
                 </div>
               </div>
+                </>
+              )}
 
               {order.message && (
                 <div className="bg-gray-50 rounded-md p-3 text-sm text-muted-foreground italic border">

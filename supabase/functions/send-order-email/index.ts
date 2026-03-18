@@ -361,6 +361,41 @@ ${contactBlock()}
 `, order.ref);
 }
 
+function samplesConfirmationTemplate(order: any) {
+  const prenom = firstName(order.client_name);
+  const sampleItems = (order.sample_items || []) as Array<{ name: string; hex: string; refCode?: string }>;
+  const samplesList = sampleItems.map(item =>
+    `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d8;font-size:14px;color:#2d2d2d;">
+      <span style="display:inline-block;width:16px;height:16px;background:${item.hex || '#ccc'};border-radius:3px;vertical-align:middle;margin-right:8px;border:1px solid #e8e2d8;"></span>
+      ${item.name}${item.refCode ? ` <span style="color:#8a7e6b;font-size:12px;">(${item.refCode})</span>` : ''}
+    </td></tr>`
+  ).join('');
+
+  return emailWrapper(`
+${iconHeader("🎨", "#e8f5e9", `Vos échantillons arrivent bientôt, ${prenom} !`)}
+
+<p style="font-size:14px;color:#555555;line-height:1.7;">Merci pour votre commande d'échantillons ! Vous recevrez prochainement vos coloris de toile Dickson pour les découvrir en conditions réelles.</p>
+
+<!-- Sample items -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;margin:20px 0;">
+<tr><td style="padding:16px 12px 8px;">
+<p style="margin:0 0 8px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">VOS ÉCHANTILLONS — Réf. ${order.ref}</p>
+</td></tr>
+${samplesList}
+<tr><td style="padding:12px;border-top:1px solid #e8e2d8;">
+<p style="margin:0;font-size:16px;font-weight:bold;color:#2d2d2d;">Total : ${formatPrice(order.amount)} €</p>
+<p style="margin:4px 0 0;font-size:12px;color:#8a7e6b;">${sampleItems.length} échantillon${sampleItems.length > 1 ? 's' : ''}</p>
+</td></tr>
+</table>
+
+<h2 style="font-family:Georgia,serif;font-size:18px;color:#2d2d2d;margin:28px 0 12px;">Et après ?</h2>
+<p style="font-size:14px;color:#555555;line-height:1.7;">Une fois vos échantillons reçus, rendez-vous sur notre configurateur pour créer votre store sur-mesure !</p>
+
+${ctaButton("Configurer mon store →", `${SITE_URL}/configurateur`)}
+${contactBlock()}
+`, order.ref);
+}
+
 function savRequestedTemplate(order: any, extra?: { ticketRef?: string; issue?: string }) {
   const prenom = firstName(order.client_name);
   const ticketRef = extra?.ticketRef || "En cours d'attribution";
@@ -407,7 +442,7 @@ ${contactBlock("Besoin urgent ? Appelez-nous directement au 03 68 38 10 30")}
 
 // ─── TEMPLATE MAP ──────────────────────────────────────────────────
 
-type EmailType = "order_received" | "in_production" | "ready_to_ship" | "in_delivery" | "delivered" | "sav_requested";
+type EmailType = "order_received" | "in_production" | "ready_to_ship" | "in_delivery" | "delivered" | "sav_requested" | "samples_confirmation";
 
 function getEmailConfig(type: EmailType, order: any, extra?: any): { subject: string; html: string; to: string } | null {
   const configs: Record<EmailType, { subject: string; html: string; to: string }> = {
@@ -439,6 +474,11 @@ function getEmailConfig(type: EmailType, order: any, extra?: any): { subject: st
     sav_requested: {
       subject: `🔧 Votre demande SAV a bien été reçue — Réf. ${order.ref} | LuniK`,
       html: savRequestedTemplate(order, extra),
+      to: order.client_email,
+    },
+    samples_confirmation: {
+      subject: `🎨 Vos échantillons de toile sont en chemin ! — Réf. ${order.ref} | LuniK`,
+      html: samplesConfirmationTemplate(order),
       to: order.client_email,
     },
   };

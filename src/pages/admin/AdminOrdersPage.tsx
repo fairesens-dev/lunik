@@ -19,6 +19,8 @@ interface Order {
   message: string;
   statusHistory: { status: string; date: string }[];
   notes: string;
+  orderType: string;
+  sampleItems: Array<{ name: string; hex: string; refCode?: string }> | null;
 }
 
 function mapRow(r: any): Order {
@@ -37,6 +39,8 @@ function mapRow(r: any): Order {
     message: r.message || "",
     statusHistory: r.status_history || [],
     notes: r.notes || "",
+    orderType: r.order_type || "store",
+    sampleItems: r.sample_items || null,
   };
 }
 
@@ -72,6 +76,7 @@ const AdminOrdersPage = () => {
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [typeFilter, setTypeFilter] = useState("Tous types");
 
   useEffect(() => {
     (async () => {
@@ -88,8 +93,10 @@ const AdminOrdersPage = () => {
       result = result.filter(o => o.client.name.toLowerCase().includes(q) || o.client.email.toLowerCase().includes(q) || o.ref.toLowerCase().includes(q));
     }
     if (statusFilter !== "Tous") result = result.filter(o => o.status === statusFilter);
+    if (typeFilter === "Stores") result = result.filter(o => o.orderType !== "samples");
+    if (typeFilter === "Échantillons") result = result.filter(o => o.orderType === "samples");
     return result;
-  }, [orders, search, statusFilter]);
+  }, [orders, search, statusFilter, typeFilter]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
@@ -134,6 +141,12 @@ const AdminOrdersPage = () => {
               <SelectTrigger className="w-[160px]"><SelectValue /></SelectTrigger>
               <SelectContent>{STATUS_OPTIONS.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}</SelectContent>
             </Select>
+            <Select value={typeFilter} onValueChange={v => { setTypeFilter(v); setPage(1); }}>
+              <SelectTrigger className="w-[140px]"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {["Tous types", "Stores", "Échantillons"].map(t => <SelectItem key={t} value={t}>{t}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <Select value={period} onValueChange={setPeriod}>
               <SelectTrigger className="w-[150px]"><SelectValue /></SelectTrigger>
               <SelectContent>{PERIOD_OPTIONS.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}</SelectContent>
@@ -173,9 +186,16 @@ const AdminOrdersPage = () => {
               {paginated.map(o => (
                 <TableRow key={o.id}>
                   <TableCell><Checkbox checked={selected.has(o.id)} onCheckedChange={(c) => { const n = new Set(selected); if (c) n.add(o.id); else n.delete(o.id); setSelected(n); }} /></TableCell>
-                  <TableCell className="text-xs font-mono">{o.ref}</TableCell>
+                  <TableCell className="text-xs font-mono">
+                    {o.ref}
+                    {o.orderType === "samples" && <Badge className="ml-1.5 bg-purple-100 text-purple-700 text-[9px]" variant="secondary">Échantillons</Badge>}
+                  </TableCell>
                   <TableCell className="text-xs"><div>{o.client.name}</div><div className="text-gray-400">{o.client.email}</div></TableCell>
-                  <TableCell className="text-xs">{o.width}×{o.projection} cm · {o.toileColor} · {o.armatureColor}</TableCell>
+                  <TableCell className="text-xs">
+                    {o.orderType === "samples"
+                      ? `${(o.sampleItems || []).length} échantillon${(o.sampleItems || []).length > 1 ? "s" : ""}`
+                      : `${o.width}×${o.projection} cm · ${o.toileColor} · ${o.armatureColor}`}
+                  </TableCell>
                   <TableCell>
                     <div className="flex gap-1">
                       {o.options.length === 0 && <span className="text-xs text-gray-400">—</span>}
