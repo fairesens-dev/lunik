@@ -58,6 +58,7 @@ const App = () => (
         <ContentProvider>
         <ConfiguratorSettingsProvider>
         <CartProvider>
+        <SampleCartProvider>
         <AuthProvider>
         <ContactWidgetProvider>
           <Routes>
