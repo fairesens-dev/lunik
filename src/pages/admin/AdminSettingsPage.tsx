@@ -912,6 +912,9 @@ function PaymentTab() {
       </Card>
 
       <Button onClick={save} className="w-full">Sauvegarder les paramètres de paiement</Button>
+
+      {/* Échantillons */}
+      <SamplesSettingsCard />
     </div>
   );
 }
