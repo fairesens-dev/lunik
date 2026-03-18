@@ -58,6 +58,7 @@ interface Props {
   onPromoApplied?: (code: string, discount: number) => void;
   promoCode?: string;
   promoDiscount?: number;
+  isSampleOrder?: boolean;
 }
 
 const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, promoCode = "", promoDiscount = 0 }: Props) => {
