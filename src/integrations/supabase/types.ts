@@ -657,12 +657,14 @@ export type Database = {
           newsletter_optin: boolean | null
           notes: string | null
           options: string[] | null
+          order_type: string | null
           payment_method: string | null
           payment_status: string | null
           projection: number
           promo_code: string | null
           promo_discount: number | null
           ref: string
+          sample_items: Json | null
           status: string
           status_history: Json | null
           stripe_payment_intent_id: string | null
@@ -689,12 +691,14 @@ export type Database = {
           newsletter_optin?: boolean | null
           notes?: string | null
           options?: string[] | null
+          order_type?: string | null
           payment_method?: string | null
           payment_status?: string | null
           projection: number
           promo_code?: string | null
           promo_discount?: number | null
           ref: string
+          sample_items?: Json | null
           status?: string
           status_history?: Json | null
           stripe_payment_intent_id?: string | null
@@ -721,12 +725,14 @@ export type Database = {
           newsletter_optin?: boolean | null
           notes?: string | null
           options?: string[] | null
+          order_type?: string | null
           payment_method?: string | null
           payment_status?: string | null
           projection?: number
           promo_code?: string | null
           promo_discount?: number | null
           ref?: string
+          sample_items?: Json | null
           status?: string
           status_history?: Json | null
           stripe_payment_intent_id?: string | null
