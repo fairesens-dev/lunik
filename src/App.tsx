@@ -8,6 +8,7 @@ import { ConfiguratorSettingsProvider } from "@/contexts/ConfiguratorSettingsCon
 import { ContentProvider } from "@/contexts/ContentContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ContactWidgetProvider } from "@/contexts/ContactWidgetContext";
+import ScrollToTop from "./components/ScrollToTop";
 import Layout from "./components/Layout";
 import Index from "./pages/Index";
 import SAVPage from "./pages/SAVPage";
@@ -51,6 +52,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+        <ScrollToTop />
         <ContentProvider>
         <ConfiguratorSettingsProvider>
         <CartProvider>
