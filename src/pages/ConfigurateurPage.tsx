@@ -117,6 +117,21 @@ const ConfigurateurPage = () => {
   // Sort options by order field
   const sortedOptions = [...PRICING_OPTIONS].sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
 
+  // Group options by category for step 03
+  const groupedOptions = useMemo(() => {
+    const groups: { category: string; options: typeof sortedOptions }[] = [];
+    const catMap = new Map<string, typeof sortedOptions>();
+    for (const opt of sortedOptions) {
+      const cat = opt.category || "Autres";
+      if (!catMap.has(cat)) {
+        catMap.set(cat, []);
+        groups.push({ category: cat, options: catMap.get(cat)! });
+      }
+      catMap.get(cat)!.push(opt);
+    }
+    return groups;
+  }, [sortedOptions]);
+
   // Contextual sticky bar button label & action
   const stickyButtonLabel =
     activeStep === "01" ? "Choisir mes couleurs" : activeStep === "02" ? "Personnaliser les options" : "Commander";
