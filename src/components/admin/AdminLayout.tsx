@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard, Package, MessageSquare, Settings2,
   FileEdit, BarChart3, Wrench, LogOut, Bell, ExternalLink,
-  Menu, X, ChevronRight, Tag, Users, Mail, Layers, Target,
+  Menu, X, ChevronRight, Tag, Users, Mail, Layers, Target, Inbox,
 } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
