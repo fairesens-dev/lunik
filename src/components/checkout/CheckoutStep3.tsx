@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import OrderSummary from "./OrderSummary";
 import { useCart } from "@/contexts/CartContext";
+import { useSampleCart } from "@/contexts/SampleCartContext";
 import type { Step1Data } from "./CheckoutStep1";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -38,10 +39,12 @@ interface Props {
   onBack: () => void;
   promoCode?: string;
   promoDiscount?: number;
+  isSampleOrder?: boolean;
 }
 
-const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", promoDiscount = 0 }: Props) => {
+const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", promoDiscount = 0, isSampleOrder = false }: Props) => {
   const { item, clearCart } = useCart();
+  const sampleCart = useSampleCart();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState<"card" | "transfer" | "check">("card");
@@ -66,9 +69,12 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     else if (settings.check.enabled) setPaymentMethod("check");
   }, [settingsLoaded, settings]);
 
-  if (!item) return null;
+  if (!isSampleOrder && !item) return null;
+  if (isSampleOrder && sampleCart.totalItems === 0) return null;
 
-  const total = item.pricing.total - promoDiscount;
+  const total = isSampleOrder
+    ? sampleCart.totalAmount - promoDiscount
+    : (item?.pricing.total ?? 0) - promoDiscount;
 
   const generateRef = () => "SC-" + Date.now().toString(36).toUpperCase();
 
