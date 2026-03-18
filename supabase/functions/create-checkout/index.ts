@@ -178,7 +178,7 @@ serve(async (req) => {
     if (orderData) {
       const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
         ...orderData,
-        amount: finalAmount,
+        amount: Math.round(finalAmount),
         promo_code: promoCode || "",
         promo_discount: validatedDiscount,
         payment_status: "pending",
