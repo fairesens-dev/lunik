@@ -241,14 +241,14 @@ const AdminOrderDetailPage = () => {
       toast({ title: "Statut mis à jour", description: `Commande ${order.ref} → ${newStatus}` });
 
       const emailMap: Record<string, string> = {
-        "En fabrication": "fabrication",
-        "Expédié": "shipped",
+        "En fabrication": "in_production",
+        "Prêt à expédier": "ready_to_ship",
+        "Expédié": "in_delivery",
         "Livré": "delivered",
-        "Annulé": "cancellation",
       };
       const emailType = emailMap[newStatus];
       if (emailType) {
-        if (emailType === "shipped") {
+        if (emailType === "in_delivery") {
           setShowTrackingModal(true);
         } else {
           await sendOrderEmail(emailType);
