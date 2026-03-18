@@ -1,4 +1,4 @@
-import { Check, TrendingUp, Lightbulb, Ruler, ArrowLeftRight, ArrowUpDown, RotateCcw } from "lucide-react";
+import { Check, TrendingUp, Ruler, ArrowLeftRight, ArrowUpDown, RotateCcw } from "lucide-react";
 import MeasurementDiagram from "@/components/product/MeasurementDiagram";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
