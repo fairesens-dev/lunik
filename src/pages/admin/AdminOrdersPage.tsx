@@ -40,7 +40,7 @@ function mapRow(r: any): Order {
   };
 }
 
-const STATUS_OPTIONS = ["Tous", "Nouveau", "En fabrication", "Expédié", "Livré", "Annulé"];
+const STATUS_OPTIONS = ["Tous", "Nouveau", "En fabrication", "Prêt à expédier", "Expédié", "Livré", "Annulé"];
 const PERIOD_OPTIONS = ["Ce mois", "3 mois", "6 mois", "Cette année", "Personnalisé"];
 
 const statusColor: Record<string, string> = {
