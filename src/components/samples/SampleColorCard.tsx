@@ -1,5 +1,5 @@
 import React from "react";
-import { Plus, Check, X } from "lucide-react";
+import { Plus, Check, Search } from "lucide-react";
 
 interface SampleColorCardProps {
   name: string;
@@ -10,9 +10,10 @@ interface SampleColorCardProps {
   photoUrl?: string;
   isSelected: boolean;
   onToggle: () => void;
+  onZoom?: () => void;
 }
 
-const SampleColorCard = ({ name, hex, type, colors, refCode, photoUrl, isSelected, onToggle }: SampleColorCardProps) => {
+const SampleColorCard = ({ name, hex, type, colors, refCode, photoUrl, isSelected, onToggle, onZoom }: SampleColorCardProps) => {
   const getSwatchStyle = (): React.CSSProperties => {
     if (photoUrl) {
       return { backgroundImage: `url(${photoUrl})`, backgroundSize: "cover", backgroundPosition: "center" };
@@ -32,10 +33,20 @@ const SampleColorCard = ({ name, hex, type, colors, refCode, photoUrl, isSelecte
           : "border-transparent hover:bg-secondary/50"
       }`}
     >
-      <div
-        className="w-8 h-8 rounded-md border border-border flex-shrink-0"
-        style={getSwatchStyle()}
-      />
+      <div className="relative group flex-shrink-0">
+        <div
+          className="w-8 h-8 rounded-md border border-border"
+          style={getSwatchStyle()}
+        />
+        {photoUrl && onZoom && (
+          <div
+            onClick={(e) => { e.stopPropagation(); onZoom(); }}
+            className="absolute inset-0 rounded-md bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer"
+          >
+            <Search className="w-3.5 h-3.5 text-white" />
+          </div>
+        )}
+      </div>
       <div className="flex-1 min-w-0">
         <p className="text-[13px] font-medium text-foreground truncate">{name}</p>
         {refCode && <p className="text-[10px] text-muted-foreground">{refCode}</p>}
