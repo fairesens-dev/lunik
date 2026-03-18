@@ -93,8 +93,10 @@ const AdminOrdersPage = () => {
       result = result.filter(o => o.client.name.toLowerCase().includes(q) || o.client.email.toLowerCase().includes(q) || o.ref.toLowerCase().includes(q));
     }
     if (statusFilter !== "Tous") result = result.filter(o => o.status === statusFilter);
+    if (typeFilter === "Stores") result = result.filter(o => o.orderType !== "samples");
+    if (typeFilter === "Échantillons") result = result.filter(o => o.orderType === "samples");
     return result;
-  }, [orders, search, statusFilter]);
+  }, [orders, search, statusFilter, typeFilter]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated = filtered.slice((page - 1) * PER_PAGE, page * PER_PAGE);
