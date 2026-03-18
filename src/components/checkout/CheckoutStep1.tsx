@@ -88,7 +88,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
   const civility = watch("civility");
   const differentDelivery = watch("differentDelivery");
 
-  if (!item) return null;
+  if (!isSampleOrder && !item) return null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_400px] gap-8 w-full">
