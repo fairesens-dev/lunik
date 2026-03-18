@@ -19,6 +19,8 @@ interface Order {
   message: string;
   statusHistory: { status: string; date: string }[];
   notes: string;
+  orderType: string;
+  sampleItems: Array<{ name: string; hex: string; refCode?: string }> | null;
 }
 
 function mapRow(r: any): Order {
