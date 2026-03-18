@@ -21,8 +21,28 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("fr-FR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
+function formatDateShort(d: string) {
+  if (!d) return "—";
+  return new Date(d).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
 function firstName(fullName: string) {
   return (fullName || "").replace(/^(M\.|Mme)\s*/, "").split(" ")[0] || "Client";
+}
+
+// ─── CONTACT BLOCK ────────────────────────────────────────────────
+
+function contactBlock(extra?: string) {
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 0;">
+<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;text-align:center;">
+<p style="margin:0 0 8px;font-family:Georgia,serif;font-size:14px;color:#2d2d2d;font-weight:bold;">Besoin d'aide ?</p>
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.8;">
+📞 <a href="tel:+33368381030" style="color:#4A5E3A;text-decoration:none;font-weight:bold;">03 68 38 10 30</a><br>
+📧 <a href="mailto:contact@lunik-store.fr" style="color:#4A5E3A;text-decoration:none;">contact@lunik-store.fr</a><br>
+<span style="color:#8a7e6b;font-size:12px;">Lundi – Vendredi : 9h – 18h</span>
+</p>
+${extra ? `<p style="margin:12px 0 0;font-size:12px;color:#c17c3e;font-weight:bold;">${extra}</p>` : ""}
+</td></tr></table>`;
 }
 
 // ─── EMAIL WRAPPER ─────────────────────────────────────────────────
@@ -31,31 +51,46 @@ function emailWrapper(content: string, ref?: string) {
   return `<!DOCTYPE html>
 <html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Mon Store</title></head>
-<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:Arial,Helvetica,sans-serif;">
+<title>LuniK</title></head>
+<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f0e8;">
 <tr><td align="center" style="padding:24px 16px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
 <!-- HEADER -->
-<tr><td style="background-color:#f5f0e8;padding:24px 32px;text-align:center;">
-<h1 style="margin:0;font-family:Georgia,serif;font-size:28px;color:#4A5E3A;letter-spacing:2px;">MON STORE</h1>
-<p style="margin:4px 0 0;font-size:12px;color:#8a7e6b;letter-spacing:1px;">Protection solaire sur-mesure</p>
+<tr><td style="background-color:#f5f0e8;padding:32px 32px 24px;text-align:center;">
+<h1 style="margin:0;font-family:Georgia,serif;font-size:28px;color:#4A5E3A;letter-spacing:2px;">LUNIK</h1>
+<p style="margin:6px 0 0;font-size:12px;color:#8a7e6b;letter-spacing:1px;font-family:Arial,Helvetica,sans-serif;">Protection solaire sur-mesure</p>
 </td></tr>
 
 <!-- CONTENT -->
-<tr><td style="background-color:#ffffff;padding:32px;">
+<tr><td style="background-color:#ffffff;padding:40px 32px;border-radius:4px 4px 0 0;">
 ${content}
 </td></tr>
 
 <!-- FOOTER -->
-<tr><td style="padding:24px 32px;text-align:center;">
-<p style="margin:0 0 8px;font-size:12px;color:#8a7e6b;">Mon Store — 12 rue de l'Atelier, 67000 Strasbourg</p>
-<p style="margin:0 0 8px;font-size:11px;color:#8a7e6b;">
-<a href="${SITE_URL}/cgv" style="color:#4A5E3A;text-decoration:underline;">CGV</a> · 
-<a href="${SITE_URL}/mentions-legales" style="color:#4A5E3A;text-decoration:underline;">Mentions légales</a>
+<tr><td style="background-color:#ffffff;border-top:1px solid #e8e2d8;padding:24px 32px 32px;border-radius:0 0 4px 4px;">
+
+<!-- Social links -->
+<table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
+<tr>
+<td style="padding:0 12px;"><a href="https://www.instagram.com/lunik.store/" style="color:#4A5E3A;text-decoration:none;font-size:13px;">Instagram</a></td>
+<td style="color:#e8e2d8;">|</td>
+<td style="padding:0 12px;"><a href="https://www.facebook.com/lunik.store/" style="color:#4A5E3A;text-decoration:none;font-size:13px;">Facebook</a></td>
+<td style="color:#e8e2d8;">|</td>
+<td style="padding:0 12px;"><a href="https://www.pinterest.fr/lunikstore/" style="color:#4A5E3A;text-decoration:none;font-size:13px;">Pinterest</a></td>
+</tr></table>
+
+<p style="margin:0 0 8px;font-size:12px;color:#8a7e6b;text-align:center;">LuniK — 15 Chemin de la Loupe, 67420 Ranrupt, France</p>
+<p style="margin:0 0 12px;font-size:11px;color:#8a7e6b;text-align:center;">
+<a href="${SITE_URL}/cgv" style="color:#4A5E3A;text-decoration:underline;">CGV</a> &nbsp;·&nbsp; 
+<a href="${SITE_URL}/mentions-legales" style="color:#4A5E3A;text-decoration:underline;">Mentions légales</a> &nbsp;·&nbsp;
+<a href="${SITE_URL}/cookies" style="color:#4A5E3A;text-decoration:underline;">Politique de cookies</a>
 </p>
-${ref ? `<p style="margin:0;font-size:11px;color:#b0a898;">Réf : ${ref}</p>` : ""}
+${ref ? `<p style="margin:0 0 8px;font-size:11px;color:#b0a898;text-align:center;">Réf. commande : ${ref}</p>` : ""}
+<p style="margin:0;font-size:10px;color:#b0a898;text-align:center;">
+<a href="#" style="color:#b0a898;text-decoration:underline;">Se désinscrire</a> de nos communications
+</p>
 </td></tr>
 
 </table>
@@ -65,12 +100,19 @@ ${ref ? `<p style="margin:0;font-size:11px;color:#b0a898;">Réf : ${ref}</p>` : 
 </html>`;
 }
 
-// ─── CTA BUTTON ────────────────────────────────────────────────────
+// ─── CTA BUTTONS ──────────────────────────────────────────────────
 
 function ctaButton(text: string, url: string) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
 <tr><td style="background-color:#4A5E3A;border-radius:6px;padding:14px 32px;">
-<a href="${url}" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block;">${text}</a>
+<a href="${url}" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block;font-family:Arial,Helvetica,sans-serif;">${text}</a>
+</td></tr></table>`;
+}
+
+function ctaButtonOutline(text: string, url: string) {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto;">
+<tr><td style="border:2px solid #4A5E3A;border-radius:6px;padding:12px 28px;background-color:transparent;">
+<a href="${url}" style="color:#4A5E3A;text-decoration:none;font-size:13px;font-weight:bold;display:inline-block;font-family:Arial,Helvetica,sans-serif;">${text}</a>
 </td></tr></table>`;
 }
 
@@ -79,14 +121,14 @@ function ctaButton(text: string, url: string) {
 function configSummary(order: any) {
   const options = order.options || [];
   const optionsText = options.length > 0 ? options.map((o: string) => `+ ${o}`).join("<br>") : "";
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;margin:16px 0;">
-<tr><td style="padding:20px;">
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;margin:20px 0;">
+<tr><td style="padding:24px;">
 <p style="margin:0 0 4px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">VOTRE COMMANDE — Réf. ${order.ref}</p>
-<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:18px;color:#333;">Store Coffre Sur-Mesure</p>
-<p style="margin:0 0 4px;font-size:14px;color:#555;">${order.width} × ${order.projection} cm · Toile ${order.toile_color || "—"} · ${order.armature_color || "—"}</p>
+<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:18px;color:#2d2d2d;">Store Coffre Sur-Mesure</p>
+<p style="margin:0 0 4px;font-size:14px;color:#555555;">${order.width} × ${order.projection} cm · Toile ${order.toile_color || "—"} · ${order.armature_color || "—"}</p>
 ${optionsText ? `<p style="margin:8px 0 0;font-size:13px;color:#4A5E3A;">${optionsText}</p>` : ""}
 <hr style="border:none;border-top:1px solid #e8e2d8;margin:16px 0;">
-<p style="margin:0;font-size:16px;font-weight:bold;color:#333;">Total payé : ${formatPrice(order.amount)} €</p>
+<p style="margin:0;font-size:16px;font-weight:bold;color:#2d2d2d;">Total payé : ${formatPrice(order.amount)} €</p>
 <p style="margin:4px 0 0;font-size:12px;color:#8a7e6b;">Date : ${formatDate(order.created_at)}</p>
 </td></tr></table>`;
 }
@@ -96,290 +138,308 @@ ${optionsText ? `<p style="margin:8px 0 0;font-size:13px;color:#4A5E3A;">${optio
 function progressBar(activeIndex: number) {
   const steps = ["Commandé", "Fabrication", "Expédié", "Livré"];
   const dots = steps.map((s, i) => {
-    const active = i <= activeIndex;
-    const color = active ? "#4A5E3A" : "#ccc";
-    return `<td style="text-align:center;padding:0 4px;">
-<div style="width:14px;height:14px;border-radius:50%;background:${color};margin:0 auto 4px;"></div>
-<span style="font-size:10px;color:${active ? "#4A5E3A" : "#999"};">${s}</span>
+    const isActive = i <= Math.floor(activeIndex);
+    const isInProgress = !isActive && i === Math.ceil(activeIndex) && activeIndex % 1 !== 0;
+    let dotStyle: string;
+    if (isActive) {
+      dotStyle = "width:16px;height:16px;border-radius:50%;background:#4A5E3A;margin:0 auto 6px;";
+    } else if (isInProgress) {
+      dotStyle = "width:16px;height:16px;border-radius:50%;background:#ffffff;border:3px solid #4A5E3A;margin:0 auto 6px;box-sizing:border-box;";
+    } else {
+      dotStyle = "width:16px;height:16px;border-radius:50%;background:#ddd;margin:0 auto 6px;";
+    }
+    const labelColor = isActive ? "#4A5E3A" : isInProgress ? "#4A5E3A" : "#999";
+    const labelWeight = isActive || isInProgress ? "bold" : "normal";
+    return `<td style="text-align:center;padding:0 8px;width:25%;">
+<div style="${dotStyle}"></div>
+<span style="font-size:10px;color:${labelColor};font-weight:${labelWeight};font-family:Arial,Helvetica,sans-serif;">${s}</span>
 </td>`;
   }).join("");
-  return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto;"><tr>${dots}</tr></table>`;
+
+  // Connection line
+  return `<table role="presentation" cellpadding="0" cellspacing="0" width="80%" style="margin:20px auto;">
+<tr>${dots}</tr></table>`;
+}
+
+// ─── ICON HEADER ──────────────────────────────────────────────────
+
+function iconHeader(emoji: string, bgColor: string, title: string) {
+  return `<div style="text-align:center;margin-bottom:24px;">
+<div style="width:60px;height:60px;border-radius:50%;background-color:${bgColor};margin:0 auto 16px;line-height:60px;font-size:30px;">${emoji}</div>
+<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#2d2d2d;line-height:1.3;">${title}</h1>
+</div>`;
 }
 
 // ─── TEMPLATES ─────────────────────────────────────────────────────
 
-function confirmationTemplate(order: any) {
+function orderReceivedTemplate(order: any) {
   const prenom = firstName(order.client_name);
   return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<div style="width:56px;height:56px;border-radius:50%;background-color:#e8f5e9;margin:0 auto 12px;line-height:56px;font-size:28px;">✅</div>
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Merci pour votre commande, ${prenom} !</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">Nous avons bien reçu votre commande et votre paiement. Notre équipe va prendre contact avec vous dans les 24h pour confirmer les détails de fabrication.</p>
+${iconHeader("✅", "#e8f5e9", `Merci pour votre commande, ${prenom} !`)}
+
+<p style="font-size:14px;color:#555555;line-height:1.7;">Nous avons bien reçu votre commande et votre paiement. Votre store sur-mesure va bientôt être transmis à notre atelier de fabrication en France.</p>
+
+<!-- Alert block: 48h modification -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#fff8e1;border-left:4px solid #c17c3e;border-radius:4px;padding:20px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="width:32px;vertical-align:top;font-size:20px;">⏰</td>
+<td>
+<p style="margin:0 0 6px;font-family:Georgia,serif;font-size:15px;color:#2d2d2d;font-weight:bold;">Vous avez 48h pour modifier votre commande</p>
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.6;">Une fois ce délai passé, votre commande sera transmise à l'usine et ne pourra plus être modifiée. Pour tout changement (dimensions, coloris, options), contactez-nous rapidement.</p>
+</td>
+</tr></table>
+${ctaButtonOutline("Modifier ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
+</td></tr></table>
 
 ${configSummary(order)}
 
-<h2 style="font-family:Georgia,serif;font-size:18px;color:#333;margin:24px 0 12px;">Et maintenant ?</h2>
+<h2 style="font-family:Georgia,serif;font-size:18px;color:#2d2d2d;margin:28px 0 16px;">Et maintenant ?</h2>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:8px 0;font-size:14px;color:#555;">
-<strong style="color:#4A5E3A;">1.</strong> Appel de notre équipe sous 24h</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555;">
-<strong style="color:#4A5E3A;">2.</strong> Fabrication sur-mesure en France (3-4 semaines)</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555;">
-<strong style="color:#4A5E3A;">3.</strong> Livraison et installation</td></tr>
+<tr><td style="padding:10px 0;font-size:14px;color:#555555;border-bottom:1px solid #f0ece4;">
+<strong style="color:#4A5E3A;font-size:16px;margin-right:8px;">1.</strong> Transmission à l'usine sous 48h</td></tr>
+<tr><td style="padding:10px 0;font-size:14px;color:#555555;border-bottom:1px solid #f0ece4;">
+<strong style="color:#4A5E3A;font-size:16px;margin-right:8px;">2.</strong> Fabrication sur-mesure en France (4-5 semaines)</td></tr>
+<tr><td style="padding:10px 0;font-size:14px;color:#555555;">
+<strong style="color:#4A5E3A;font-size:16px;margin-right:8px;">3.</strong> Livraison à domicile par transporteur</td></tr>
 </table>
 
 ${ctaButton("Suivre ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
-
-<p style="font-size:12px;color:#8a7e6b;text-align:center;margin-top:16px;">
-📞 03 88 XX XX XX · 📧 contact@monstore.fr<br>Lun–Ven 9h–18h
-</p>
+${contactBlock()}
 `, order.ref);
 }
 
-function fabricationTemplate(order: any) {
+function inProductionTemplate(order: any) {
   const prenom = firstName(order.client_name);
-  const estimatedDate = new Date(Date.now() + 28 * 86400000).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const estimatedDate = new Date(Date.now() + 35 * 86400000).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<div style="width:56px;height:56px;border-radius:50%;background-color:#fff3e0;margin:0 auto 12px;line-height:56px;font-size:28px;">🏭</div>
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Bonne nouvelle, ${prenom} !</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">Votre store est maintenant en cours de fabrication dans notre atelier en France.</p>
+${iconHeader("🏭", "#fff3e0", `Votre store est entre de bonnes mains, ${prenom} !`)}
 
-<div style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:16px;margin:16px 0;text-align:center;">
-<p style="margin:0 0 8px;font-size:13px;color:#8a7e6b;">Date de livraison estimée</p>
-<p style="margin:0;font-size:18px;font-weight:bold;color:#333;">Avant le ${estimatedDate}</p>
-</div>
+<p style="font-size:14px;color:#555555;line-height:1.7;">Bonne nouvelle ! Votre commande a été transmise à notre atelier partenaire en France. Nos artisans commencent la fabrication de votre store sur-mesure.</p>
 
 ${progressBar(1)}
+
+<!-- Estimated delivery -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;text-align:center;">
+<p style="margin:0 0 8px;font-size:13px;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.5px;">Date de livraison estimée</p>
+<p style="margin:0;font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#2d2d2d;">Avant le ${estimatedDate}</p>
+</td></tr></table>
+
 ${configSummary(order)}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#333;margin:24px 0 8px;">En attendant</h2>
-<p style="font-size:13px;color:#555;line-height:1.6;">
-📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;">Consultez notre FAQ</a><br>
-🔧 <a href="${SITE_URL}/sav" style="color:#4A5E3A;">Service après-vente</a><br>
-📞 03 88 XX XX XX
+<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">💡 Le saviez-vous ?</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border-radius:8px;margin:0 0 20px;">
+<tr><td style="padding:20px;">
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.8;">
+Chaque store LuniK est fabriqué individuellement selon vos dimensions exactes, avec une <strong style="color:#2d2d2d;">toile Dickson certifiée OEKO-TEX</strong> et une <strong style="color:#2d2d2d;">motorisation Somfy</strong>. Notre atelier partenaire français est spécialisé dans les stores sur-mesure depuis plus de 30 ans.
 </p>
+</td></tr></table>
 
 ${ctaButton("Suivre ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
+${contactBlock()}
 `, order.ref);
 }
 
-function shippedTemplate(order: any, trackingInfo?: { carrier?: string; tracking_number?: string; tracking_url?: string }) {
+function readyToShipTemplate(order: any) {
   const prenom = firstName(order.client_name);
-  const carrier = trackingInfo?.carrier || "notre transporteur";
-  const trackingNumber = trackingInfo?.tracking_number || "";
-  const trackingUrl = trackingInfo?.tracking_url || "#";
   return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<div style="width:56px;height:56px;border-radius:50%;background-color:#e3f2fd;margin:0 auto 12px;line-height:56px;font-size:28px;">🚚</div>
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Votre store est en route, ${prenom} !</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">Votre colis a été pris en charge par ${carrier} et sera livré à votre adresse sous 2 à 5 jours ouvrés.</p>
+${iconHeader("📦", "#e3f2fd", `Votre store est terminé, ${prenom} !`)}
+
+<p style="font-size:14px;color:#555555;line-height:1.7;">La fabrication de votre store sur-mesure est terminée ! Il est désormais prêt et en attente de prise en charge par notre transporteur.</p>
+
+${progressBar(1.5)}
+
+<!-- Transporter info block -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#f0f4ff;border-left:4px solid #4A5E3A;border-radius:4px;padding:20px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr>
+<td style="width:32px;vertical-align:top;font-size:20px;">📧</td>
+<td>
+<p style="margin:0 0 6px;font-family:Georgia,serif;font-size:15px;color:#2d2d2d;font-weight:bold;">Prochaine étape : la livraison</p>
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.6;">Vous allez recevoir prochainement un e-mail de notre transporteur avec un lien pour choisir votre créneau de livraison. Pensez à vérifier vos spams !</p>
+</td>
+</tr></table>
+</td></tr></table>
+
+${configSummary(order)}
+
+<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">Préparez l'arrivée de votre store</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">✅ Vérifiez l'espace disponible sur votre terrasse ou façade</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">🔧 Préparez l'outillage nécessaire (perceuse, niveau à bulle)</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Consultez notre guide d'installation</a></td></tr>
+</table>
+
+${ctaButton("Suivre ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
+${contactBlock()}
+`, order.ref);
+}
+
+function inDeliveryTemplate(order: any, tracking?: { carrier?: string; tracking_number?: string; tracking_url?: string }) {
+  const prenom = firstName(order.client_name);
+  const carrier = tracking?.carrier || "notre transporteur";
+  const trackingNumber = tracking?.tracking_number || "";
+  const trackingUrl = tracking?.tracking_url || "#";
+  return emailWrapper(`
+${iconHeader("🚚", "#e3f2fd", `Votre store arrive bientôt, ${prenom} !`)}
+
+<p style="font-size:14px;color:#555555;line-height:1.7;">Votre store a été pris en charge par le transporteur et est en route vers chez vous !</p>
 
 ${progressBar(2)}
 
 ${trackingNumber ? `
-<div style="background-color:#f0f4ff;border:2px solid #4A5E3A;border-radius:8px;padding:20px;margin:16px 0;text-align:center;">
-<p style="margin:0 0 4px;font-size:12px;color:#8a7e6b;text-transform:uppercase;">Transporteur : ${carrier}</p>
-<p style="margin:0 0 12px;font-family:'Courier New',monospace;font-size:20px;font-weight:bold;color:#333;letter-spacing:1px;">${trackingNumber}</p>
+<!-- Tracking block -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#f0f4ff;border:2px solid #4A5E3A;border-radius:8px;padding:24px;text-align:center;">
+<p style="margin:0 0 4px;font-size:12px;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.5px;">Transporteur : ${carrier}</p>
+<p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:20px;font-weight:bold;color:#2d2d2d;letter-spacing:1px;">${trackingNumber}</p>
 ${ctaButton("Suivre mon colis →", trackingUrl)}
-</div>` : ""}
+</td></tr></table>` : ""}
 
 ${order.client_address ? `
-<div style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:16px;margin:16px 0;">
-<p style="margin:0 0 8px;font-size:11px;color:#8a7e6b;text-transform:uppercase;">Adresse de livraison</p>
-<p style="margin:0;font-size:14px;color:#333;">${order.client_name}<br>${order.client_address}${order.client_address2 ? "<br>" + order.client_address2 : ""}<br>${order.client_postal_code} ${order.client_city}<br>${order.client_country || "France"}</p>
-</div>` : ""}
+<!-- Delivery address -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;">
+<p style="margin:0 0 8px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.5px;">Adresse de livraison</p>
+<p style="margin:0;font-size:14px;color:#2d2d2d;line-height:1.6;">${order.client_name}<br>${order.client_address}${order.client_address2 ? "<br>" + order.client_address2 : ""}<br>${order.client_postal_code} ${order.client_city}<br>${order.client_country || "France"}</p>
+</td></tr></table>` : ""}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#333;margin:24px 0 8px;">Pour préparer votre installation</h2>
-<p style="font-size:13px;color:#555;line-height:1.8;">
-✅ Vérifier l'espace disponible sur votre terrasse<br>
-🔧 Préparer l'outillage nécessaire (perceuse, niveau)<br>
-📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;">Télécharger le guide d'installation</a>
-</p>
+<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">Jour J — Ce qu'il faut prévoir</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📏 Un espace dégagé pour réceptionner le colis (le store mesure environ ${order.width} cm)</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">👥 Prévoyez une deuxième personne pour manipuler le colis</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📸 Vérifiez l'état du colis à la réception et photographiez tout dommage éventuel</td></tr>
+</table>
 
-<p style="font-size:12px;color:#8a7e6b;text-align:center;margin-top:20px;">
-Besoin d'aide ? 📞 03 88 XX XX XX · 📧 sav@monstore.fr
-</p>
+${ctaButton("Suivre ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
+${contactBlock("Un problème à la réception ? Contactez notre SAV immédiatement.")}
 `, order.ref);
 }
 
 function deliveredTemplate(order: any) {
   const prenom = firstName(order.client_name);
   const purchaseDate = formatDate(order.created_at);
-  const warrantyExpiry = new Date(new Date(order.created_at).getTime() + 5 * 365.25 * 86400000).toLocaleDateString("fr-FR");
+  const warrantyDate = new Date(new Date(order.created_at).getTime() + 5 * 365.25 * 86400000);
+  const warrantyExpiry = warrantyDate.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
   return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<div style="width:56px;height:56px;border-radius:50%;background-color:#fff8e1;margin:0 auto 12px;line-height:56px;font-size:28px;">☀️</div>
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Profitez bien du soleil, ${prenom} !</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">Votre store coffre a été livré. Nous espérons qu'il répond pleinement à vos attentes.</p>
+${iconHeader("☀️", "#fff8e1", `Bienvenue au soleil, ${prenom} !`)}
+
+<p style="font-size:14px;color:#555555;line-height:1.7;">Votre store LuniK a été livré avec succès. Nous espérons qu'il transformera vos moments en extérieur !</p>
 
 ${progressBar(3)}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#333;margin:24px 0 8px;">Ressources d'installation</h2>
-<p style="font-size:13px;color:#555;line-height:1.8;">
-📖 Guide d'installation PDF<br>
-🎬 Vidéo tutoriel<br>
-📞 SAV : 03 88 XX XX XX
-</p>
+<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">Ressources utiles</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Guide d'installation</a></td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">🎬 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Vidéo tutoriel de montage</a></td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📋 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Guide d'entretien de votre store</a></td></tr>
+</table>
 
-<div style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;margin:20px 0;">
-<p style="margin:0 0 4px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">Carte de garantie</p>
-<p style="margin:0 0 4px;font-size:14px;color:#333;">Store Coffre Sur-Mesure — Réf. ${order.ref}</p>
-<p style="margin:0 0 4px;font-size:13px;color:#555;">Date d'achat : ${purchaseDate}</p>
-<p style="margin:0;font-size:13px;color:#555;">Valable jusqu'au : <strong>${warrantyExpiry}</strong></p>
-<p style="margin:8px 0 0;font-size:16px;font-weight:bold;color:#4A5E3A;">✅ Garantie 5 ans</p>
-</div>
+<!-- Warranty card -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:24px;">
+<p style="margin:0 0 4px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">Votre carte de garantie</p>
+<p style="margin:0 0 8px;font-family:Georgia,serif;font-size:16px;color:#2d2d2d;">Store Coffre Sur-Mesure — Réf. ${order.ref}</p>
+<p style="margin:0 0 4px;font-size:13px;color:#555555;">Date d'achat : ${purchaseDate}</p>
+<p style="margin:0 0 12px;font-size:13px;color:#555555;">Garantie valable jusqu'au : <strong style="color:#2d2d2d;">${warrantyExpiry}</strong></p>
+<p style="margin:0;font-size:16px;font-weight:bold;color:#4A5E3A;">✅ Garantie 5 ans</p>
+</td></tr></table>
 
-<div style="text-align:center;margin:24px 0;">
-<p style="margin:0 0 8px;font-size:14px;color:#333;">Êtes-vous satisfait(e) de votre store ?</p>
+<!-- Review block -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+<tr><td style="text-align:center;padding:24px;background-color:#f9f7f4;border-radius:8px;">
+<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:16px;color:#2d2d2d;">Êtes-vous satisfait(e) de votre store ?</p>
 <p style="margin:0 0 12px;font-size:32px;letter-spacing:4px;">⭐⭐⭐⭐⭐</p>
-<p style="margin:0;font-size:12px;color:#8a7e6b;">Votre avis aide d'autres clients à choisir en confiance.</p>
-</div>
+<p style="margin:0 0 16px;font-size:12px;color:#8a7e6b;">Votre avis aide d'autres clients à choisir en confiance.</p>
 ${ctaButton("Laisser un avis", "https://www.trustpilot.com")}
+</td></tr></table>
+
+${contactBlock()}
 `, order.ref);
 }
 
-function reviewRequestTemplate(order: any) {
+function savRequestedTemplate(order: any, extra?: { ticketRef?: string; issue?: string }) {
   const prenom = firstName(order.client_name);
+  const ticketRef = extra?.ticketRef || "En cours d'attribution";
+  const issue = extra?.issue || "—";
+  const today = formatDate(new Date().toISOString());
   return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Êtes-vous satisfait(e) de votre store ?</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">${prenom}, cela fait une semaine que votre store est installé. Nous espérons qu'il transforme vos moments en extérieur !</p>
+${iconHeader("🔧", "#f5f5f5", `Nous avons bien reçu votre demande, ${prenom}`)}
 
-<div style="text-align:center;margin:32px 0;">
-<p style="margin:0 0 16px;font-size:36px;letter-spacing:6px;">⭐⭐⭐⭐⭐</p>
-<p style="margin:0;font-size:13px;color:#8a7e6b;">Ça prend moins de 2 minutes</p>
-</div>
-${ctaButton("Laisser un avis Trustpilot", "https://www.trustpilot.com")}
+<p style="font-size:14px;color:#555555;line-height:1.7;">Nous avons bien pris en compte votre signalement concernant votre commande. Notre équipe SAV va analyser votre demande et vous recontacter dans les plus brefs délais.</p>
 
-<div style="background-color:#fef3f2;border:1px solid #fecaca;border-radius:8px;padding:16px;margin:24px 0;">
-<p style="margin:0 0 4px;font-size:13px;font-weight:bold;color:#991b1b;">Un problème ?</p>
-<p style="margin:0;font-size:13px;color:#555;">Notre service après-vente est là pour vous aider.<br>
-📞 03 88 XX XX XX · <a href="${SITE_URL}/sav" style="color:#4A5E3A;">Contacter le SAV</a></p>
-</div>
-`, order.ref);
-}
+<!-- SAV summary -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#fef3f2;border:1px solid #fecaca;border-radius:8px;padding:24px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
+<tr><td style="padding:6px 0;color:#8a7e6b;width:45%;">Numéro de ticket SAV</td><td style="padding:6px 0;font-weight:bold;color:#2d2d2d;">${ticketRef}</td></tr>
+<tr><td style="padding:6px 0;color:#8a7e6b;">Commande concernée</td><td style="padding:6px 0;color:#2d2d2d;">Réf. ${order.ref}</td></tr>
+<tr><td style="padding:6px 0;color:#8a7e6b;">Date de la demande</td><td style="padding:6px 0;color:#2d2d2d;">${today}</td></tr>
+<tr><td style="padding:6px 0;color:#8a7e6b;">Problème signalé</td><td style="padding:6px 0;color:#2d2d2d;">${issue}</td></tr>
+</table>
+</td></tr></table>
 
-function cancellationTemplate(order: any) {
-  const prenom = firstName(order.client_name);
-  return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Votre commande a été annulée</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">${prenom}, nous confirmons l'annulation de votre commande <strong>${order.ref}</strong>.</p>
+<!-- What happens next -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
+<tr><td style="background-color:#f9f7f4;border-radius:8px;padding:24px;">
+<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:16px;color:#2d2d2d;font-weight:bold;">Ce qui va se passer</p>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;border-bottom:1px solid #e8e2d8;">
+<strong style="color:#4A5E3A;">1.</strong> Notre équipe analyse votre demande (sous 24-48h ouvrées)</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;border-bottom:1px solid #e8e2d8;">
+<strong style="color:#4A5E3A;">2.</strong> Un technicien vous contacte pour diagnostic</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;">
+<strong style="color:#4A5E3A;">3.</strong> Nous vous proposons une solution (réparation, remplacement, etc.)</td></tr>
+</table>
+</td></tr></table>
 
-<div style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:16px;margin:16px 0;">
-<p style="margin:0 0 8px;font-size:14px;color:#333;font-weight:bold;">Informations de remboursement</p>
-<p style="margin:0;font-size:14px;color:#555;">Le remboursement de <strong>${formatPrice(order.amount)} €</strong> sera crédité sur votre carte bancaire sous 5 à 10 jours ouvrés.</p>
-</div>
-
-<p style="font-size:14px;color:#555;line-height:1.6;">Nous sommes désolés de vous voir partir. Si vous changez d'avis, notre configurateur est toujours disponible :</p>
-${ctaButton("Configurer un store", `${SITE_URL}/store-coffre`)}
-
-<p style="font-size:12px;color:#8a7e6b;text-align:center;margin-top:16px;">
-📞 03 88 XX XX XX · 📧 contact@monstore.fr
-</p>
-`, order.ref);
-}
-
-function abandonedCartTemplate(order: any) {
-  const prenom = firstName(order.client_name || "");
-  return emailWrapper(`
-<div style="text-align:center;margin-bottom:24px;">
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#333;">Vous avez laissé quelque chose...</h1>
-</div>
-<p style="font-size:14px;color:#555;line-height:1.6;">${prenom ? prenom + ", vous" : "Vous"} avez configuré un store sur-mesure il y a peu. Il vous attend !</p>
+<p style="font-size:13px;color:#555555;line-height:1.7;margin:16px 0;">Pour rappel, votre store bénéficie d'une <strong style="color:#2d2d2d;">garantie de 5 ans</strong>. Si votre problème est couvert, la prise en charge sera intégralement à notre charge.</p>
 
 ${configSummary(order)}
 
-<div style="background-color:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:16px;margin:16px 0;">
-<p style="margin:0;font-size:13px;color:#795548;">⚠️ Les prix peuvent évoluer. Finalisez votre commande pour bénéficier de ce tarif.</p>
-</div>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:16px 0;">
-<tr><td style="padding:8px 0;font-size:13px;color:#555;">❓ <strong>Une question ?</strong> — 📞 03 88 XX XX XX</td></tr>
-<tr><td style="padding:8px 0;font-size:13px;color:#555;">📦 <strong>Des échantillons ?</strong> — <a href="${SITE_URL}/contact" style="color:#4A5E3A;">Demander des échantillons gratuits</a></td></tr>
-<tr><td style="padding:8px 0;font-size:13px;color:#555;">💳 <strong>Le budget ?</strong> — Payez en 4x sans frais dès ${formatPrice((order.amount || 0) / 4)} €/mois</td></tr>
-</table>
-
-${ctaButton("Reprendre ma configuration →", `${SITE_URL}/store-coffre`)}
-`, order.ref);
-}
-
-function adminNewOrderTemplate(order: any, adminUrl: string) {
-  return emailWrapper(`
-<div style="background-color:#e8f5e9;border-radius:8px;padding:12px 16px;margin-bottom:16px;text-align:center;">
-<p style="margin:0;font-size:14px;font-weight:bold;color:#2e7d32;">🛒 NOUVELLE COMMANDE</p>
-</div>
-
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
-<tr><td style="padding:6px 0;color:#8a7e6b;">Client</td><td style="padding:6px 0;font-weight:bold;color:#333;">${order.client_name}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Email</td><td style="padding:6px 0;color:#333;">${order.client_email}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Téléphone</td><td style="padding:6px 0;color:#333;">${order.client_phone || "—"}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Config</td><td style="padding:6px 0;color:#333;">${order.width}×${order.projection}cm · ${order.toile_color || "—"} · ${order.armature_color || "—"}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Options</td><td style="padding:6px 0;color:#333;">${(order.options || []).join(", ") || "—"}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Total</td><td style="padding:6px 0;font-size:18px;font-weight:bold;color:#4A5E3A;">${formatPrice(order.amount)} €</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Paiement</td><td style="padding:6px 0;color:#333;">${order.payment_method === "card" ? "CB ✅" : order.payment_method || "—"}</td></tr>
-</table>
-
-${ctaButton("Voir la commande dans l'admin →", adminUrl)}
+${ctaButton("Suivre ma demande SAV", `${SITE_URL}/suivi?ref=${order.ref}`)}
+${contactBlock("Besoin urgent ? Appelez-nous directement au 03 68 38 10 30")}
 `, order.ref);
 }
 
 // ─── TEMPLATE MAP ──────────────────────────────────────────────────
 
-type EmailType = "confirmation" | "fabrication" | "shipped" | "delivered" | "review_request" | "cancellation" | "abandoned_cart" | "admin_new_order";
+type EmailType = "order_received" | "in_production" | "ready_to_ship" | "in_delivery" | "delivered" | "sav_requested";
 
 function getEmailConfig(type: EmailType, order: any, extra?: any): { subject: string; html: string; to: string } | null {
-  const fromName = Deno.env.get("FROM_NAME") || "Mon Store";
-  const adminEmail = Deno.env.get("ADMIN_EMAIL") || "";
-  const adminUrl = `${SITE_URL}/admin/commandes/${order.id}`;
-
   const configs: Record<EmailType, { subject: string; html: string; to: string }> = {
-    confirmation: {
-      subject: `✅ Votre commande Mon Store est confirmée — Réf. ${order.ref}`,
-      html: confirmationTemplate(order),
+    order_received: {
+      subject: `✅ Commande confirmée — Réf. ${order.ref} | LuniK`,
+      html: orderReceivedTemplate(order),
       to: order.client_email,
     },
-    fabrication: {
-      subject: `🏭 Votre store est en cours de fabrication — Réf. ${order.ref}`,
-      html: fabricationTemplate(order),
+    in_production: {
+      subject: `🏭 Votre store est en fabrication — Réf. ${order.ref} | LuniK`,
+      html: inProductionTemplate(order),
       to: order.client_email,
     },
-    shipped: {
-      subject: `🚚 Votre store Mon Store est en route ! — Réf. ${order.ref}`,
-      html: shippedTemplate(order, extra?.tracking),
+    ready_to_ship: {
+      subject: `📦 Votre store est prêt ! — Réf. ${order.ref} | LuniK`,
+      html: readyToShipTemplate(order),
+      to: order.client_email,
+    },
+    in_delivery: {
+      subject: `🚚 Votre store est en route ! — Réf. ${order.ref} | LuniK`,
+      html: inDeliveryTemplate(order, extra?.tracking),
       to: order.client_email,
     },
     delivered: {
-      subject: `☀️ Votre store est livré ! — Réf. ${order.ref}`,
+      subject: `☀️ Votre store est livré — profitez-en ! — Réf. ${order.ref} | LuniK`,
       html: deliveredTemplate(order),
       to: order.client_email,
     },
-    review_request: {
-      subject: `⭐ ${firstName(order.client_name)}, votre avis nous aide beaucoup`,
-      html: reviewRequestTemplate(order),
+    sav_requested: {
+      subject: `🔧 Votre demande SAV a bien été reçue — Réf. ${order.ref} | LuniK`,
+      html: savRequestedTemplate(order, extra),
       to: order.client_email,
-    },
-    cancellation: {
-      subject: `Votre commande Mon Store a été annulée — Réf. ${order.ref}`,
-      html: cancellationTemplate(order),
-      to: order.client_email,
-    },
-    abandoned_cart: {
-      subject: `Votre store sur-mesure vous attend 🌞`,
-      html: abandonedCartTemplate(order),
-      to: order.client_email,
-    },
-    admin_new_order: {
-      subject: `🛒 Nouvelle commande ${order.ref} — ${formatPrice(order.amount)} €`,
-      html: adminNewOrderTemplate(order, adminUrl),
-      to: adminEmail,
     },
   };
 
@@ -435,7 +495,7 @@ serve(async (req) => {
     // Read transactional email from DB, fallback to env
     const { data: generalSettings } = await supabaseAdmin.from("admin_settings").select("data").eq("id", "general").single();
     const fromEmail = (generalSettings?.data as any)?.transactionalEmail || Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
-    const fromName = Deno.env.get("FROM_NAME") || "Mon Store";
+    const fromName = "LuniK";
 
     // Send email via Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
@@ -453,19 +513,17 @@ serve(async (req) => {
     console.log(`Email sent: type=${type}, to=${emailConfig.to}, id=${emailData?.id}`);
 
     // Update emails_sent on the order (append)
-    if (type !== "admin_new_order") {
-      const currentEmails = (order.emails_sent as any[]) || [];
-      const updatedEmails = [...currentEmails, {
-        type,
-        sent_at: new Date().toISOString(),
-        resend_id: emailData?.id || null,
-      }];
+    const currentEmails = (order.emails_sent as any[]) || [];
+    const updatedEmails = [...currentEmails, {
+      type,
+      sent_at: new Date().toISOString(),
+      resend_id: emailData?.id || null,
+    }];
 
-      await supabaseAdmin
-        .from("orders")
-        .update({ emails_sent: updatedEmails })
-        .eq("id", orderId);
-    }
+    await supabaseAdmin
+      .from("orders")
+      .update({ emails_sent: updatedEmails })
+      .eq("id", orderId);
 
     return new Response(
       JSON.stringify({ success: true, emailId: emailData?.id }),
