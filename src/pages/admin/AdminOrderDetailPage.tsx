@@ -304,7 +304,7 @@ const AdminOrderDetailPage = () => {
       return;
     }
     setShowTrackingModal(false);
-    await sendOrderEmail("shipped", {
+    await sendOrderEmail("in_delivery", {
       tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl },
     });
   };
