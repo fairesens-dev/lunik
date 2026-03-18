@@ -280,7 +280,7 @@ const ContactWidget = () => {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="mb-3 w-[340px] bg-background border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col"
+            className="mb-3 w-[340px] bg-background rounded-2xl shadow-2xl overflow-hidden flex flex-col"
             style={{ maxHeight: "min(600px, calc(100vh - 100px))" }}
             role="dialog" aria-label="Widget de contact"
           >

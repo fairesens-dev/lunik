@@ -116,7 +116,7 @@ const ValuesSection = () => {
             return (
               <div
                 key={v.id}
-                className="min-w-[280px] sm:min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-white border border-primary-foreground/10 rounded-2xl overflow-hidden group"
+                className="min-w-[280px] sm:min-w-[320px] max-w-[340px] flex-shrink-0 snap-start bg-white rounded-2xl overflow-hidden group"
               >
                 <div className="aspect-[3/2] overflow-hidden">
                   <img
