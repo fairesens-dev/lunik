@@ -413,6 +413,16 @@ const ConfigurateurPage = () => {
                   </p>
                   <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
                   <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
+
+                  {sampleEnabled && (
+                    <button
+                      onClick={() => setSampleModalOpen(true)}
+                      className="flex items-center gap-2 text-sm text-[#4A5E3A] hover:underline mt-4"
+                    >
+                      <Palette className="w-4 h-4" />
+                      Besoin de voir les coloris en vrai ? Commandez des échantillons
+                    </button>
+                  )}
                 </div>
               </div>
             )}

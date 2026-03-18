@@ -115,6 +115,7 @@ const App = () => (
           </Routes>
         </ContactWidgetProvider>
         </AuthProvider>
+        </SampleCartProvider>
         </CartProvider>
         </ConfiguratorSettingsProvider>
         </ContentProvider>
