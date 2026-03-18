@@ -482,9 +482,6 @@ function ActivityTab() {
 
 function SettingsTab() {
   const queryClient = useQueryClient();
-  const [fromEmail, setFromEmail] = useState("");
-  const [fromName, setFromName] = useState("LuniK");
-  const [replyTo, setReplyTo] = useState("");
   const [testEmail, setTestEmail] = useState("");
   const [testType, setTestType] = useState("order_received");
   const [sending, setSending] = useState(false);
@@ -497,14 +494,18 @@ function SettingsTab() {
     },
   });
 
-  // Sync form with DB
-  useState(() => {
-    if (settings) {
-      setFromEmail((settings as any)?.transactionalEmail || "");
-      setFromName((settings as any)?.senderName || "LuniK");
-      setReplyTo((settings as any)?.replyTo || "");
-    }
-  });
+  const [fromEmail, setFromEmail] = useState("");
+  const [fromName, setFromName] = useState("LuniK");
+  const [replyTo, setReplyTo] = useState("");
+  const [initialized, setInitialized] = useState(false);
+
+  // Sync form with DB once loaded
+  if (settings && !initialized) {
+    setFromEmail((settings as any)?.transactionalEmail || "");
+    setFromName((settings as any)?.senderName || "LuniK");
+    setReplyTo((settings as any)?.replyTo || "");
+    setInitialized(true);
+  }
 
   const { data: resendStatus } = useQuery({
     queryKey: ["resend_status"],
