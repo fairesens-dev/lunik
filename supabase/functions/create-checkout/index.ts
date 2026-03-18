@@ -159,7 +159,7 @@ serve(async (req) => {
               name: productName || "Store Coffre Sur-Mesure",
               description: description || "",
             },
-            unit_amount: finalAmount * 100,
+            unit_amount: Math.round(finalAmount * 100),
           },
           quantity: 1,
         },
