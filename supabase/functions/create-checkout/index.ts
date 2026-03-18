@@ -234,8 +234,7 @@ serve(async (req) => {
           }
         };
 
-        sendEmail("confirmation");
-        sendEmail("admin_new_order");
+        sendEmail("order_received");
       }
     }
 

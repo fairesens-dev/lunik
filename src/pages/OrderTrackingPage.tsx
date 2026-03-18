@@ -66,8 +66,9 @@ const OrderTrackingPage = () => {
   const getCurrentStep = (status: string) => {
     const map: Record<string, number> = {
       "Nouveau": 0,
-      "Confirmé": 1,
-      "En fabrication": 2,
+      "Confirmé": 0,
+      "En fabrication": 1,
+      "Prêt à expédier": 2,
       "Expédié": 3,
       "Livré": 4,
     };

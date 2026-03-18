@@ -914,8 +914,8 @@ const AdminOrderDetailPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowTrackingModal(false)}>Annuler</Button>
-            <Button onClick={handleTrackingConfirm} disabled={!trackingCarrier || !trackingNumber || sendingEmail === "shipped"}>
-              {sendingEmail === "shipped" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
+            <Button onClick={handleTrackingConfirm} disabled={!trackingCarrier || !trackingNumber || sendingEmail === "in_delivery"}>
+              {sendingEmail === "in_delivery" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
               Confirmer & Envoyer
             </Button>
           </DialogFooter>
