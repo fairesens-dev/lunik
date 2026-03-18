@@ -95,7 +95,7 @@ const CheckoutPage = () => {
       {/* Progress */}
       <div className="max-w-[1100px] mx-auto px-6 py-6 flex-1 checkout-inputs">
         <div className="flex items-center justify-center gap-0 mb-10">
-          {STEPS.map((label, i) => (
+          {actualSteps.map((label, i) => (
             <div key={label} className="flex items-center">
               <div className="flex items-center gap-2">
                 <div
@@ -111,7 +111,7 @@ const CheckoutPage = () => {
                   {label}
                 </span>
               </div>
-              {i < STEPS.length - 1 && <div className="w-8 sm:w-16 h-px bg-border mx-2 sm:mx-4" />}
+              {i < actualSteps.length - 1 && <div className="w-8 sm:w-16 h-px bg-border mx-2 sm:mx-4" />}
             </div>
           ))}
         </div>
@@ -119,7 +119,7 @@ const CheckoutPage = () => {
         {/* Steps */}
         {step === 1 && (
           <CheckoutStep1
-            onNext={handleStep1}
+            onNext={isSampleOrder ? handleStep1Samples : handleStep1}
             defaultValues={contactData ?? undefined}
             onEmailCapture={captureEmail}
             onPromoApplied={(code, discount) => { setPromoCode(code); setPromoDiscount(discount); }}
@@ -127,14 +127,15 @@ const CheckoutPage = () => {
             promoDiscount={promoDiscount}
           />
         )}
-        {step === 2 && <CheckoutStep2 onNext={handleStep2} onBack={() => setStep(1)} />}
-        {step === 3 && contactData && (
+        {!isSampleOrder && step === 2 && <CheckoutStep2 onNext={handleStep2} onBack={() => setStep(1)} />}
+        {((isSampleOrder && step === 2) || (!isSampleOrder && step === 3)) && contactData && (
           <CheckoutStep3
             contactData={contactData}
             deliveryOption={deliveryOption}
-            onBack={() => setStep(2)}
+            onBack={() => setStep(isSampleOrder ? 1 : 2)}
             promoCode={promoCode}
             promoDiscount={promoDiscount}
+            isSampleOrder={isSampleOrder}
           />
         )}
       </div>
