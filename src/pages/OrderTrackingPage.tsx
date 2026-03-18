@@ -23,7 +23,7 @@ interface OrderResult {
   created_at: string;
 }
 
-const STATUS_STEPS = ["Commande reçue", "Confirmation", "En fabrication", "Expédition", "Livraison"];
+const STATUS_STEPS = ["Commandé", "En fabrication", "Prêt à expédier", "Expédié", "Livré"];
 
 const OrderTrackingPage = () => {
   const [params] = useSearchParams();
@@ -66,8 +66,9 @@ const OrderTrackingPage = () => {
   const getCurrentStep = (status: string) => {
     const map: Record<string, number> = {
       "Nouveau": 0,
-      "Confirmé": 1,
-      "En fabrication": 2,
+      "Confirmé": 0,
+      "En fabrication": 1,
+      "Prêt à expédier": 2,
       "Expédié": 3,
       "Livré": 4,
     };

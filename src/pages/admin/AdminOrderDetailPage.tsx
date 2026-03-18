@@ -26,11 +26,12 @@ import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/contexts/AuthContext";
 import { generateInvoicePDF } from "@/lib/generateInvoice";
 
-const STATUS_OPTIONS = ["Nouveau", "En fabrication", "Expédié", "Livré", "Annulé"];
+const STATUS_OPTIONS = ["Nouveau", "En fabrication", "Prêt à expédier", "Expédié", "Livré", "Annulé"];
 
 const statusColor: Record<string, string> = {
   Nouveau: "bg-blue-100 text-blue-700 border-blue-200",
   "En fabrication": "bg-orange-100 text-orange-700 border-orange-200",
+  "Prêt à expédier": "bg-cyan-100 text-cyan-700 border-cyan-200",
   Expédié: "bg-purple-100 text-purple-700 border-purple-200",
   Livré: "bg-green-100 text-green-700 border-green-200",
   Annulé: "bg-red-100 text-red-700 border-red-200",
@@ -52,11 +53,12 @@ const TRACKING_STAGES = [
 const CARRIERS = ["Geodis", "TNT", "Chronopost", "DPD", "GLS", "Colissimo", "Autre"];
 
 const TRANSACTIONAL_EMAILS = [
-  { key: "confirmation", label: "Confirmation commande" },
-  { key: "fabrication", label: "Accusé fabrication" },
-  { key: "expedition", label: "Email expédition" },
-  { key: "livraison", label: "Email livraison" },
-  { key: "satisfaction", label: "Email satisfaction" },
+  { key: "order_received", label: "Commande reçue" },
+  { key: "in_production", label: "En production" },
+  { key: "ready_to_ship", label: "Prêt à expédier" },
+  { key: "in_delivery", label: "Livraison en cours" },
+  { key: "delivered", label: "Livré" },
+  { key: "sav_requested", label: "Demande SAV" },
 ];
 
 // Armature color hex map
@@ -239,14 +241,14 @@ const AdminOrderDetailPage = () => {
       toast({ title: "Statut mis à jour", description: `Commande ${order.ref} → ${newStatus}` });
 
       const emailMap: Record<string, string> = {
-        "En fabrication": "fabrication",
-        "Expédié": "shipped",
+        "En fabrication": "in_production",
+        "Prêt à expédier": "ready_to_ship",
+        "Expédié": "in_delivery",
         "Livré": "delivered",
-        "Annulé": "cancellation",
       };
       const emailType = emailMap[newStatus];
       if (emailType) {
-        if (emailType === "shipped") {
+        if (emailType === "in_delivery") {
           setShowTrackingModal(true);
         } else {
           await sendOrderEmail(emailType);
@@ -302,7 +304,7 @@ const AdminOrderDetailPage = () => {
       return;
     }
     setShowTrackingModal(false);
-    await sendOrderEmail("shipped", {
+    await sendOrderEmail("in_delivery", {
       tracking: { carrier: trackingCarrier, tracking_number: trackingNumber, tracking_url: trackingUrl },
     });
   };
@@ -818,10 +820,12 @@ const AdminOrderDetailPage = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               {[
-                { label: "Envoyer confirmation commande", icon: Mail, type: "confirmation", openModal: false },
-                { label: "Notifier mise en fabrication", icon: Bell, type: "fabrication", openModal: false },
-                { label: "Envoyer numéro de suivi", icon: Truck, type: "shipped", openModal: true },
-                { label: "Demander un avis", icon: Star, type: "review_request", openModal: false },
+                { label: "Envoyer confirmation commande", icon: Mail, type: "order_received", openModal: false },
+                { label: "Notifier mise en fabrication", icon: Bell, type: "in_production", openModal: false },
+                { label: "Notifier prêt à expédier", icon: Package, type: "ready_to_ship", openModal: false },
+                { label: "Envoyer numéro de suivi", icon: Truck, type: "in_delivery", openModal: true },
+                { label: "Notifier livraison", icon: CheckCircle2, type: "delivered", openModal: false },
+                { label: "Confirmer demande SAV", icon: RefreshCw, type: "sav_requested", openModal: false },
               ].map((action) => (
                 <Button
                   key={action.type}
@@ -910,8 +914,8 @@ const AdminOrderDetailPage = () => {
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowTrackingModal(false)}>Annuler</Button>
-            <Button onClick={handleTrackingConfirm} disabled={!trackingCarrier || !trackingNumber || sendingEmail === "shipped"}>
-              {sendingEmail === "shipped" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
+            <Button onClick={handleTrackingConfirm} disabled={!trackingCarrier || !trackingNumber || sendingEmail === "in_delivery"}>
+              {sendingEmail === "in_delivery" ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Send className="w-4 h-4 mr-1" />}
               Confirmer & Envoyer
             </Button>
           </DialogFooter>
