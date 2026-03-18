@@ -519,10 +519,14 @@ serve(async (req) => {
     const fromName = (generalSettings?.data as any)?.senderName || "LuniK";
     const replyToEmail = (generalSettings?.data as any)?.replyTo || undefined;
 
+    // Override recipient for test emails
+    const recipient = extra?.testRecipient || emailConfig.to;
+
     // Send email via Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
-      to: [emailConfig.to],
+      to: [recipient],
+      ...(replyToEmail ? { reply_to: replyToEmail } : {}),
       subject: emailConfig.subject,
       html: emailConfig.html,
     });
