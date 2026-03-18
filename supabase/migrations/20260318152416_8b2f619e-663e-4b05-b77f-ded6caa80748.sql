@@ -1,0 +1,1 @@
+INSERT INTO email_templates (id, is_active) VALUES ('samples_confirmation', true) ON CONFLICT (id) DO NOTHING;
