@@ -492,15 +492,41 @@ serve(async (req) => {
       throw new Error(`No recipient for email type: ${type}`);
     }
 
+    // Read template overrides from DB
+    const { data: templateOverride } = await supabaseAdmin
+      .from("email_templates")
+      .select("*")
+      .eq("id", type)
+      .single();
+
+    // Check if template is disabled
+    if (templateOverride && templateOverride.is_active === false) {
+      console.log(`Template ${type} is disabled, skipping send`);
+      return new Response(
+        JSON.stringify({ success: true, skipped: true, reason: "template_disabled" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
+      );
+    }
+
+    // Apply subject override if exists
+    if (templateOverride?.subject_override) {
+      emailConfig.subject = templateOverride.subject_override.replace("{ref}", order.ref);
+    }
+
     // Read transactional email from DB, fallback to env
     const { data: generalSettings } = await supabaseAdmin.from("admin_settings").select("data").eq("id", "general").single();
     const fromEmail = (generalSettings?.data as any)?.transactionalEmail || Deno.env.get("FROM_EMAIL") || "onboarding@resend.dev";
-    const fromName = "LuniK";
+    const fromName = (generalSettings?.data as any)?.senderName || "LuniK";
+    const replyToEmail = (generalSettings?.data as any)?.replyTo || undefined;
+
+    // Override recipient for test emails
+    const recipient = extra?.testRecipient || emailConfig.to;
 
     // Send email via Resend
     const { data: emailData, error: emailError } = await resend.emails.send({
       from: `${fromName} <${fromEmail}>`,
-      to: [emailConfig.to],
+      to: [recipient],
+      ...(replyToEmail ? { reply_to: replyToEmail } : {}),
       subject: emailConfig.subject,
       html: emailConfig.html,
     });
