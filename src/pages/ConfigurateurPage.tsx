@@ -283,7 +283,7 @@ const ConfigurateurPage = () => {
                   <button
                     key={step}
                     onClick={() => setActiveStep(step)}
-                    className={`flex-1 py-2 rounded-lg text-xs font-medium uppercase tracking-[0.1em] transition-all border ${
+                    className={`flex-1 py-2 rounded-lg text-[10px] sm:text-xs font-medium uppercase tracking-[0.1em] transition-all border ${
                       activeStep === step
                         ? "border-primary bg-primary/5 text-primary"
                         : "border-border text-muted-foreground hover:border-primary/30"
