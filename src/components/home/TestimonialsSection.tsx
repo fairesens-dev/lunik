@@ -108,11 +108,11 @@ const TestimonialsSection = () => {
             rel="noopener noreferrer"
             className="flex items-center gap-3 mb-10 group"
           >
-            <img src={trustpilotBadge} alt="Trustpilot - Excellent" className="h-6 w-auto" />
-            <span className="text-sm text-muted-foreground">
+            <img src={trustpilotBadge} alt="Trustpilot - Excellent" className="h-4 md:h-6 w-auto" />
+            <span className="hidden md:inline text-sm text-muted-foreground">
               <strong className="text-foreground">4.8/5</strong> · 233 avis vérifiés
             </span>
-            <span className="text-xs text-primary group-hover:underline">Voir les avis →</span>
+            <span className="hidden md:inline text-xs text-primary group-hover:underline">Voir les avis →</span>
           </a>
         </AnimatedSection>
 
