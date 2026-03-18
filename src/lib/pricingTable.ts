@@ -199,6 +199,21 @@ export function getWidthRangeLabel(widthMm: number): string | null {
   return r?.label ?? null;
 }
 
+/** Get the next width range label (the one after the current range) */
+export function getNextWidthRangeLabel(widthMm: number): string | null {
+  const idx = WIDTH_RANGES.findIndex(r => widthMm >= r.min && widthMm <= r.max);
+  if (idx === -1 || idx >= WIDTH_RANGES.length - 1) return null;
+  return WIDTH_RANGES[idx + 1]?.label ?? null;
+}
+
+/** Get progress within all width ranges (0 to 1) */
+export function getWidthProgress(widthMm: number): number {
+  if (WIDTH_RANGES.length === 0) return 0;
+  const globalMin = WIDTH_RANGES[0].min;
+  const globalMax = WIDTH_RANGES[WIDTH_RANGES.length - 1].max;
+  return Math.max(0, Math.min(1, (widthMm - globalMin) / (globalMax - globalMin)));
+}
+
 /** Min / max width in cm — computed dynamically */
 export function getMinWidthCm(): number {
   return WIDTH_RANGES.length > 0 ? Math.floor(WIDTH_RANGES[0].min / 10) : 190;

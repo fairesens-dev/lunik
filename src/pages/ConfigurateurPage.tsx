@@ -12,7 +12,7 @@ import ToileColorSelector from "@/components/product/ToileColorSelector";
 import { useConfigurator } from "@/hooks/useConfigurator";
 import { useCart } from "@/contexts/CartContext";
 import { useCartAbandonment } from "@/hooks/useCartAbandonment";
-import { MIN_WIDTH_CM, MAX_WIDTH_CM } from "@/lib/pricingTable";
+import { MIN_WIDTH_CM, MAX_WIDTH_CM, getNextWidthRangeLabel, getWidthProgress } from "@/lib/pricingTable";
 import { useContent } from "@/contexts/ContentContext";
 import logoLunik from "@/assets/logo-lunik.svg";
 import { useEffect, useState } from "react";
