@@ -1,7 +1,7 @@
 import { useNavigate, Link } from "react-router-dom";
 import { useMemo } from "react";
 
-import { Check, ArrowLeft, Lock, Truck, Shield, Camera, ZoomIn, Star, ChevronRight, Ruler, Lightbulb, ArrowLeftRight, ArrowUpDown, RotateCcw } from "lucide-react";
+import { Check, ArrowLeft, Lock, Truck, Shield, Camera, ZoomIn, Star, ChevronRight, Ruler } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
