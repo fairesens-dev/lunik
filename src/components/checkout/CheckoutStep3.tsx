@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import OrderSummary from "./OrderSummary";
 import { useCart } from "@/contexts/CartContext";
+import { useSampleCart } from "@/contexts/SampleCartContext";
 import type { Step1Data } from "./CheckoutStep1";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
@@ -38,10 +39,12 @@ interface Props {
   onBack: () => void;
   promoCode?: string;
   promoDiscount?: number;
+  isSampleOrder?: boolean;
 }
 
-const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", promoDiscount = 0 }: Props) => {
+const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", promoDiscount = 0, isSampleOrder = false }: Props) => {
   const { item, clearCart } = useCart();
+  const sampleCart = useSampleCart();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [paymentMethod, setPaymentMethod] = useState<"card" | "transfer" | "check">("card");
@@ -66,9 +69,12 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     else if (settings.check.enabled) setPaymentMethod("check");
   }, [settingsLoaded, settings]);
 
-  if (!item) return null;
+  if (!isSampleOrder && !item) return null;
+  if (isSampleOrder && sampleCart.totalItems === 0) return null;
 
-  const total = item.pricing.total - promoDiscount;
+  const total = isSampleOrder
+    ? sampleCart.totalAmount - promoDiscount
+    : (item?.pricing.total ?? 0) - promoDiscount;
 
   const generateRef = () => "SC-" + Date.now().toString(36).toUpperCase();
 
@@ -77,60 +83,122 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
     setError("");
 
     try {
-      const options: string[] = [];
-      if (item.configuration.options.packConnect) options.push("Pack Connect");
-      else {
-        if (item.configuration.options.motorisation) options.push("Motorisation");
-        if (item.configuration.options.led) options.push("LED");
-      }
-
       const ref = generateRef();
 
-      const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
-        body: {
-          amount: total,
-          ref,
-          customerEmail: contactData.email,
-          customerName: `${contactData.firstName} ${contactData.lastName}`,
-          productName: item.productName,
-          description: `${item.configuration.width}×${item.configuration.projection}cm · Toile ${item.configuration.toileColor.label} · ${item.configuration.armatureColor.label}`,
-          paymentMethod,
-          promoCode: promoCode || undefined,
-          promoDiscount: promoDiscount || undefined,
-          orderData: {
-            ref,
-            client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
-            client_email: contactData.email,
-            client_phone: contactData.phone,
-            client_postal_code: contactData.postalCode,
-            client_address: contactData.address,
-            client_address2: contactData.address2 || "",
-            client_city: contactData.city,
-            client_country: contactData.country,
-            civility: contactData.civility,
-            width: item.configuration.width,
-            projection: item.configuration.projection,
-            toile_color: item.configuration.toileColor.label,
-            armature_color: item.configuration.armatureColor.label,
-            options,
+      if (isSampleOrder) {
+        // Sample order flow
+        const sampleNames = sampleCart.items.map((s) => s.name).join(", ");
+        const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
+          body: {
             amount: total,
-            delivery_option: deliveryOption,
-            payment_method: paymentMethod,
-            message: contactData.note || "",
-            newsletter_optin: contactData.newsletter || false,
+            ref,
+            customerEmail: contactData.email,
+            customerName: `${contactData.firstName} ${contactData.lastName}`,
+            productName: "Échantillons de toile Dickson",
+            description: `${sampleCart.totalItems} coloris : ${sampleNames}`,
+            paymentMethod,
+            promoCode: promoCode || undefined,
+            promoDiscount: promoDiscount || undefined,
+            orderType: "samples",
+            orderData: {
+              ref,
+              client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
+              client_email: contactData.email,
+              client_phone: contactData.phone,
+              client_postal_code: contactData.postalCode,
+              client_address: contactData.address,
+              client_address2: contactData.address2 || "",
+              client_city: contactData.city,
+              client_country: contactData.country,
+              civility: contactData.civility,
+              width: 0,
+              projection: 0,
+              toile_color: "",
+              armature_color: "",
+              options: [],
+              amount: total,
+              delivery_option: "colissimo",
+              payment_method: paymentMethod,
+              message: contactData.note || "",
+              newsletter_optin: contactData.newsletter || false,
+              order_type: "samples",
+              sample_items: sampleCart.items.map((s) => ({
+                name: s.name,
+                hex: s.hex,
+                refCode: s.refCode,
+                type: s.type,
+              })),
+            },
           },
-        },
-      });
+        });
 
-      if (fnError) throw new Error(fnError.message);
+        if (fnError) throw new Error(fnError.message);
 
-      if (data?.url) {
-        window.location.href = data.url;
-      } else if (data?.redirect) {
-        clearCart();
-        navigate(`${data.redirect}`);
+        if (data?.url) {
+          window.location.href = data.url;
+        } else if (data?.redirect) {
+          sampleCart.clearCart();
+          navigate(`${data.redirect}`);
+        } else {
+          throw new Error("Aucune URL de paiement retournée");
+        }
       } else {
-        throw new Error("Aucune URL de paiement retournée");
+        // Normal store order flow
+        if (!item) throw new Error("Aucun article dans le panier");
+
+        const options: string[] = [];
+        if (item.configuration.options.packConnect) options.push("Pack Connect");
+        else {
+          if (item.configuration.options.motorisation) options.push("Motorisation");
+          if (item.configuration.options.led) options.push("LED");
+        }
+
+        const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
+          body: {
+            amount: total,
+            ref,
+            customerEmail: contactData.email,
+            customerName: `${contactData.firstName} ${contactData.lastName}`,
+            productName: item.productName,
+            description: `${item.configuration.width}×${item.configuration.projection}cm · Toile ${item.configuration.toileColor.label} · ${item.configuration.armatureColor.label}`,
+            paymentMethod,
+            promoCode: promoCode || undefined,
+            promoDiscount: promoDiscount || undefined,
+            orderData: {
+              ref,
+              client_name: `${contactData.civility} ${contactData.firstName} ${contactData.lastName}`,
+              client_email: contactData.email,
+              client_phone: contactData.phone,
+              client_postal_code: contactData.postalCode,
+              client_address: contactData.address,
+              client_address2: contactData.address2 || "",
+              client_city: contactData.city,
+              client_country: contactData.country,
+              civility: contactData.civility,
+              width: item.configuration.width,
+              projection: item.configuration.projection,
+              toile_color: item.configuration.toileColor.label,
+              armature_color: item.configuration.armatureColor.label,
+              options,
+              amount: total,
+              delivery_option: deliveryOption,
+              payment_method: paymentMethod,
+              message: contactData.note || "",
+              newsletter_optin: contactData.newsletter || false,
+            },
+          },
+        });
+
+        if (fnError) throw new Error(fnError.message);
+
+        if (data?.url) {
+          window.location.href = data.url;
+        } else if (data?.redirect) {
+          clearCart();
+          navigate(`${data.redirect}`);
+        } else {
+          throw new Error("Aucune URL de paiement retournée");
+        }
       }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Erreur inattendue";
@@ -332,14 +400,45 @@ const CheckoutStep3 = ({ contactData, deliveryOption, onBack, promoCode = "", pr
         </div>
       </div>
 
-      <div className="lg:hidden mt-8">
-        <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
-      </div>
+      {!isSampleOrder && item && (
+        <>
+        <div className="lg:hidden mt-8">
+          <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
+        </div>
+        </>
+      )}
+      {isSampleOrder && (
+        <div className="lg:hidden mt-8">
+          <div className="border border-border rounded-lg p-5 space-y-3">
+            <p className="font-serif text-lg">Récapitulatif</p>
+            {sampleCart.items.map((s) => (
+              <div key={s.name} className="flex items-center gap-2 text-sm">
+                <span className="w-4 h-4 rounded border" style={{ backgroundColor: s.hex }} />
+                <span>{s.name}</span>
+              </div>
+            ))}
+            <p className="text-sm font-semibold border-t pt-2">Total : {total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €</p>
+          </div>
+        </div>
+      )}
       </div>
 
       <div className="hidden lg:block min-w-0">
         <div className="sticky top-8">
-          <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
+          {!isSampleOrder && item ? (
+            <OrderSummary item={item} deliveryOption={deliveryOption} promoCode={promoCode} promoDiscount={promoDiscount} />
+          ) : (
+            <div className="border border-border rounded-lg p-5 space-y-3">
+              <p className="font-serif text-lg">Récapitulatif</p>
+              {sampleCart.items.map((s) => (
+                <div key={s.name} className="flex items-center gap-2 text-sm">
+                  <span className="w-4 h-4 rounded border" style={{ backgroundColor: s.hex }} />
+                  <span>{s.name}</span>
+                </div>
+              ))}
+              <p className="text-sm font-semibold border-t pt-2">Total : {total.toLocaleString("fr-FR", { minimumFractionDigits: 2 })} €</p>
+            </div>
+          )}
         </div>
       </div>
     </div>

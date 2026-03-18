@@ -20,6 +20,9 @@ import { useEffect, useState } from "react";
 import SEOMeta from "@/components/SEOMeta";
 import VisualizeAtHomeDialog from "@/components/product/VisualizeAtHomeDialog";
 import ToileCloseUpDialog from "@/components/product/ToileCloseUpDialog";
+import SampleOrderModal from "@/components/samples/SampleOrderModal";
+import { useSampleCart } from "@/contexts/SampleCartContext";
+import { Palette } from "lucide-react";
 
 /* ── Témoignage pour la fiche technique ────────────────────────── */
 const TESTIMONIAL = {
@@ -35,7 +38,8 @@ const ConfigurateurPage = () => {
   const { setStage } = useCartAbandonment();
   const { content } = useContent();
   const { productPage } = content;
-
+  const { enabled: sampleEnabled } = useSampleCart();
+  const [sampleModalOpen, setSampleModalOpen] = useState(false);
   useEffect(() => {
     setStage("configurateur");
   }, [setStage]);
@@ -410,6 +414,16 @@ const ConfigurateurPage = () => {
                   </p>
                   <ToileColorSelector colors={TOILE_COLORS} selected={toileColor} onSelect={setToileColor} />
                   <p className="text-xs text-muted-foreground mt-3">Sélectionnée : {toileColor}</p>
+
+                  {sampleEnabled && (
+                    <button
+                      onClick={() => setSampleModalOpen(true)}
+                      className="flex items-center gap-2 text-sm text-[#4A5E3A] hover:underline mt-4"
+                    >
+                      <Palette className="w-4 h-4" />
+                      Besoin de voir les coloris en vrai ? Commandez des échantillons
+                    </button>
+                  )}
                 </div>
               </div>
             )}
@@ -571,6 +585,7 @@ const ConfigurateurPage = () => {
           </div>
         </div>
       </div>
+      <SampleOrderModal open={sampleModalOpen} onOpenChange={setSampleModalOpen} />
     </>
   );
 };

@@ -14,7 +14,7 @@ serve(async (req) => {
   }
 
   try {
-    const { amount, ref, customerEmail, customerName, productName, description, paymentMethod, orderData, promoCode, promoDiscount } =
+    const { amount, ref, customerEmail, customerName, productName, description, paymentMethod, orderData, promoCode, promoDiscount, orderType } =
       await req.json();
 
     if (!amount || !ref || !customerEmail) {
@@ -62,6 +62,8 @@ serve(async (req) => {
         stripe_payment_intent_id: "",
         status: "Nouveau",
         status_history: [{ status: "Nouveau", date: new Date().toISOString() }],
+        order_type: orderData.order_type || "store",
+        sample_items: orderData.sample_items || null,
       }).select("id").single();
 
       if (insertError) {
@@ -116,7 +118,7 @@ serve(async (req) => {
           }
         };
 
-        sendEmail("order_received");
+        sendEmail(orderType === "samples" ? "samples_confirmation" : "order_received");
       }
 
       return insertedOrder;
@@ -183,6 +185,8 @@ serve(async (req) => {
         stripe_payment_intent_id: session.id,
         status: "Nouveau",
         status_history: [{ status: "Nouveau", date: new Date().toISOString() }],
+        order_type: orderData.order_type || "store",
+        sample_items: orderData.sample_items || null,
       }).select("id").single();
 
       if (insertError) {

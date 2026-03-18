@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useCart } from "@/contexts/CartContext";
+import { useSampleCart } from "@/contexts/SampleCartContext";
 import { useCartAbandonment } from "@/hooks/useCartAbandonment";
 import { ArrowLeft, Lock } from "lucide-react";
 import logoLunik from "@/assets/logo-lunik.svg";
@@ -12,7 +13,10 @@ const STEPS = ["Coordonnées", "Livraison", "Paiement"];
 
 const CheckoutPage = () => {
   const { item } = useCart();
+  const sampleCart = useSampleCart();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const isSampleOrder = searchParams.get("type") === "samples";
   const { setStage, captureEmail } = useCartAbandonment();
   const [step, setStep] = useState(1);
   const [contactData, setContactData] = useState<Step1Data | null>(null);
@@ -21,8 +25,12 @@ const CheckoutPage = () => {
   const [promoDiscount, setPromoDiscount] = useState(0);
 
   useEffect(() => {
-    if (!item) navigate("/", { replace: true });
-  }, [item, navigate]);
+    if (isSampleOrder) {
+      if (sampleCart.totalItems === 0) navigate("/", { replace: true });
+    } else {
+      if (!item) navigate("/", { replace: true });
+    }
+  }, [item, sampleCart.totalItems, isSampleOrder, navigate]);
 
   // Track abandonment stage
   useEffect(() => {
@@ -34,7 +42,12 @@ const CheckoutPage = () => {
     setStage(stageMap[step] || "checkout_step_1");
   }, [step, setStage]);
 
-  if (!item) return null;
+  // For sample orders, skip step 2 (delivery) and go directly to step 3
+  const hasStep2 = !isSampleOrder;
+  const actualSteps = isSampleOrder ? ["Coordonnées", "Paiement"] : STEPS;
+
+  if (!isSampleOrder && !item) return null;
+  if (isSampleOrder && sampleCart.totalItems === 0) return null;
 
   const handleStep1 = (data: Step1Data) => {
     setContactData(data);
@@ -44,7 +57,18 @@ const CheckoutPage = () => {
 
   const handleStep2 = (delivery: string) => {
     setDeliveryOption(delivery);
-    setStep(3);
+    setStep(isSampleOrder ? 2 : 3);
+    window.scrollTo(0, 0);
+  };
+
+  // For samples, after step 1 go to payment directly (step becomes 2 which maps to payment)
+  const handleStep1Samples = (data: Step1Data) => {
+    setContactData(data);
+    if (isSampleOrder) {
+      setStep(2); // step 2 = payment for samples
+    } else {
+      setStep(2);
+    }
     window.scrollTo(0, 0);
   };
 
@@ -71,7 +95,7 @@ const CheckoutPage = () => {
       {/* Progress */}
       <div className="max-w-[1100px] mx-auto px-6 py-6 flex-1 checkout-inputs">
         <div className="flex items-center justify-center gap-0 mb-10">
-          {STEPS.map((label, i) => (
+          {actualSteps.map((label, i) => (
             <div key={label} className="flex items-center">
               <div className="flex items-center gap-2">
                 <div
@@ -87,7 +111,7 @@ const CheckoutPage = () => {
                   {label}
                 </span>
               </div>
-              {i < STEPS.length - 1 && <div className="w-8 sm:w-16 h-px bg-border mx-2 sm:mx-4" />}
+              {i < actualSteps.length - 1 && <div className="w-8 sm:w-16 h-px bg-border mx-2 sm:mx-4" />}
             </div>
           ))}
         </div>
@@ -95,7 +119,7 @@ const CheckoutPage = () => {
         {/* Steps */}
         {step === 1 && (
           <CheckoutStep1
-            onNext={handleStep1}
+            onNext={isSampleOrder ? handleStep1Samples : handleStep1}
             defaultValues={contactData ?? undefined}
             onEmailCapture={captureEmail}
             onPromoApplied={(code, discount) => { setPromoCode(code); setPromoDiscount(discount); }}
@@ -103,14 +127,15 @@ const CheckoutPage = () => {
             promoDiscount={promoDiscount}
           />
         )}
-        {step === 2 && <CheckoutStep2 onNext={handleStep2} onBack={() => setStep(1)} />}
-        {step === 3 && contactData && (
+        {!isSampleOrder && step === 2 && <CheckoutStep2 onNext={handleStep2} onBack={() => setStep(1)} />}
+        {((isSampleOrder && step === 2) || (!isSampleOrder && step === 3)) && contactData && (
           <CheckoutStep3
             contactData={contactData}
             deliveryOption={deliveryOption}
-            onBack={() => setStep(2)}
+            onBack={() => setStep(isSampleOrder ? 1 : 2)}
             promoCode={promoCode}
             promoDiscount={promoDiscount}
+            isSampleOrder={isSampleOrder}
           />
         )}
       </div>
