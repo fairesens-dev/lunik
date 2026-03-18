@@ -76,6 +76,7 @@ const AdminOrdersPage = () => {
   const [dateTo, setDateTo] = useState("");
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [typeFilter, setTypeFilter] = useState("Tous types");
 
   useEffect(() => {
     (async () => {
