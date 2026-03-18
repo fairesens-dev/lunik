@@ -39,6 +39,8 @@ function mapRow(r: any): Order {
     message: r.message || "",
     statusHistory: r.status_history || [],
     notes: r.notes || "",
+    orderType: r.order_type || "store",
+    sampleItems: r.sample_items || null,
   };
 }
 
