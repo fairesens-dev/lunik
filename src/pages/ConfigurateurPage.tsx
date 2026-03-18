@@ -303,9 +303,29 @@ const ConfigurateurPage = () => {
                         Largeur hors plage ({MIN_WIDTH_CM}–{MAX_WIDTH_CM} cm)
                       </p>
                     )}
-                    {widthRangeLabel && (
-                      <p className="text-[11px] text-muted-foreground mt-1">Plage : {widthRangeLabel}</p>
-                    )}
+                    {widthRangeLabel && (() => {
+                      const nextRange = getNextWidthRangeLabel(width * 10);
+                      const progress = getWidthProgress(width * 10);
+                      return (
+                        <div className="mt-1.5 space-y-1">
+                          {nextRange && (
+                            <p className="text-[11px] text-muted-foreground">Plage suivante : {nextRange}</p>
+                          )}
+                          {!nextRange && (
+                            <p className="text-[11px] text-muted-foreground">Plage maximale atteinte</p>
+                          )}
+                          <div className="flex items-center gap-2">
+                            <div className="relative h-1.5 flex-1 rounded-full bg-secondary overflow-hidden">
+                              <div
+                                className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all duration-300"
+                                style={{ width: `${Math.round(progress * 100)}%` }}
+                              />
+                            </div>
+                            <span className="text-[10px] text-muted-foreground whitespace-nowrap">{MAX_WIDTH_CM} cm max</span>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground mb-1 block">Avancée (cm)</label>
@@ -326,11 +346,6 @@ const ConfigurateurPage = () => {
                 <p className="text-xs text-muted-foreground">
                   Surface : <strong>{surfaceArea} m²</strong>
                 </p>
-                {basePrice !== null && (
-                  <p className="text-xs text-primary font-medium">
-                    Prix de base : {basePrice.toLocaleString("fr-FR")} € TTC
-                  </p>
-                )}
 
                 {/* Astuces pour bien mesurer */}
                 <div className="border border-primary/20 bg-primary/5 rounded-xl p-4">
