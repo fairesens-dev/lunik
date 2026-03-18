@@ -20,6 +20,9 @@ import { useEffect, useState } from "react";
 import SEOMeta from "@/components/SEOMeta";
 import VisualizeAtHomeDialog from "@/components/product/VisualizeAtHomeDialog";
 import ToileCloseUpDialog from "@/components/product/ToileCloseUpDialog";
+import SampleOrderModal from "@/components/samples/SampleOrderModal";
+import { useSampleCart } from "@/contexts/SampleCartContext";
+import { Palette } from "lucide-react";
 
 /* ── Témoignage pour la fiche technique ────────────────────────── */
 const TESTIMONIAL = {
