@@ -10,7 +10,9 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { ChevronDown } from "lucide-react";
 import OrderSummary from "./OrderSummary";
+import SampleOrderSummary from "./SampleOrderSummary";
 import { useCart } from "@/contexts/CartContext";
+import { useSampleCart } from "@/contexts/SampleCartContext";
 import { useState } from "react";
 
 const step1Schema = z.object({
