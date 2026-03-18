@@ -282,7 +282,7 @@ const CheckoutStep1 = ({ onNext, defaultValues, onEmailCapture, onPromoApplied, 
           type="submit"
           className="w-full py-5 rounded-none tracking-[0.15em] uppercase text-sm font-medium h-auto"
         >
-          Continuer vers la livraison →
+          {isSampleOrder ? "Continuer vers le paiement →" : "Continuer vers la livraison →"}
         </Button>
       </form>
 
