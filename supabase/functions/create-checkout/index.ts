@@ -54,7 +54,7 @@ serve(async (req) => {
 
       const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
         ...orderData,
-        amount: finalAmount,
+        amount: Math.round(finalAmount),
         promo_code: promoCode || "",
         promo_discount: validatedDiscount,
         payment_status: paymentStatus,
@@ -159,7 +159,7 @@ serve(async (req) => {
               name: productName || "Store Coffre Sur-Mesure",
               description: description || "",
             },
-            unit_amount: finalAmount * 100,
+            unit_amount: Math.round(finalAmount * 100),
           },
           quantity: 1,
         },
@@ -178,7 +178,7 @@ serve(async (req) => {
     if (orderData) {
       const { data: insertedOrder, error: insertError } = await supabaseAdmin.from("orders").insert({
         ...orderData,
-        amount: finalAmount,
+        amount: Math.round(finalAmount),
         promo_code: promoCode || "",
         promo_discount: validatedDiscount,
         payment_status: "pending",
