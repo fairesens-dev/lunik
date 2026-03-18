@@ -820,10 +820,12 @@ const AdminOrderDetailPage = () => {
             </CardHeader>
             <CardContent className="space-y-2">
               {[
-                { label: "Envoyer confirmation commande", icon: Mail, type: "confirmation", openModal: false },
-                { label: "Notifier mise en fabrication", icon: Bell, type: "fabrication", openModal: false },
-                { label: "Envoyer numéro de suivi", icon: Truck, type: "shipped", openModal: true },
-                { label: "Demander un avis", icon: Star, type: "review_request", openModal: false },
+                { label: "Envoyer confirmation commande", icon: Mail, type: "order_received", openModal: false },
+                { label: "Notifier mise en fabrication", icon: Bell, type: "in_production", openModal: false },
+                { label: "Notifier prêt à expédier", icon: Package, type: "ready_to_ship", openModal: false },
+                { label: "Envoyer numéro de suivi", icon: Truck, type: "in_delivery", openModal: true },
+                { label: "Notifier livraison", icon: CheckCircle2, type: "delivered", openModal: false },
+                { label: "Confirmer demande SAV", icon: RefreshCw, type: "sav_requested", openModal: false },
               ].map((action) => (
                 <Button
                   key={action.type}
