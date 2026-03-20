@@ -9,6 +9,8 @@ const corsHeaders = {
 };
 
 const SITE_URL = "https://lunik.lovable.app";
+const LOGO_URL = "https://gejgtkgqyzdfbsbxujgl.supabase.co/storage/v1/object/public/Website/logo-lunik.png";
+const FONT = "'DM Sans', Arial, Helvetica, sans-serif";
 
 // ─── HELPERS ───────────────────────────────────────────────────────
 
@@ -34,14 +36,14 @@ function firstName(fullName: string) {
 
 function contactBlock(extra?: string) {
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0 0;">
-<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;text-align:center;">
-<p style="margin:0 0 8px;font-family:Georgia,serif;font-size:14px;color:#2d2d2d;font-weight:bold;">Besoin d'aide ?</p>
-<p style="margin:0;font-size:13px;color:#555555;line-height:1.8;">
+<tr><td style="background-color:#f7f7f6;border:1px solid #e5e5e3;border-radius:8px;padding:20px;text-align:center;">
+<p style="margin:0 0 8px;font-family:${FONT};font-size:14px;color:#2d2d2d;font-weight:bold;">Besoin d'aide ?</p>
+<p style="margin:0;font-family:${FONT};font-size:13px;color:#555555;line-height:1.8;">
 📞 <a href="tel:+33368381030" style="color:#4A5E3A;text-decoration:none;font-weight:bold;">03 68 38 10 30</a><br>
 📧 <a href="mailto:contact@lunik-store.fr" style="color:#4A5E3A;text-decoration:none;">contact@lunik-store.fr</a><br>
-<span style="color:#8a7e6b;font-size:12px;">Lundi – Vendredi : 9h – 18h</span>
+<span style="color:#8a8a88;font-size:12px;">Lundi – Vendredi : 9h – 18h</span>
 </p>
-${extra ? `<p style="margin:12px 0 0;font-size:12px;color:#c17c3e;font-weight:bold;">${extra}</p>` : ""}
+${extra ? `<p style="margin:12px 0 0;font-size:12px;color:#c17c3e;font-weight:bold;font-family:${FONT};">${extra}</p>` : ""}
 </td></tr></table>`;
 }
 
@@ -52,45 +54,51 @@ function emailWrapper(content: string, ref?: string) {
 <html lang="fr">
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>LuniK</title></head>
-<body style="margin:0;padding:0;background-color:#f5f0e8;font-family:Arial,Helvetica,sans-serif;-webkit-font-smoothing:antialiased;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f5f0e8;">
+<body style="margin:0;padding:0;background-color:#eeeeec;font-family:${FONT};-webkit-font-smoothing:antialiased;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#eeeeec;">
 <tr><td align="center" style="padding:24px 16px;">
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
 
 <!-- HEADER -->
-<tr><td style="background-color:#f5f0e8;padding:32px 32px 24px;text-align:center;">
-<h1 style="margin:0;font-family:Georgia,serif;font-size:28px;color:#4A5E3A;letter-spacing:2px;">LUNIK</h1>
-<p style="margin:6px 0 0;font-size:12px;color:#8a7e6b;letter-spacing:1px;font-family:Arial,Helvetica,sans-serif;">Protection solaire sur-mesure</p>
+<tr><td style="padding:32px 32px 24px;text-align:center;">
+<img src="${LOGO_URL}" alt="LuniK" height="40" style="height:40px;width:auto;display:inline-block;" />
 </td></tr>
 
 <!-- CONTENT -->
-<tr><td style="background-color:#ffffff;padding:40px 32px;border-radius:4px 4px 0 0;">
+<tr><td style="background-color:#ffffff;padding:40px 32px;border-radius:8px 8px 0 0;">
 ${content}
 </td></tr>
 
 <!-- FOOTER -->
-<tr><td style="background-color:#ffffff;border-top:1px solid #e8e2d8;padding:24px 32px 32px;border-radius:0 0 4px 4px;">
+<tr><td style="background-color:#ffffff;border-top:1px solid #e5e5e3;padding:28px 32px 32px;border-radius:0 0 8px 8px;">
+
+<!-- Reassurances -->
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+<tr><td style="text-align:center;font-family:${FONT};font-size:12px;color:#6b6b69;line-height:2;">
+🇫🇷 Fabriqué en France &nbsp;·&nbsp; 🛡️ Garantie 5 ans &nbsp;·&nbsp; 💳 Paiement sécurisé &nbsp;·&nbsp; 📞 03 68 38 10 30
+</td></tr></table>
 
 <!-- Social links -->
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 16px;">
 <tr>
-<td style="padding:0 12px;"><a href="https://www.instagram.com/lunik.store/" style="color:#4A5E3A;text-decoration:none;font-size:13px;">Instagram</a></td>
-<td style="color:#e8e2d8;">|</td>
-<td style="padding:0 12px;"><a href="https://www.facebook.com/lunik.store/" style="color:#4A5E3A;text-decoration:none;font-size:13px;">Facebook</a></td>
-<td style="color:#e8e2d8;">|</td>
-<td style="padding:0 12px;"><a href="https://www.pinterest.fr/lunikstore/" style="color:#4A5E3A;text-decoration:none;font-size:13px;">Pinterest</a></td>
+<td style="padding:0 12px;"><a href="https://www.instagram.com/lunik.store/" style="color:#4A5E3A;text-decoration:none;font-size:12px;font-family:${FONT};">Instagram</a></td>
+<td style="color:#e5e5e3;">|</td>
+<td style="padding:0 12px;"><a href="https://www.facebook.com/lunik.store/" style="color:#4A5E3A;text-decoration:none;font-size:12px;font-family:${FONT};">Facebook</a></td>
+<td style="color:#e5e5e3;">|</td>
+<td style="padding:0 12px;"><a href="https://www.pinterest.fr/lunikstore/" style="color:#4A5E3A;text-decoration:none;font-size:12px;font-family:${FONT};">Pinterest</a></td>
 </tr></table>
 
-<p style="margin:0 0 8px;font-size:12px;color:#8a7e6b;text-align:center;">LuniK — 15 Chemin de la Loupe, 67420 Ranrupt, France</p>
-<p style="margin:0 0 12px;font-size:11px;color:#8a7e6b;text-align:center;">
+<p style="margin:0 0 8px;font-size:11px;color:#8a8a88;text-align:center;font-family:${FONT};">LuniK — 15 Chemin de la Loupe, 67420 Ranrupt, France</p>
+<p style="margin:0 0 12px;font-size:11px;color:#8a8a88;text-align:center;font-family:${FONT};">
 <a href="${SITE_URL}/cgv" style="color:#4A5E3A;text-decoration:underline;">CGV</a> &nbsp;·&nbsp; 
 <a href="${SITE_URL}/mentions-legales" style="color:#4A5E3A;text-decoration:underline;">Mentions légales</a> &nbsp;·&nbsp;
 <a href="${SITE_URL}/cookies" style="color:#4A5E3A;text-decoration:underline;">Politique de cookies</a>
 </p>
-${ref ? `<p style="margin:0 0 8px;font-size:11px;color:#b0a898;text-align:center;">Réf. commande : ${ref}</p>` : ""}
-<p style="margin:0;font-size:10px;color:#b0a898;text-align:center;">
-<a href="#" style="color:#b0a898;text-decoration:underline;">Se désinscrire</a> de nos communications
+${ref ? `<p style="margin:0 0 8px;font-size:10px;color:#b0b0ae;text-align:center;font-family:${FONT};">Réf. commande : ${ref}</p>` : ""}
+<p style="margin:0 0 8px;font-size:10px;color:#b0b0ae;text-align:center;font-family:${FONT};">
+<a href="#" style="color:#b0b0ae;text-decoration:underline;">Se désinscrire</a> de nos communications
 </p>
+<p style="margin:0;font-size:10px;color:#b0b0ae;text-align:center;font-family:${FONT};">© 2026 LuniK. Tous droits réservés.</p>
 </td></tr>
 
 </table>
@@ -105,14 +113,14 @@ ${ref ? `<p style="margin:0 0 8px;font-size:11px;color:#b0a898;text-align:center
 function ctaButton(text: string, url: string) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:24px auto;">
 <tr><td style="background-color:#4A5E3A;border-radius:6px;padding:14px 32px;">
-<a href="${url}" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block;font-family:Arial,Helvetica,sans-serif;">${text}</a>
+<a href="${url}" style="color:#ffffff;text-decoration:none;font-size:14px;font-weight:bold;display:inline-block;font-family:${FONT};">${text}</a>
 </td></tr></table>`;
 }
 
 function ctaButtonOutline(text: string, url: string) {
   return `<table role="presentation" cellpadding="0" cellspacing="0" style="margin:16px auto;">
 <tr><td style="border:2px solid #4A5E3A;border-radius:6px;padding:12px 28px;background-color:transparent;">
-<a href="${url}" style="color:#4A5E3A;text-decoration:none;font-size:13px;font-weight:bold;display:inline-block;font-family:Arial,Helvetica,sans-serif;">${text}</a>
+<a href="${url}" style="color:#4A5E3A;text-decoration:none;font-size:13px;font-weight:bold;display:inline-block;font-family:${FONT};">${text}</a>
 </td></tr></table>`;
 }
 
@@ -121,15 +129,15 @@ function ctaButtonOutline(text: string, url: string) {
 function configSummary(order: any) {
   const options = order.options || [];
   const optionsText = options.length > 0 ? options.map((o: string) => `+ ${o}`).join("<br>") : "";
-  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;margin:20px 0;">
+  return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f7f6;border:1px solid #e5e5e3;border-radius:8px;margin:20px 0;">
 <tr><td style="padding:24px;">
-<p style="margin:0 0 4px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">VOTRE COMMANDE — Réf. ${order.ref}</p>
-<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:18px;color:#2d2d2d;">Store Coffre Sur-Mesure</p>
-<p style="margin:0 0 4px;font-size:14px;color:#555555;">${order.width} × ${order.projection} cm · Toile ${order.toile_color || "—"} · ${order.armature_color || "—"}</p>
-${optionsText ? `<p style="margin:8px 0 0;font-size:13px;color:#4A5E3A;">${optionsText}</p>` : ""}
-<hr style="border:none;border-top:1px solid #e8e2d8;margin:16px 0;">
-<p style="margin:0;font-size:16px;font-weight:bold;color:#2d2d2d;">Total payé : ${formatPrice(order.amount)} €</p>
-<p style="margin:4px 0 0;font-size:12px;color:#8a7e6b;">Date : ${formatDate(order.created_at)}</p>
+<p style="margin:0 0 4px;font-size:11px;color:#8a8a88;text-transform:uppercase;letter-spacing:1px;font-family:${FONT};">VOTRE COMMANDE — Réf. ${order.ref}</p>
+<p style="margin:0 0 12px;font-family:${FONT};font-size:18px;font-weight:bold;color:#2d2d2d;">Store Coffre Sur-Mesure</p>
+<p style="margin:0 0 4px;font-size:14px;color:#555555;font-family:${FONT};">${order.width} × ${order.projection} cm · Toile ${order.toile_color || "—"} · ${order.armature_color || "—"}</p>
+${optionsText ? `<p style="margin:8px 0 0;font-size:13px;color:#4A5E3A;font-family:${FONT};">${optionsText}</p>` : ""}
+<hr style="border:none;border-top:1px solid #e5e5e3;margin:16px 0;">
+<p style="margin:0;font-size:16px;font-weight:bold;color:#2d2d2d;font-family:${FONT};">Total payé : ${formatPrice(order.amount)} €</p>
+<p style="margin:4px 0 0;font-size:12px;color:#8a8a88;font-family:${FONT};">Date : ${formatDate(order.created_at)}</p>
 </td></tr></table>`;
 }
 
@@ -152,11 +160,10 @@ function progressBar(activeIndex: number) {
     const labelWeight = isActive || isInProgress ? "bold" : "normal";
     return `<td style="text-align:center;padding:0 8px;width:25%;">
 <div style="${dotStyle}"></div>
-<span style="font-size:10px;color:${labelColor};font-weight:${labelWeight};font-family:Arial,Helvetica,sans-serif;">${s}</span>
+<span style="font-size:10px;color:${labelColor};font-weight:${labelWeight};font-family:${FONT};">${s}</span>
 </td>`;
   }).join("");
 
-  // Connection line
   return `<table role="presentation" cellpadding="0" cellspacing="0" width="80%" style="margin:20px auto;">
 <tr>${dots}</tr></table>`;
 }
@@ -166,7 +173,7 @@ function progressBar(activeIndex: number) {
 function iconHeader(emoji: string, bgColor: string, title: string) {
   return `<div style="text-align:center;margin-bottom:24px;">
 <div style="width:60px;height:60px;border-radius:50%;background-color:${bgColor};margin:0 auto 16px;line-height:60px;font-size:30px;">${emoji}</div>
-<h1 style="margin:0;font-family:Georgia,serif;font-size:24px;color:#2d2d2d;line-height:1.3;">${title}</h1>
+<h1 style="margin:0;font-family:${FONT};font-size:24px;font-weight:bold;color:#2d2d2d;line-height:1.3;">${title}</h1>
 </div>`;
 }
 
@@ -177,7 +184,7 @@ function orderReceivedTemplate(order: any) {
   return emailWrapper(`
 ${iconHeader("✅", "#e8f5e9", `Merci pour votre commande, ${prenom} !`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">Nous avons bien reçu votre commande et votre paiement. Votre store sur-mesure va bientôt être transmis à notre atelier de fabrication en France.</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Nous avons bien reçu votre commande et votre paiement. Votre store sur-mesure va bientôt être transmis à notre atelier de fabrication en France.</p>
 
 <!-- Alert block: 48h modification -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
@@ -186,8 +193,8 @@ ${iconHeader("✅", "#e8f5e9", `Merci pour votre commande, ${prenom} !`)}
 <tr>
 <td style="width:32px;vertical-align:top;font-size:20px;">⏰</td>
 <td>
-<p style="margin:0 0 6px;font-family:Georgia,serif;font-size:15px;color:#2d2d2d;font-weight:bold;">Vous avez 48h pour modifier votre commande</p>
-<p style="margin:0;font-size:13px;color:#555555;line-height:1.6;">Une fois ce délai passé, votre commande sera transmise à l'usine et ne pourra plus être modifiée. Pour tout changement (dimensions, coloris, options), contactez-nous rapidement.</p>
+<p style="margin:0 0 6px;font-family:${FONT};font-size:15px;color:#2d2d2d;font-weight:bold;">Vous avez 48h pour modifier votre commande</p>
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.6;font-family:${FONT};">Une fois ce délai passé, votre commande sera transmise à l'usine et ne pourra plus être modifiée. Pour tout changement (dimensions, coloris, options), contactez-nous rapidement.</p>
 </td>
 </tr></table>
 ${ctaButtonOutline("Modifier ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
@@ -195,13 +202,13 @@ ${ctaButtonOutline("Modifier ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)
 
 ${configSummary(order)}
 
-<h2 style="font-family:Georgia,serif;font-size:18px;color:#2d2d2d;margin:28px 0 16px;">Et maintenant ?</h2>
+<h2 style="font-family:${FONT};font-size:18px;font-weight:bold;color:#2d2d2d;margin:28px 0 16px;">Et maintenant ?</h2>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:10px 0;font-size:14px;color:#555555;border-bottom:1px solid #f0ece4;">
+<tr><td style="padding:10px 0;font-size:14px;color:#555555;border-bottom:1px solid #f0f0ee;font-family:${FONT};">
 <strong style="color:#4A5E3A;font-size:16px;margin-right:8px;">1.</strong> Transmission à l'usine sous 48h</td></tr>
-<tr><td style="padding:10px 0;font-size:14px;color:#555555;border-bottom:1px solid #f0ece4;">
+<tr><td style="padding:10px 0;font-size:14px;color:#555555;border-bottom:1px solid #f0f0ee;font-family:${FONT};">
 <strong style="color:#4A5E3A;font-size:16px;margin-right:8px;">2.</strong> Fabrication sur-mesure en France (4-5 semaines)</td></tr>
-<tr><td style="padding:10px 0;font-size:14px;color:#555555;">
+<tr><td style="padding:10px 0;font-size:14px;color:#555555;font-family:${FONT};">
 <strong style="color:#4A5E3A;font-size:16px;margin-right:8px;">3.</strong> Livraison à domicile par transporteur</td></tr>
 </table>
 
@@ -216,23 +223,23 @@ function inProductionTemplate(order: any) {
   return emailWrapper(`
 ${iconHeader("🏭", "#fff3e0", `Votre store est entre de bonnes mains, ${prenom} !`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">Bonne nouvelle ! Votre commande a été transmise à notre atelier partenaire en France. Nos artisans commencent la fabrication de votre store sur-mesure.</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Bonne nouvelle ! Votre commande a été transmise à notre atelier partenaire en France. Nos artisans commencent la fabrication de votre store sur-mesure.</p>
 
 ${progressBar(1)}
 
 <!-- Estimated delivery -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
-<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;text-align:center;">
-<p style="margin:0 0 8px;font-size:13px;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.5px;">Date de livraison estimée</p>
-<p style="margin:0;font-family:Georgia,serif;font-size:20px;font-weight:bold;color:#2d2d2d;">Avant le ${estimatedDate}</p>
+<tr><td style="background-color:#f7f7f6;border:1px solid #e5e5e3;border-radius:8px;padding:20px;text-align:center;">
+<p style="margin:0 0 8px;font-size:13px;color:#8a8a88;text-transform:uppercase;letter-spacing:0.5px;font-family:${FONT};">Date de livraison estimée</p>
+<p style="margin:0;font-family:${FONT};font-size:20px;font-weight:bold;color:#2d2d2d;">Avant le ${estimatedDate}</p>
 </td></tr></table>
 
 ${configSummary(order)}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">💡 Le saviez-vous ?</h2>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border-radius:8px;margin:0 0 20px;">
+<h2 style="font-family:${FONT};font-size:16px;font-weight:bold;color:#2d2d2d;margin:28px 0 12px;">💡 Le saviez-vous ?</h2>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f7f6;border-radius:8px;margin:0 0 20px;">
 <tr><td style="padding:20px;">
-<p style="margin:0;font-size:13px;color:#555555;line-height:1.8;">
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.8;font-family:${FONT};">
 Chaque store LuniK est fabriqué individuellement selon vos dimensions exactes, avec une <strong style="color:#2d2d2d;">toile Dickson certifiée OEKO-TEX</strong> et une <strong style="color:#2d2d2d;">motorisation Somfy</strong>. Notre atelier partenaire français est spécialisé dans les stores sur-mesure depuis plus de 30 ans.
 </p>
 </td></tr></table>
@@ -247,7 +254,7 @@ function readyToShipTemplate(order: any) {
   return emailWrapper(`
 ${iconHeader("📦", "#e3f2fd", `Votre store est terminé, ${prenom} !`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">La fabrication de votre store sur-mesure est terminée ! Il est désormais prêt et en attente de prise en charge par notre transporteur.</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">La fabrication de votre store sur-mesure est terminée ! Il est désormais prêt et en attente de prise en charge par notre transporteur.</p>
 
 ${progressBar(1.5)}
 
@@ -258,19 +265,19 @@ ${progressBar(1.5)}
 <tr>
 <td style="width:32px;vertical-align:top;font-size:20px;">📧</td>
 <td>
-<p style="margin:0 0 6px;font-family:Georgia,serif;font-size:15px;color:#2d2d2d;font-weight:bold;">Prochaine étape : la livraison</p>
-<p style="margin:0;font-size:13px;color:#555555;line-height:1.6;">Vous allez recevoir prochainement un e-mail de notre transporteur avec un lien pour choisir votre créneau de livraison. Pensez à vérifier vos spams !</p>
+<p style="margin:0 0 6px;font-family:${FONT};font-size:15px;color:#2d2d2d;font-weight:bold;">Prochaine étape : la livraison</p>
+<p style="margin:0;font-size:13px;color:#555555;line-height:1.6;font-family:${FONT};">Vous allez recevoir prochainement un e-mail de notre transporteur avec un lien pour choisir votre créneau de livraison. Pensez à vérifier vos spams !</p>
 </td>
 </tr></table>
 </td></tr></table>
 
 ${configSummary(order)}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">Préparez l'arrivée de votre store</h2>
+<h2 style="font-family:${FONT};font-size:16px;font-weight:bold;color:#2d2d2d;margin:28px 0 12px;">Préparez l'arrivée de votre store</h2>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">✅ Vérifiez l'espace disponible sur votre terrasse ou façade</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">🔧 Préparez l'outillage nécessaire (perceuse, niveau à bulle)</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Consultez notre guide d'installation</a></td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">✅ Vérifiez l'espace disponible sur votre terrasse ou façade</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">🔧 Préparez l'outillage nécessaire (perceuse, niveau à bulle)</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Consultez notre guide d'installation</a></td></tr>
 </table>
 
 ${ctaButton("Suivre ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
@@ -286,7 +293,7 @@ function inDeliveryTemplate(order: any, tracking?: { carrier?: string; tracking_
   return emailWrapper(`
 ${iconHeader("🚚", "#e3f2fd", `Votre store arrive bientôt, ${prenom} !`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">Votre store a été pris en charge par le transporteur et est en route vers chez vous !</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Votre store a été pris en charge par le transporteur et est en route vers chez vous !</p>
 
 ${progressBar(2)}
 
@@ -294,7 +301,7 @@ ${trackingNumber ? `
 <!-- Tracking block -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
 <tr><td style="background-color:#f0f4ff;border:2px solid #4A5E3A;border-radius:8px;padding:24px;text-align:center;">
-<p style="margin:0 0 4px;font-size:12px;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.5px;">Transporteur : ${carrier}</p>
+<p style="margin:0 0 4px;font-size:12px;color:#8a8a88;text-transform:uppercase;letter-spacing:0.5px;font-family:${FONT};">Transporteur : ${carrier}</p>
 <p style="margin:0 0 16px;font-family:'Courier New',monospace;font-size:20px;font-weight:bold;color:#2d2d2d;letter-spacing:1px;">${trackingNumber}</p>
 ${ctaButton("Suivre mon colis →", trackingUrl)}
 </td></tr></table>` : ""}
@@ -302,16 +309,16 @@ ${ctaButton("Suivre mon colis →", trackingUrl)}
 ${order.client_address ? `
 <!-- Delivery address -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
-<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:20px;">
-<p style="margin:0 0 8px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:0.5px;">Adresse de livraison</p>
-<p style="margin:0;font-size:14px;color:#2d2d2d;line-height:1.6;">${order.client_name}<br>${order.client_address}${order.client_address2 ? "<br>" + order.client_address2 : ""}<br>${order.client_postal_code} ${order.client_city}<br>${order.client_country || "France"}</p>
+<tr><td style="background-color:#f7f7f6;border:1px solid #e5e5e3;border-radius:8px;padding:20px;">
+<p style="margin:0 0 8px;font-size:11px;color:#8a8a88;text-transform:uppercase;letter-spacing:0.5px;font-family:${FONT};">Adresse de livraison</p>
+<p style="margin:0;font-size:14px;color:#2d2d2d;line-height:1.6;font-family:${FONT};">${order.client_name}<br>${order.client_address}${order.client_address2 ? "<br>" + order.client_address2 : ""}<br>${order.client_postal_code} ${order.client_city}<br>${order.client_country || "France"}</p>
 </td></tr></table>` : ""}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">Jour J — Ce qu'il faut prévoir</h2>
+<h2 style="font-family:${FONT};font-size:16px;font-weight:bold;color:#2d2d2d;margin:28px 0 12px;">Jour J — Ce qu'il faut prévoir</h2>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📏 Un espace dégagé pour réceptionner le colis (le store mesure environ ${order.width} cm)</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">👥 Prévoyez une deuxième personne pour manipuler le colis</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📸 Vérifiez l'état du colis à la réception et photographiez tout dommage éventuel</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">📏 Un espace dégagé pour réceptionner le colis (le store mesure environ ${order.width} cm)</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">👥 Prévoyez une deuxième personne pour manipuler le colis</td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">📸 Vérifiez l'état du colis à la réception et photographiez tout dommage éventuel</td></tr>
 </table>
 
 ${ctaButton("Suivre ma commande", `${SITE_URL}/suivi?ref=${order.ref}`)}
@@ -327,33 +334,33 @@ function deliveredTemplate(order: any) {
   return emailWrapper(`
 ${iconHeader("☀️", "#fff8e1", `Bienvenue au soleil, ${prenom} !`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">Votre store LuniK a été livré avec succès. Nous espérons qu'il transformera vos moments en extérieur !</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Votre store LuniK a été livré avec succès. Nous espérons qu'il transformera vos moments en extérieur !</p>
 
 ${progressBar(3)}
 
-<h2 style="font-family:Georgia,serif;font-size:16px;color:#2d2d2d;margin:28px 0 12px;">Ressources utiles</h2>
+<h2 style="font-family:${FONT};font-size:16px;font-weight:bold;color:#2d2d2d;margin:28px 0 12px;">Ressources utiles</h2>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Guide d'installation</a></td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">🎬 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Vidéo tutoriel de montage</a></td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">📋 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Guide d'entretien de votre store</a></td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">📖 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Guide d'installation</a></td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">🎬 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Vidéo tutoriel de montage</a></td></tr>
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">📋 <a href="${SITE_URL}/faq" style="color:#4A5E3A;text-decoration:underline;">Guide d'entretien de votre store</a></td></tr>
 </table>
 
 <!-- Warranty card -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-<tr><td style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;padding:24px;">
-<p style="margin:0 0 4px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">Votre carte de garantie</p>
-<p style="margin:0 0 8px;font-family:Georgia,serif;font-size:16px;color:#2d2d2d;">Store Coffre Sur-Mesure — Réf. ${order.ref}</p>
-<p style="margin:0 0 4px;font-size:13px;color:#555555;">Date d'achat : ${purchaseDate}</p>
-<p style="margin:0 0 12px;font-size:13px;color:#555555;">Garantie valable jusqu'au : <strong style="color:#2d2d2d;">${warrantyExpiry}</strong></p>
-<p style="margin:0;font-size:16px;font-weight:bold;color:#4A5E3A;">✅ Garantie 5 ans</p>
+<tr><td style="background-color:#f7f7f6;border:1px solid #e5e5e3;border-radius:8px;padding:24px;">
+<p style="margin:0 0 4px;font-size:11px;color:#8a8a88;text-transform:uppercase;letter-spacing:1px;font-family:${FONT};">Votre carte de garantie</p>
+<p style="margin:0 0 8px;font-family:${FONT};font-size:16px;font-weight:bold;color:#2d2d2d;">Store Coffre Sur-Mesure — Réf. ${order.ref}</p>
+<p style="margin:0 0 4px;font-size:13px;color:#555555;font-family:${FONT};">Date d'achat : ${purchaseDate}</p>
+<p style="margin:0 0 12px;font-size:13px;color:#555555;font-family:${FONT};">Garantie valable jusqu'au : <strong style="color:#2d2d2d;">${warrantyExpiry}</strong></p>
+<p style="margin:0;font-size:16px;font-weight:bold;color:#4A5E3A;font-family:${FONT};">✅ Garantie 5 ans</p>
 </td></tr></table>
 
 <!-- Review block -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
-<tr><td style="text-align:center;padding:24px;background-color:#f9f7f4;border-radius:8px;">
-<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:16px;color:#2d2d2d;">Êtes-vous satisfait(e) de votre store ?</p>
+<tr><td style="text-align:center;padding:24px;background-color:#f7f7f6;border-radius:8px;">
+<p style="margin:0 0 12px;font-family:${FONT};font-size:16px;font-weight:bold;color:#2d2d2d;">Êtes-vous satisfait(e) de votre store ?</p>
 <p style="margin:0 0 12px;font-size:32px;letter-spacing:4px;">⭐⭐⭐⭐⭐</p>
-<p style="margin:0 0 16px;font-size:12px;color:#8a7e6b;">Votre avis aide d'autres clients à choisir en confiance.</p>
+<p style="margin:0 0 16px;font-size:12px;color:#8a8a88;font-family:${FONT};">Votre avis aide d'autres clients à choisir en confiance.</p>
 ${ctaButton("Laisser un avis", "https://www.trustpilot.com")}
 </td></tr></table>
 
@@ -365,31 +372,31 @@ function samplesConfirmationTemplate(order: any) {
   const prenom = firstName(order.client_name);
   const sampleItems = (order.sample_items || []) as Array<{ name: string; hex: string; refCode?: string }>;
   const samplesList = sampleItems.map(item =>
-    `<tr><td style="padding:8px 12px;border-bottom:1px solid #e8e2d8;font-size:14px;color:#2d2d2d;">
-      <span style="display:inline-block;width:16px;height:16px;background:${item.hex || '#ccc'};border-radius:3px;vertical-align:middle;margin-right:8px;border:1px solid #e8e2d8;"></span>
-      ${item.name}${item.refCode ? ` <span style="color:#8a7e6b;font-size:12px;">(${item.refCode})</span>` : ''}
+    `<tr><td style="padding:8px 12px;border-bottom:1px solid #e5e5e3;font-size:14px;color:#2d2d2d;font-family:${FONT};">
+      <span style="display:inline-block;width:16px;height:16px;background:${item.hex || '#ccc'};border-radius:3px;vertical-align:middle;margin-right:8px;border:1px solid #e5e5e3;"></span>
+      ${item.name}${item.refCode ? ` <span style="color:#8a8a88;font-size:12px;">(${item.refCode})</span>` : ''}
     </td></tr>`
   ).join('');
 
   return emailWrapper(`
 ${iconHeader("🎨", "#e8f5e9", `Vos échantillons arrivent bientôt, ${prenom} !`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">Merci pour votre commande d'échantillons ! Vous recevrez prochainement vos coloris de toile Dickson pour les découvrir en conditions réelles.</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Merci pour votre commande d'échantillons ! Vous recevrez prochainement vos coloris de toile Dickson pour les découvrir en conditions réelles.</p>
 
 <!-- Sample items -->
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f9f7f4;border:1px solid #e8e2d8;border-radius:8px;margin:20px 0;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f7f7f6;border:1px solid #e5e5e3;border-radius:8px;margin:20px 0;">
 <tr><td style="padding:16px 12px 8px;">
-<p style="margin:0 0 8px;font-size:11px;color:#8a7e6b;text-transform:uppercase;letter-spacing:1px;">VOS ÉCHANTILLONS — Réf. ${order.ref}</p>
+<p style="margin:0 0 8px;font-size:11px;color:#8a8a88;text-transform:uppercase;letter-spacing:1px;font-family:${FONT};">VOS ÉCHANTILLONS — Réf. ${order.ref}</p>
 </td></tr>
 ${samplesList}
-<tr><td style="padding:12px;border-top:1px solid #e8e2d8;">
-<p style="margin:0;font-size:16px;font-weight:bold;color:#2d2d2d;">Total : ${formatPrice(order.amount)} €</p>
-<p style="margin:4px 0 0;font-size:12px;color:#8a7e6b;">${sampleItems.length} échantillon${sampleItems.length > 1 ? 's' : ''}</p>
+<tr><td style="padding:12px;border-top:1px solid #e5e5e3;">
+<p style="margin:0;font-size:16px;font-weight:bold;color:#2d2d2d;font-family:${FONT};">Total : ${formatPrice(order.amount)} €</p>
+<p style="margin:4px 0 0;font-size:12px;color:#8a8a88;font-family:${FONT};">${sampleItems.length} échantillon${sampleItems.length > 1 ? 's' : ''}</p>
 </td></tr>
 </table>
 
-<h2 style="font-family:Georgia,serif;font-size:18px;color:#2d2d2d;margin:28px 0 12px;">Et après ?</h2>
-<p style="font-size:14px;color:#555555;line-height:1.7;">Une fois vos échantillons reçus, rendez-vous sur notre configurateur pour créer votre store sur-mesure !</p>
+<h2 style="font-family:${FONT};font-size:18px;font-weight:bold;color:#2d2d2d;margin:28px 0 12px;">Et après ?</h2>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Une fois vos échantillons reçus, rendez-vous sur notre configurateur pour créer votre store sur-mesure !</p>
 
 ${ctaButton("Configurer mon store →", `${SITE_URL}/configurateur`)}
 ${contactBlock()}
@@ -404,34 +411,34 @@ function savRequestedTemplate(order: any, extra?: { ticketRef?: string; issue?: 
   return emailWrapper(`
 ${iconHeader("🔧", "#f5f5f5", `Nous avons bien reçu votre demande, ${prenom}`)}
 
-<p style="font-size:14px;color:#555555;line-height:1.7;">Nous avons bien pris en compte votre signalement concernant votre commande. Notre équipe SAV va analyser votre demande et vous recontacter dans les plus brefs délais.</p>
+<p style="font-size:14px;color:#555555;line-height:1.7;font-family:${FONT};">Nous avons bien pris en compte votre signalement concernant votre commande. Notre équipe SAV va analyser votre demande et vous recontacter dans les plus brefs délais.</p>
 
 <!-- SAV summary -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
 <tr><td style="background-color:#fef3f2;border:1px solid #fecaca;border-radius:8px;padding:24px;">
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;">
-<tr><td style="padding:6px 0;color:#8a7e6b;width:45%;">Numéro de ticket SAV</td><td style="padding:6px 0;font-weight:bold;color:#2d2d2d;">${ticketRef}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Commande concernée</td><td style="padding:6px 0;color:#2d2d2d;">Réf. ${order.ref}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Date de la demande</td><td style="padding:6px 0;color:#2d2d2d;">${today}</td></tr>
-<tr><td style="padding:6px 0;color:#8a7e6b;">Problème signalé</td><td style="padding:6px 0;color:#2d2d2d;">${issue}</td></tr>
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;font-family:${FONT};">
+<tr><td style="padding:6px 0;color:#8a8a88;width:45%;">Numéro de ticket SAV</td><td style="padding:6px 0;font-weight:bold;color:#2d2d2d;">${ticketRef}</td></tr>
+<tr><td style="padding:6px 0;color:#8a8a88;">Commande concernée</td><td style="padding:6px 0;color:#2d2d2d;">Réf. ${order.ref}</td></tr>
+<tr><td style="padding:6px 0;color:#8a8a88;">Date de la demande</td><td style="padding:6px 0;color:#2d2d2d;">${today}</td></tr>
+<tr><td style="padding:6px 0;color:#8a8a88;">Problème signalé</td><td style="padding:6px 0;color:#2d2d2d;">${issue}</td></tr>
 </table>
 </td></tr></table>
 
 <!-- What happens next -->
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:20px 0;">
-<tr><td style="background-color:#f9f7f4;border-radius:8px;padding:24px;">
-<p style="margin:0 0 12px;font-family:Georgia,serif;font-size:16px;color:#2d2d2d;font-weight:bold;">Ce qui va se passer</p>
+<tr><td style="background-color:#f7f7f6;border-radius:8px;padding:24px;">
+<p style="margin:0 0 12px;font-family:${FONT};font-size:16px;color:#2d2d2d;font-weight:bold;">Ce qui va se passer</p>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;border-bottom:1px solid #e8e2d8;">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;border-bottom:1px solid #e5e5e3;font-family:${FONT};">
 <strong style="color:#4A5E3A;">1.</strong> Notre équipe analyse votre demande (sous 24-48h ouvrées)</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;border-bottom:1px solid #e8e2d8;">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;border-bottom:1px solid #e5e5e3;font-family:${FONT};">
 <strong style="color:#4A5E3A;">2.</strong> Un technicien vous contacte pour diagnostic</td></tr>
-<tr><td style="padding:8px 0;font-size:14px;color:#555555;">
+<tr><td style="padding:8px 0;font-size:14px;color:#555555;font-family:${FONT};">
 <strong style="color:#4A5E3A;">3.</strong> Nous vous proposons une solution (réparation, remplacement, etc.)</td></tr>
 </table>
 </td></tr></table>
 
-<p style="font-size:13px;color:#555555;line-height:1.7;margin:16px 0;">Pour rappel, votre store bénéficie d'une <strong style="color:#2d2d2d;">garantie de 5 ans</strong>. Si votre problème est couvert, la prise en charge sera intégralement à notre charge.</p>
+<p style="font-size:13px;color:#555555;line-height:1.7;margin:16px 0;font-family:${FONT};">Pour rappel, votre store bénéficie d'une <strong style="color:#2d2d2d;">garantie de 5 ans</strong>. Si votre problème est couvert, la prise en charge sera intégralement à notre charge.</p>
 
 ${configSummary(order)}
 
